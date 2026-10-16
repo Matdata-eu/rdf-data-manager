@@ -1,0 +1,67 @@
+/*
+ * Design tokens: the MatData design system (light and dark). Every colour, size and
+ * font in styles.css comes from here, so another organisation can restyle the app by
+ * replacing this one file.
+ */
+:root {
+  --surface: #f5f3ee;
+  --surface-raised: #ffffff;
+  --surface-sunken: #ebe8e0;
+  --line: #d9d4c7;
+  --line-strong: #8a8476;
+  --ink: #0f1b2d;
+  --ink-muted: #4a5563;
+  --brand: #0563bb;
+  --brand-strong: #044a8c;
+  --on-brand: #ffffff;
+  --brand-soft: #e3eefa;
+  --amber: #f2b300;
+  --on-amber: #0f1b2d;
+  --amber-soft: #fbefc7;
+  --amber-ink: #6e4d00;
+  --danger: #b42318;
+  --danger-soft: #fbe4e1;
+  --focus: #044a8c;
+  --shadow-raised: 0 1px 2px rgba(15, 27, 45, 0.08), 0 4px 12px rgba(15, 27, 45, 0.06);
+
+  --font-sans: 'Barlow', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-pill: 999px;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --surface: #0d141c;
+    --surface-raised: #16202b;
+    --surface-sunken: #0a1016;
+    --line: #26323e;
+    --line-strong: #6f7e8c;
+    --ink: #eef1ef;
+    --ink-muted: #a3afba;
+    --brand: #5aa8f2;
+    --brand-strong: #93c5f6;
+    --on-brand: #04172b;
+    --brand-soft: #0e2a48;
+    --amber: #f5c242;
+    --amber-soft: #3a2f0c;
+    --amber-ink: #f5c242;
+    --danger: #ff8f80;
+    --danger-soft: #3d1512;
+    --focus: #f5c242;
+    --shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.5);
+    color-scheme: dark;
+  }
+}

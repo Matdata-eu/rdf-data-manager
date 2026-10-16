@@ -70,7 +70,7 @@ export function App () {
   return (
     <div className='app'>
       <header className='topbar'>
-        <a className='brand' href='#/'>RDF Data Manager</a>
+        <a className='brand' href='#/'><img src='./favicon.svg' alt='' />RDF <b>Data</b> Manager</a>
         {config?.queryUrl && <span className='endpoint' title={config.queryUrl}>{config.queryUrl}</span>}
         {!locked && <a className='button ghost' href='#/settings'>Settings</a>}
       </header>
