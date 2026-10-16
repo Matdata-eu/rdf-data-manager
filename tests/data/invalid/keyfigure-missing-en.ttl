@@ -1,4 +1,4 @@
-# expect-shape: _shape_Dataset_description
+# expect-shape: _shape_title
 # expect-severity: Violation
 @prefix bnd: <https://data.banenor.no/data/> .
 @prefix bno: <https://data.banenor.no/ontology/> .
@@ -14,4 +14,4 @@ bnd:_mq a yasgui:ManagedQuery .
 bnd:_mq_v1 dcterms:isVersionOf bnd:_mq ; dcterms:created "2026-01-01T00:00:00Z"^^xsd:dateTime ; spin:text "SELECT (1 AS ?value) {}" .
 bnd:_section a bno:KeyFigureSection ; dcterms:title "S"@en, "S"@nb, "S"@nn ; schema:position 1 .
 
-bnd:_dataset_x a dcat:Dataset ; dcterms:title "X"@en, "X"@nb ; dcterms:description "X"@en ; dcterms:modified "2026-01-01"^^xsd:date ; bno:usesManagedQuery bnd:_mq .
+bnd:_keyFigure_x a bno:KeyFigure ; dcterms:title "X"@nb, "X"@nn ; schema:position 1 ; bno:usesManagedQuery bnd:_mq .

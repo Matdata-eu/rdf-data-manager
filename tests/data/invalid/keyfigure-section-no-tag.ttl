@@ -1,0 +1,17 @@
+# expect-shape: _shape_preferNbOverNo
+# expect-severity: Warning
+@prefix bnd: <https://data.banenor.no/data/> .
+@prefix bno: <https://data.banenor.no/ontology/> .
+@prefix csvw: <http://www.w3.org/ns/csvw#> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix schema: <http://schema.org/> .
+@prefix spin: <http://spinrdf.org/spin#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix yasgui: <https://matdata.eu/ns/yasgui#> .
+
+bnd:_mq a yasgui:ManagedQuery .
+bnd:_mq_v1 dcterms:isVersionOf bnd:_mq ; dcterms:created "2026-01-01T00:00:00Z"^^xsd:dateTime ; spin:text "SELECT (1 AS ?value) {}" .
+bnd:_section a bno:KeyFigureSection ; dcterms:title "S"@en, "S"@nb, "S"@nn ; schema:position 1 .
+
+bnd:_s2 a bno:KeyFigureSection ; dcterms:title "S"@en, "S"@no ; schema:position 2 .
