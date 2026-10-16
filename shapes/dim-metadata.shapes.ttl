@@ -70,21 +70,55 @@ bnd:_shapeGroup_distributions a sh:PropertyGroup ;
 # Shared property shapes
 # ---------------------------------------------------------------------------
 
-# Titles of key figures and sections: exactly one value in each of en, nb and nn.
-bnd:_shape_titleEnNbNn a sh:PropertyShape ;
+# Language policy for titles and descriptions: English is required; Norwegian
+# may be given as nb and/or nn. One value per language. "no" is accepted because
+# existing data uses it, but bnd:_shape_preferNbOverNo warns about it.
+bnd:_shape_title a sh:PropertyShape ;
     sh:path dcterms:title ;
     sh:name "Title"@en, "Tittel"@nb ;
-    sh:description "Display label, one value in each of English, Bokmål and Nynorsk."@en ;
+    sh:description "Display label: English required, plus Bokmål (nb) and Nynorsk (nn). One value per language."@en ;
     sh:datatype rdf:langString ;
-    sh:languageIn ( "en" "nb" "nn" ) ;
+    sh:languageIn ( "en" "nb" "nn" "no" ) ;
     sh:uniqueLang true ;
-    sh:minCount 3 ;
-    sh:maxCount 3 ;
-    sh:message "Provide exactly one title in each of en, nb and nn."@en ;
+    sh:qualifiedValueShape [ sh:languageIn ( "en" ) ] ;
+    sh:qualifiedMinCount 1 ;
+    sh:minCount 1 ;
     dash:editor dash:TextFieldWithLangEditor ;
     dash:singleLine true ;
+    rdm:languages ( "en" "nb" "nn" ) ;
     sh:group bnd:_shapeGroup_general ;
     sh:order 1 .
+
+bnd:_shape_description a sh:PropertyShape ;
+    sh:path dcterms:description ;
+    sh:name "Description"@en, "Beskrivelse"@nb ;
+    sh:description "English required, plus Bokmål (nb) and Nynorsk (nn). One value per language."@en ;
+    sh:datatype rdf:langString ;
+    sh:languageIn ( "en" "nb" "nn" "no" ) ;
+    sh:uniqueLang true ;
+    sh:qualifiedValueShape [ sh:languageIn ( "en" ) ] ;
+    sh:qualifiedMinCount 1 ;
+    sh:minCount 1 ;
+    dash:editor dash:TextAreaWithLangEditor ;
+    dash:singleLine false ;
+    rdm:languages ( "en" "nb" "nn" ) ;
+    sh:group bnd:_shapeGroup_general ;
+    sh:order 2 .
+
+bnd:_shape_preferNbOverNo a sh:NodeShape ;
+    sh:targetClass dcat:Dataset, bno:KeyFigure, bno:KeyFigureTable, bno:KeyFigureSection ;
+    sh:severity sh:Warning ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Text tagged @no should be tagged @nb (Bokmål) or @nn (Nynorsk): \"{?value}\"."@en ;
+        sh:prefixes <https://data.banenor.no/data/_shapes_metadata> ;
+        sh:select """
+            SELECT $this ?value
+            WHERE {
+                { $this dcterms:title ?value } UNION { $this dcterms:description ?value }
+                FILTER (lang(?value) = "no")
+            }
+        """ ] .
 
 bnd:_shape_position a sh:PropertyShape ;
     sh:path schema:position ;
@@ -167,40 +201,11 @@ bnd:_shape_Dataset a sh:NodeShape ;
     rdm:localNamePattern "^[a-z][a-z0-9]*(_[a-z0-9]+)*$" ;
     rdm:localNameDescription "lower_snake_case slug, e.g. platform_edges"@en ;
     sh:property
-        bnd:_shape_Dataset_title ,
-        bnd:_shape_Dataset_description ,
+        bnd:_shape_title ,
+        bnd:_shape_description ,
         bnd:_shape_Dataset_modified ,
         bnd:_shape_usesManagedQuery ,
         bnd:_shape_distributions .
-
-bnd:_shape_Dataset_title a sh:PropertyShape ;
-    sh:path dcterms:title ;
-    sh:name "Title"@en, "Tittel"@nb ;
-    sh:description "Display name, one value in each of English and Bokmål."@en ;
-    sh:datatype rdf:langString ;
-    sh:languageIn ( "en" "nb" ) ;
-    sh:uniqueLang true ;
-    sh:minCount 2 ;
-    sh:maxCount 2 ;
-    sh:message "Provide exactly one title in each of en and nb."@en ;
-    dash:editor dash:TextFieldWithLangEditor ;
-    dash:singleLine true ;
-    sh:group bnd:_shapeGroup_general ;
-    sh:order 1 .
-
-bnd:_shape_Dataset_description a sh:PropertyShape ;
-    sh:path dcterms:description ;
-    sh:name "Description"@en, "Beskrivelse"@nb ;
-    sh:datatype rdf:langString ;
-    sh:languageIn ( "en" "nb" ) ;
-    sh:uniqueLang true ;
-    sh:minCount 2 ;
-    sh:maxCount 2 ;
-    sh:message "Provide exactly one description in each of en and nb."@en ;
-    dash:editor dash:TextAreaWithLangEditor ;
-    dash:singleLine false ;
-    sh:group bnd:_shapeGroup_general ;
-    sh:order 2 .
 
 bnd:_shape_Dataset_modified a sh:PropertyShape ;
     sh:path dcterms:modified ;
@@ -227,7 +232,7 @@ bnd:_shape_KeyFigureSection a sh:NodeShape ;
     rdm:localNamePattern "^[a-z][A-Za-z0-9]*$" ;
     rdm:localNameDescription "camelCase name, e.g. infrastructure"@en ;
     sh:property
-        bnd:_shape_titleEnNbNn ,
+        bnd:_shape_title ,
         bnd:_shape_position .
 
 # ---------------------------------------------------------------------------
@@ -243,7 +248,7 @@ bnd:_shape_KeyFigure a sh:NodeShape ;
     rdm:localNamePattern "^[a-z][A-Za-z0-9]*$" ;
     rdm:localNameDescription "camelCase name, e.g. trackLength"@en ;
     sh:property
-        bnd:_shape_titleEnNbNn ,
+        bnd:_shape_title ,
         bnd:_shape_usesManagedQuery ,
         bnd:_shape_position ,
         bnd:_shape_keyFigure_section ,
@@ -280,7 +285,7 @@ bnd:_shape_KeyFigureTable a sh:NodeShape ;
     rdm:localNamePattern "^[a-z][A-Za-z0-9]*$" ;
     rdm:localNameDescription "camelCase name, e.g. switchesByType"@en ;
     sh:property
-        bnd:_shape_titleEnNbNn ,
+        bnd:_shape_title ,
         bnd:_shape_usesManagedQuery ,
         bnd:_shape_KeyFigureTable_tableSchema ,
         bnd:_shape_position ,
@@ -422,3 +427,4 @@ bnd:_shape_Distribution a sh:NodeShape ;
 # rdm:defaultValue        node     value pre-filled on create (rdm:today = current date)
 # rdm:orderBy             IRI      property used to sort multiple values / nested nodes
 # rdm:orderDescending     boolean  sort descending instead of ascending
+# rdm:languages           list     language tags the form offers for a text field, in order

@@ -113,7 +113,7 @@ bnd:_keyFigureTable_switchesByType a bno:KeyFigureTable ;
     bno:usesManagedQuery bnd:_ws_keyFigures_mq_keyFigureTable_switchesByType ;
     dcat:distribution bnd:_dist_switchesByType_20260307 .
 
-bnd:_keyFigureTable_schema_switchesByType a csvw:Schema ;
+bnd:_keyFigureTable_schema_switchesByType a csvw:TableSchema ;
     csvw:column bnd:_keyFigureTable_col_switchesByType_type,
                 bnd:_keyFigureTable_col_switchesByType_count .
 
@@ -133,9 +133,10 @@ bnd:_dist_switchesByType_20260307 a dcat:Distribution ;
 # --- Datasets (CSV exports) -------------------------------------------------
 
 bnd:_dataset_signals a dcat:Dataset ;
-    dcterms:title "Signals"@en, "Signaler"@nb ;
+    dcterms:title "Signals"@en, "Signaler"@nb, "Signal"@nn ;
     dcterms:description "A complete list of all signals in the DIM knowledge graph"@en,
-                        "En komplett liste over alle signaler i DIM kunnskapsgrafen"@nb ;
+                        "En komplett liste over alle signaler i DIM kunnskapsgrafen"@nb,
+                        "Ei komplett liste over alle signal i DIM-kunnskapsgrafen"@nn ;
     dcterms:modified "2026-03-05"^^xsd:date ;
     bno:usesManagedQuery bnd:_ws_datasets_mq_signals ;
     dcat:distribution bnd:_distribution_signals_20260307 .
