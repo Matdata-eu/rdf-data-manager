@@ -22,8 +22,9 @@ from the Fuseki `/metadata` dataset. The web app itself is not built yet.
 | [examples/dim-metadata.sample.ttl](examples/dim-metadata.sample.ttl) | Sample metadata that conforms to the shapes |
 | [tests/data/invalid/](tests/data/invalid/) | One file per rule the shapes must catch |
 
-Titles and descriptions need an English value and may add Bokmål (`nb`) and Nynorsk (`nn`),
-one value per language. Existing `@no` values are accepted with a warning to retag them.
+Datasets, key figures and key figure tables need exactly one title and one description in
+each of English (`en`), Bokmål (`nb`) and Nynorsk (`nn`). Key figure sections need an English
+title and may add `nb` and `nn`; a legacy `@no` title gives a warning.
 
 The shapes are meant to live in the named graph
 `<https://data.banenor.no/data/_shapes_metadata>` of `/metadata`, next to the data.
