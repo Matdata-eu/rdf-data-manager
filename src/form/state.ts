@@ -226,6 +226,8 @@ export function ownedSubjects (node: NodeState, out: Term[] = []): Term[] {
 
 /** All IRIs the node refers to outside itself (for loading validation context). */
 export function referencedIris (node: NodeState, out: Set<string> = new Set()): Set<string> {
+  // Read-only nodes are never written, so what they refer to needs no checking.
+  if (node.readOnly) return out
   for (const p of node.shape.properties) {
     for (const v of node.values[p.path.value] ?? []) {
       if (v.node) referencedIris(v.node, out)
@@ -233,7 +235,6 @@ export function referencedIris (node: NodeState, out: Set<string> = new Set()): 
       else if (editorFor(p) === 'uri' && v.text.trim()) out.add(v.text.trim())
     }
   }
-  for (const t of node.types) out.add(t.value)
   return out
 }
 
