@@ -1,4 +1,4 @@
-# expect-shape: _shape_TableSchema_uniquePosition
+# expect-shape: _shape_TableSchema_uniqueColumns
 # expect-severity: Violation
 @prefix bnd: <https://data.banenor.no/data/> .
 @prefix bno: <https://data.banenor.no/ontology/> .

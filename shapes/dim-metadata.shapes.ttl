@@ -126,7 +126,7 @@ bnd:_shape_preferNbOverNo a sh:NodeShape ;
     sh:severity sh:Warning ;
     sh:sparql [
         a sh:SPARQLConstraint ;
-        sh:message "Title tagged @no should be tagged @nb (Bokmål) or @nn (Nynorsk): \"{?value}\"."@en ;
+        sh:message "Title tagged @no should be tagged @nb (Bokmål) or @nn (Nynorsk): {?value}."@en ;
         sh:prefixes <https://data.banenor.no/data/_shapes_metadata> ;
         sh:select """
             SELECT $this ?value
@@ -232,6 +232,7 @@ bnd:_shape_Dataset_modified a sh:PropertyShape ;
     sh:maxCount 1 ;
     dash:editor dash:DatePickerEditor ;
     rdm:defaultValue rdm:today ;
+    rdm:updateOnSave true ;
     sh:group bnd:_shapeGroup_general ;
     sh:order 3 .
 
@@ -314,6 +315,7 @@ bnd:_shape_KeyFigureTable_tableSchema a sh:PropertyShape ;
     sh:path csvw:tableSchema ;
     sh:name "Columns"@en, "Kolonner"@nb ;
     sh:description "Ordered column definitions of the result table."@en ;
+    sh:class csvw:TableSchema ;
     sh:node bnd:_shape_TableSchema ;
     sh:nodeKind sh:BlankNodeOrIRI ;
     sh:minCount 1 ;
@@ -339,13 +341,12 @@ bnd:_shape_TableSchema a sh:NodeShape ;
     rdfs:label "Table schema"@en, "Tabellskjema"@nb ;
     dash:uriStart "https://data.banenor.no/data/_keyFigureTable_schema_" ;
     sh:property bnd:_shape_TableSchema_column ;
-    sh:sparql
-        bnd:_shape_TableSchema_uniquePosition ,
-        bnd:_shape_TableSchema_uniqueName .
+    sh:sparql bnd:_shape_TableSchema_uniqueColumns .
 
 bnd:_shape_TableSchema_column a sh:PropertyShape ;
     sh:path csvw:column ;
     sh:name "Column"@en, "Kolonne"@nb ;
+    sh:class csvw:Column ;
     sh:node bnd:_shape_Column ;
     sh:nodeKind sh:BlankNodeOrIRI ;
     sh:minCount 1 ;
@@ -354,36 +355,35 @@ bnd:_shape_TableSchema_column a sh:PropertyShape ;
     rdm:orderBy schema:position ;
     sh:order 1 .
 
-bnd:_shape_TableSchema_uniquePosition a sh:SPARQLConstraint ;
-    sh:message "Column position {?value} is used more than once."@en ;
+# One SPARQL constraint per shape: some engines (shacl-engine) evaluate only one
+# sh:sparql per shape correctly.
+bnd:_shape_TableSchema_uniqueColumns a sh:SPARQLConstraint ;
+    sh:message "Column {?kind} {?value} is used more than once."@en ;
     sh:prefixes <https://data.banenor.no/data/_shapes_metadata> ;
     sh:select """
-        SELECT DISTINCT $this ?value
+        SELECT ?kind ?value
         WHERE {
-            $this csvw:column ?c1, ?c2 .
-            FILTER (?c1 != ?c2)
-            ?c1 schema:position ?value .
-            ?c2 schema:position ?value .
+            {
+                $this csvw:column ?column .
+                ?column schema:position ?value .
+                BIND ("position" AS ?kind)
+            }
+            UNION
+            {
+                $this csvw:column ?column .
+                ?column csvw:name ?value .
+                BIND ("name" AS ?kind)
+            }
         }
-    """ .
-
-bnd:_shape_TableSchema_uniqueName a sh:SPARQLConstraint ;
-    sh:message "Column name \"{?value}\" is used more than once."@en ;
-    sh:prefixes <https://data.banenor.no/data/_shapes_metadata> ;
-    sh:select """
-        SELECT DISTINCT $this ?value
-        WHERE {
-            $this csvw:column ?c1, ?c2 .
-            FILTER (?c1 != ?c2)
-            ?c1 csvw:name ?value .
-            ?c2 csvw:name ?value .
-        }
+        GROUP BY ?kind ?value
+        HAVING (COUNT(?column) > 1)
     """ .
 
 bnd:_shape_Column a sh:NodeShape ;
     sh:targetClass csvw:Column ;
     rdfs:label "Column"@en, "Kolonne"@nb ;
     dash:uriStart "https://data.banenor.no/data/_keyFigureTable_col_" ;
+    rdm:localNameProperty csvw:name ;
     rdm:hideFromMenu true ;
     sh:property
         bnd:_shape_Column_name ,
@@ -442,7 +442,9 @@ bnd:_shape_Distribution a sh:NodeShape ;
 # rdm:hideFromMenu        boolean  do not list this target class in the menu
 # rdm:localNamePattern    string   regex for the part of a new IRI after dash:uriStart
 # rdm:localNameDescription string  help text for that local name
+# rdm:localNameProperty   IRI      property whose value completes the IRI of a new nested node
 # rdm:defaultValue        node     value pre-filled on create (rdm:today = current date)
+# rdm:updateOnSave        boolean  set the value to today whenever the resource is saved
 # rdm:orderBy             IRI      property used to sort multiple values / nested nodes
 # rdm:orderDescending     boolean  sort descending instead of ascending
 # rdm:languages           list     language tags the form offers for a text field, in order
