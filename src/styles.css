@@ -203,3 +203,10 @@ legend { font-weight: 600; padding: 0 .25rem; }
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
   padding: .75rem; overflow: auto; font-size: .8rem; max-height: 400px;
 }
+
+.collapse-toggle {
+  align-self: flex-start; margin-top: .25rem; border: 0; background: none; padding: 0;
+  color: var(--accent); font: inherit; font-size: .8rem; cursor: pointer;
+}
+.collapse-toggle:disabled { color: var(--muted); cursor: default; }
+.collapsed-summary, .show-more { align-self: flex-start; color: var(--accent); }

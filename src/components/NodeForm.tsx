@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useApp } from '../app/context'
 import { href } from '../app/router'
 import { localName, type Literal } from '../rdf/terms'
@@ -67,6 +68,10 @@ function ValueView ({ property, value }: { property: PropertyShape; value: Value
   return <span className='value mono'>{term.value}</span>
 }
 
+/** Fields with more values than this start collapsed unless the shape says otherwise. */
+const COLLAPSE_ABOVE = 5
+const DEFAULT_PAGE_SIZE = 10
+
 function Field ({ property, node, onChange, issues, subjects, depth }: {
   property: PropertyShape
   node: NodeState
@@ -87,11 +92,19 @@ function Field ({ property, node, onChange, issues, subjects, depth }: {
   const own = issues.filter(i => i.focusNode === subject && i.path === path)
   const required = (property.minCount ?? 0) > 0
   const canAdd = !readOnly && (property.maxCount === undefined || values.length < property.maxCount)
+  const pageSize = property.pageSize ?? DEFAULT_PAGE_SIZE
+  const [open, setOpen] = useState(() => !(property.collapsed ?? values.length > COLLAPSE_ABOVE))
+  const [shown, setShown] = useState(pageSize)
+  // Problems on a field must never hide behind a collapsed header.
+  const expanded = open || own.length > 0
+  const visible = expanded ? values.slice(0, shown) : []
 
   const setValues = (next: ValueState[]) => onChange({ ...node, values: { ...node.values, [path]: next } })
   const replace = (v: ValueState) => setValues(values.map(x => x.id === v.id ? v : x))
   const remove = (v: ValueState) => setValues(values.filter(x => x.id !== v.id))
   const add = () => {
+    setOpen(true)
+    setShown(n => Math.max(n, values.length + 1))
     if (kind === 'details') {
       const nested = newNestedValue(property, model)
       if (nested) setValues([...values, nested])
@@ -107,13 +120,26 @@ function Field ({ property, node, onChange, issues, subjects, depth }: {
   return (
     <div className={`field${own.some(i => i.severity === 'Violation') ? ' has-error' : ''}`}>
       <div className='field-label'>
-        <label htmlFor={values[0] && !values[0].node ? `${id}-${values[0].id}` : undefined}>
+        <label htmlFor={expanded && values[0] && !values[0].node ? `${id}-${values[0].id}` : undefined}>
           {label}{required && !readOnly && <span className='required' title='Required'>*</span>}
         </label>
+        {(values.length > COLLAPSE_ABOVE || property.collapsed !== undefined) && values.length > 0 && (
+          <button
+            type='button' className='collapse-toggle' aria-expanded={expanded}
+            onClick={() => setOpen(!expanded)} disabled={own.length > 0}
+          >
+            {expanded ? '▾' : '▸'} {values.length} values
+          </button>
+        )}
         {description && <span className='hint'>{description}</span>}
       </div>
       <div className='field-values'>
-        {values.map(v => v.node
+        {!expanded && (
+          <button type='button' className='button ghost small collapsed-summary' onClick={() => setOpen(true)}>
+            Show {values.length} {label.toLowerCase()}
+          </button>
+        )}
+        {visible.map(v => v.node
           ? (
             <div key={v.id} className='nested'>
               <div className='nested-header'>
@@ -135,7 +161,12 @@ function Field ({ property, node, onChange, issues, subjects, depth }: {
                   )}
             </div>
             ))}
-        {canAdd && (
+        {expanded && values.length > shown && (
+          <button type='button' className='button ghost small show-more' onClick={() => setShown(values.length)}>
+            Show all ({values.length - shown} more)
+          </button>
+        )}
+        {canAdd && (expanded || values.length === 0) && (
           <button type='button' className='button ghost small add' onClick={add}>
             + Add {kind === 'details' ? label.toLowerCase() : 'value'}
           </button>

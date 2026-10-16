@@ -46,6 +46,10 @@ export interface PropertyShape {
   languages?: string[]
   defaultValue?: Term
   updateOnSave: boolean
+  /** rdm:collapsed; when unset, fields with many values start collapsed. */
+  collapsed?: boolean
+  /** rdm:pageSize: values shown before "Show more". */
+  pageSize?: number
   orderBy?: string
   orderDescending: boolean
 }
@@ -165,6 +169,8 @@ function parsePropertyShape (store: Store, id: Term): PropertyShape | undefined 
     languages: languages ? list(store, languages).map(t => t.value) : undefined,
     defaultValue: one(store, id, rdm('defaultValue')) ?? one(store, id, sh('defaultValue')),
     updateOnSave: bool(one(store, id, rdm('updateOnSave'))),
+    collapsed: one(store, id, rdm('collapsed')) ? bool(one(store, id, rdm('collapsed'))) : undefined,
+    pageSize: num(one(store, id, rdm('pageSize'))),
     orderBy: lit(rdm('orderBy')),
     orderDescending: bool(one(store, id, rdm('orderDescending')))
   }
