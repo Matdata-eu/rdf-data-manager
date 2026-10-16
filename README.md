@@ -22,6 +22,9 @@ from the Fuseki `/metadata` dataset. The web app itself is not built yet.
 | [examples/dim-metadata.sample.ttl](examples/dim-metadata.sample.ttl) | Sample metadata that conforms to the shapes |
 | [tests/data/invalid/](tests/data/invalid/) | One file per rule the shapes must catch |
 
+Titles and descriptions need an English value and may add Bokmål (`nb`) and Nynorsk (`nn`),
+one value per language. Existing `@no` values are accepted with a warning to retag them.
+
 The shapes are meant to live in the named graph
 `<https://data.banenor.no/data/_shapes_metadata>` of `/metadata`, next to the data.
 
@@ -52,3 +55,4 @@ Annotations in the `rdm:` namespace (`https://matdata.eu/ns/rdf-data-manager#`):
 | `rdm:localNameDescription` | node shape | Help text for that local name |
 | `rdm:defaultValue` | property shape | Value pre-filled on create (`rdm:today` = current date) |
 | `rdm:orderBy`, `rdm:orderDescending` | property / node shape | Sort order of multiple values |
+| `rdm:languages` | property shape | Language tags the form offers for a text field |
