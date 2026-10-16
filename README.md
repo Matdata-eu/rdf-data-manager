@@ -31,6 +31,11 @@ or a local file. Settings are kept in the browser. They can also be passed in th
 e.g. `?dataset=http://localhost:3030/metadata/&shapesGraph=https://…`, or served as a
 `config.json` next to `index.html` (`"locked": true` hides Settings).
 
+The look follows the [MatData design system](https://claude.ai/artifact/TtLC5gbV1pXHbZX22cPxCx):
+Barlow and JetBrains Mono (from Google Fonts), and light and dark themes. All colours,
+fonts, spacing and radii are CSS variables in [src/theme.css](src/theme.css), so another
+organisation can restyle the app by replacing that one file.
+
 If the endpoint does not send CORS headers, run the dev server with
 `RDM_PROXY_TARGET=http://localhost:8030 npm run dev` and use
 `http://localhost:5173/proxy/jena-fuseki/metadata/` as the dataset URL.

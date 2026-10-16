@@ -128,7 +128,7 @@ function Field ({ property, node, onChange, issues, subjects, depth }: {
             type='button' className='collapse-toggle' aria-expanded={expanded}
             onClick={() => setOpen(!expanded)} disabled={own.length > 0}
           >
-            {expanded ? '▾' : '▸'} {values.length} values
+            {expanded ? '▾' : '▸'} {values.length} {values.length === 1 ? 'value' : 'values'}
           </button>
         )}
         {description && <span className='hint'>{description}</span>}
@@ -136,7 +136,7 @@ function Field ({ property, node, onChange, issues, subjects, depth }: {
       <div className='field-values'>
         {!expanded && (
           <button type='button' className='button ghost small collapsed-summary' onClick={() => setOpen(true)}>
-            Show {values.length} {label.toLowerCase()}
+            {values.length === 1 ? 'Show' : `Show ${values.length} ${label.toLowerCase()}`}
           </button>
         )}
         {visible.map(v => v.node
