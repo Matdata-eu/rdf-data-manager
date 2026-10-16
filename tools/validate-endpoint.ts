@@ -13,6 +13,7 @@
  *
  * Exit code: 0 when the data conforms (warnings allowed), 1 when it does not, 2 on errors.
  */
+import { setDefaultResultOrder } from 'node:dns'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
@@ -21,6 +22,9 @@ import { endpointsFromDataset, DEFAULT_SHAPES_GRAPH } from '../src/config/config
 import { SparqlClient } from '../src/sparql/client'
 import { ShapesValidator, type Issue } from '../src/validation/validate'
 import type { Quad } from '../src/rdf/terms'
+
+// Fuseki behind a tunnel often listens on 127.0.0.1 only, and Node would try ::1 first.
+setDefaultResultOrder('ipv4first')
 
 const SH = 'http://www.w3.org/ns/shacl#'
 const DISTRIBUTION = 'http://www.w3.org/ns/dcat#Distribution'
@@ -71,14 +75,15 @@ function shapeClasses (shapes: Quad[]): string[] {
 function summarise (issues: Issue[]): string {
   const groups = new Map<string, Issue[]>()
   for (const i of issues) {
-    const key = [i.severity, i.sourceConstraint ?? i.sourceShape ?? '', i.constraint ?? '', i.message].join('\t')
+    // SPARQL constraint messages embed the value, so those group by constraint alone.
+    const key = [i.severity, i.sourceShape ?? '', i.sourceConstraint ?? '', i.constraint ?? '', i.sourceConstraint ? '' : i.message].join('\t')
     groups.set(key, [...(groups.get(key) ?? []), i])
   }
   const lines: string[] = []
   for (const [key, list] of [...groups].sort((a, b) => b[1].length - a[1].length)) {
-    const [severity, shape, constraint, message] = key.split('\t')
+    const [severity, shape, , constraint] = key.split('\t')
     lines.push(`${String(list.length).padStart(5)}  ${severity.padEnd(9)} ${shape} (${constraint})`)
-    lines.push(`       ${message}`)
+    lines.push(`       ${list[0].message}`)
     lines.push(`       e.g. ${list.slice(0, 3).map(i => i.focusNode).join(', ')}`)
   }
   return lines.join('\n')
