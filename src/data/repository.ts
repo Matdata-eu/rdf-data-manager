@@ -138,8 +138,8 @@ export class Repository {
   }
 
   /**
-   * Triples around the resources a form refers to (two hops out, and in
-   * and back out except through rdf:type), so
+   * Triples around the resources a form refers to (two hops out, and in and back
+   * out except through rdf:type), so
    * validation can check sh:class and SPARQL constraints that look at neighbouring nodes.
    */
   async contextQuads (iris: string[]): Promise<Quad[]> {
@@ -149,7 +149,8 @@ export class Repository {
         CONSTRUCT { ?o ?p ?x . ?x ?r ?z . ?y ?q ?o . ?y ?s ?w }
         WHERE {
           VALUES ?o { ${iriList(part)} }
-          ${this.g(`{ ?o ?p ?x } UNION { ?o ?p ?x . ?x ?r ?z } UNION { ?y ?q ?o }
+          ${this.g(`{ ?o ?p ?x } UNION { ?o ?p ?x . ?x ?r ?z }
+            UNION { ?y ?q ?o . FILTER (?q != ${toNT(RDF_TYPE)}) }
             UNION { ?y ?q ?o . FILTER (?q != ${toNT(RDF_TYPE)}) ?y ?s ?w }`)}
         }`))
     }
