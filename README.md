@@ -12,7 +12,39 @@ Licensed under the [MIT License](LICENSE).
 
 The first target is the metadata of the Bane NOR Digital Infrastructure Model (DIM):
 the CSV datasets and key figures that the `dim-etl-dataset-generation` pipeline reads
-from the Fuseki `/metadata` dataset. The web app itself is not built yet.
+from the Fuseki `/metadata` dataset.
+
+## Running the app
+
+The app is a static TypeScript/React site with no backend: the browser talks to the
+SPARQL endpoint directly, so the endpoint must allow CORS from the app's origin (Fuseki
+does by default).
+
+```bash
+npm install
+npm run dev        # http://localhost:5173
+```
+
+Open Settings and enter the endpoint (for Fuseki, the dataset URL fills in the query and
+update URLs) and where the shapes come from: a named graph in the endpoint, a Turtle URL
+or a local file. Settings are kept in the browser. They can also be passed in the URL,
+e.g. `?dataset=http://localhost:3030/metadata/&shapesGraph=https://…`, or served as a
+`config.json` next to `index.html` (`"locked": true` hides Settings).
+
+If the endpoint does not send CORS headers, run the dev server with
+`RDM_PROXY_TARGET=http://localhost:8030 npm run dev` and use
+`http://localhost:5173/proxy/jena-fuseki/metadata/` as the dataset URL.
+
+What the app does:
+
+- Lists the instances of every class the shapes describe, with counts and a filter.
+- Creates, edits and deletes resources with forms built from the shapes, including
+  nested nodes such as a table's columns, which are saved together with their parent.
+- Validates the would-be stored data with the shapes before every save (in the browser,
+  with [shacl-engine](https://github.com/rdf-ext/shacl-engine)). Violations block the save
+  unless you choose "Save anyway"; warnings are shown after saving.
+- Writes only the triples the form manages, as a minimal `DELETE DATA` / `INSERT DATA`
+  update, so properties outside the shapes are left alone.
 
 ## Shapes
 
@@ -30,10 +62,9 @@ The shapes are meant to live in the named graph
 `<https://data.banenor.no/data/_shapes_metadata>` of `/metadata`, next to the data.
 
 ```bash
-pip install -r requirements-dev.txt
-python -m pytest tests                                    # shapes vs. sample and invalid cases
-python tools/validate_endpoint.py http://localhost:8030/jena-fuseki/metadata/   # reads shape targets only; --full, --no-distributions, --timeout
-python tools/load_shapes.py       http://localhost:8030/jena-fuseki/metadata/
+npm test                                                              # shapes vs. sample and invalid cases, form logic
+npm run validate-endpoint -- http://localhost:8030/jena-fuseki/metadata/   # reads shape targets only; --full, --no-distributions, --timeout, --json
+npm run load-shapes -- http://localhost:8030/jena-fuseki/metadata/         # PUT the shapes into their named graph
 ```
 
 ### How the shapes drive the UI
@@ -54,6 +85,8 @@ Annotations in the `rdm:` namespace (`https://matdata.eu/ns/rdf-data-manager#`):
 | `rdm:hideFromMenu` | node shape | Do not list the target class in the menu |
 | `rdm:localNamePattern` | node shape | Regex for the local name of new instances |
 | `rdm:localNameDescription` | node shape | Help text for that local name |
+| `rdm:localNameProperty` | node shape | Property whose value completes the IRI of a new nested node |
 | `rdm:defaultValue` | property shape | Value pre-filled on create (`rdm:today` = current date) |
+| `rdm:updateOnSave` | property shape | Set the value to today whenever the resource is saved |
 | `rdm:orderBy`, `rdm:orderDescending` | property / node shape | Sort order of multiple values |
 | `rdm:languages` | property shape | Language tags the form offers for a text field |
