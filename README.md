@@ -32,7 +32,7 @@ The shapes are meant to live in the named graph
 ```bash
 pip install -r requirements-dev.txt
 python -m pytest tests                                    # shapes vs. sample and invalid cases
-python tools/validate_endpoint.py http://localhost:8030/jena-fuseki/metadata/
+python tools/validate_endpoint.py http://localhost:8030/jena-fuseki/metadata/   # reads shape targets only; --full, --no-distributions, --timeout
 python tools/load_shapes.py       http://localhost:8030/jena-fuseki/metadata/
 ```
 
