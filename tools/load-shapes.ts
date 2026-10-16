@@ -5,14 +5,11 @@
  *
  * Uses the SPARQL 1.1 Graph Store Protocol endpoint (<dataset>/data).
  */
-import { setDefaultResultOrder } from 'node:dns'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
 import { DEFAULT_SHAPES_GRAPH } from '../src/config/config'
-
-// Fuseki behind a tunnel often listens on 127.0.0.1 only, and Node would try ::1 first.
-setDefaultResultOrder('ipv4first')
+import { ipv4Loopback } from './loopback'
 
 async function main (): Promise<number> {
   const { values, positionals } = parseArgs({
@@ -27,7 +24,7 @@ async function main (): Promise<number> {
     console.error('Usage: load-shapes <dataset URL> [--shapes file] [--graph iri]')
     return values.help ? 0 : 2
   }
-  const url = `${positionals[0].replace(/\/+$/, '')}/data?graph=${encodeURIComponent(values.graph!)}`
+  const url = `${ipv4Loopback(positionals[0]).replace(/\/+$/, '')}/data?graph=${encodeURIComponent(values.graph!)}`
   const response = await fetch(url, {
     method: 'PUT',
     headers: { 'Content-Type': 'text/turtle; charset=utf-8' },

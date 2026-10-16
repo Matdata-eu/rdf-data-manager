@@ -13,7 +13,6 @@
  *
  * Exit code: 0 when the data conforms (warnings allowed), 1 when it does not, 2 on errors.
  */
-import { setDefaultResultOrder } from 'node:dns'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
@@ -22,9 +21,7 @@ import { endpointsFromDataset, DEFAULT_SHAPES_GRAPH } from '../src/config/config
 import { SparqlClient } from '../src/sparql/client'
 import { ShapesValidator, type Issue } from '../src/validation/validate'
 import type { Quad } from '../src/rdf/terms'
-
-// Fuseki behind a tunnel often listens on 127.0.0.1 only, and Node would try ::1 first.
-setDefaultResultOrder('ipv4first')
+import { ipv4Loopback } from './loopback'
 
 const SH = 'http://www.w3.org/ns/shacl#'
 const DISTRIBUTION = 'http://www.w3.org/ns/dcat#Distribution'
@@ -83,7 +80,7 @@ function summarise (issues: Issue[]): string {
   for (const [key, list] of [...groups].sort((a, b) => b[1].length - a[1].length)) {
     const [severity, shape, , constraint] = key.split('\t')
     lines.push(`${String(list.length).padStart(5)}  ${severity.padEnd(9)} ${shape} (${constraint})`)
-    lines.push(`       ${list[0].message}`)
+    lines.push(`       ${list.length > 1 && list[0].sourceConstraint ? `${list[0].message.replace(/:[^:]*$/, '')} (value differs per result)` : list[0].message}`)
     lines.push(`       e.g. ${list.slice(0, 3).map(i => i.focusNode).join(', ')}`)
   }
   return lines.join('\n')
@@ -108,7 +105,7 @@ async function main (): Promise<number> {
   }
 
   const shapes = new Parser().parse(readFileSync(values.shapes!, 'utf8'))
-  const { queryUrl, updateUrl } = endpointsFromDataset(positionals[0])
+  const { queryUrl, updateUrl } = endpointsFromDataset(ipv4Loopback(positionals[0]))
   const client = new SparqlClient({ queryUrl, updateUrl, timeoutMs: Number(values.timeout) * 1000 })
   const shapesGraph = values['shapes-graph']!
   const todo = values.full

@@ -59,9 +59,8 @@ export class SparqlClient {
       })
     } catch (err) {
       const reason = err instanceof Error ? err.message : String(err)
-      throw new SparqlError(
-        `Could not reach ${url} (${reason}). Check the URL, that the server is running and that it allows cross-origin (CORS) requests from this page.`
-      )
+      const cors = typeof window === 'undefined' ? '' : ' and that it allows cross-origin (CORS) requests from this page'
+      throw new SparqlError(`Could not reach ${url} (${reason}). Check the URL, that the server is running${cors}.`)
     } finally {
       if (timer) clearTimeout(timer)
     }
