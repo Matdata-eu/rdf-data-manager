@@ -181,6 +181,8 @@ bnd:_shape_distributions a sh:PropertyShape ;
     sh:node bnd:_shape_Distribution ;
     dash:readOnly true ;
     dash:viewer dash:DetailsViewer ;
+    rdm:collapsed true ;
+    rdm:pageSize 5 ;
     sh:group bnd:_shapeGroup_distributions ;
     sh:order 1 .
 
@@ -447,4 +449,6 @@ bnd:_shape_Distribution a sh:NodeShape ;
 # rdm:updateOnSave        boolean  set the value to today whenever the resource is saved
 # rdm:orderBy             IRI      property used to sort multiple values / nested nodes
 # rdm:orderDescending     boolean  sort descending instead of ascending
+# rdm:collapsed           boolean  start the field collapsed (default: collapsed when it has more than 5 values)
+# rdm:pageSize            integer  values shown before "Show more" (default 10)
 # rdm:languages           list     language tags the form offers for a text field, in order

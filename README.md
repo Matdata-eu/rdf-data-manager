@@ -89,4 +89,6 @@ Annotations in the `rdm:` namespace (`https://matdata.eu/ns/rdf-data-manager#`):
 | `rdm:defaultValue` | property shape | Value pre-filled on create (`rdm:today` = current date) |
 | `rdm:updateOnSave` | property shape | Set the value to today whenever the resource is saved |
 | `rdm:orderBy`, `rdm:orderDescending` | property / node shape | Sort order of multiple values |
+| `rdm:collapsed` | property shape | Start the field collapsed; without it, fields with more than 5 values start collapsed |
+| `rdm:pageSize` | property shape | Number of values shown before "Show more" (default 10) |
 | `rdm:languages` | property shape | Language tags the form offers for a text field |
