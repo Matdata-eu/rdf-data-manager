@@ -84,6 +84,9 @@ bnd:_keyFiguresSection_infrastructure a bno:KeyFigureSection ;
 bnd:_keyFigure_trackLength a bno:KeyFigure ;
     dcterms:isPartOf bnd:_keyFiguresSection_general ;
     dcterms:title "Total track length"@en, "Total sporlengde"@nb, "Total sporlengd"@nn ;
+    dcterms:description "Sum of the lengths of all tracks"@en,
+                        "Summen av lengden på alle spor"@nb,
+                        "Summen av lengda på alle spor"@nn ;
     schema:position 1 ;
     schema:unitCode "KMT" ;
     bno:usesManagedQuery bnd:_ws_keyFigures_mq_keyFigure_trackLength ;
@@ -100,6 +103,9 @@ bnd:_dist_trackLength_20260307 a dcat:Distribution ;
 bnd:_keyFigure_switchCount a bno:KeyFigure ;
     dcterms:isPartOf bnd:_keyFiguresSection_infrastructure ;
     dcterms:title "Number of switches"@en, "Antall sporveksler"@nb, "Talet på sporvekslar"@nn ;
+    dcterms:description "Number of switches in the network"@en,
+                        "Antall sporveksler i nettet"@nb,
+                        "Talet på sporvekslar i nettet"@nn ;
     schema:position 1 ;
     bno:usesManagedQuery bnd:_ws_keyFigures_mq_keyFigure_switchCount .
 
@@ -108,6 +114,9 @@ bnd:_keyFigure_switchCount a bno:KeyFigure ;
 bnd:_keyFigureTable_switchesByType a bno:KeyFigureTable ;
     dcterms:isPartOf bnd:_keyFiguresSection_infrastructure ;
     dcterms:title "Switches by type"@en, "Sporveksler etter type"@nb, "Sporvekslar etter type"@nn ;
+    dcterms:description "Number of switches per switch type"@en,
+                        "Antall sporveksler per type"@nb,
+                        "Talet på sporvekslar per type"@nn ;
     schema:position 2 ;
     csvw:tableSchema bnd:_keyFigureTable_schema_switchesByType ;
     bno:usesManagedQuery bnd:_ws_keyFigures_mq_keyFigureTable_switchesByType ;
@@ -149,8 +158,9 @@ bnd:_distribution_signals_20260307 a dcat:Distribution ;
     dcat:byteSize 482113 .
 
 bnd:_dataset_tracks a dcat:Dataset ;
-    dcterms:title "Tracks"@en, "Spor"@nb ;
+    dcterms:title "Tracks"@en, "Spor"@nb, "Spor"@nn ;
     dcterms:description "All tracks in the DIM knowledge graph"@en,
-                        "Alle spor i DIM kunnskapsgrafen"@nb ;
+                        "Alle spor i DIM kunnskapsgrafen"@nb,
+                        "Alle spor i DIM-kunnskapsgrafen"@nn ;
     dcterms:modified "2026-03-05"^^xsd:date ;
     bno:usesManagedQuery bnd:_ws_datasets_mq_tracks .

@@ -1,4 +1,4 @@
-# expect-shape: _shape_description
+# expect-shape: _shape_descriptionEnNbNn
 # expect-severity: Violation
 @prefix bnd: <https://data.banenor.no/data/> .
 @prefix bno: <https://data.banenor.no/ontology/> .
