@@ -1,0 +1,155 @@
+# Sample content for the DIM /metadata dataset, valid against
+# shapes/dim-metadata.shapes.ttl. Use it to try RDF Data Manager against an empty
+# Fuseki dataset. The managed queries are minimal stand-ins for what yasgui stores.
+
+@prefix bnd:     <https://data.banenor.no/data/> .
+@prefix bno:     <https://data.banenor.no/ontology/> .
+@prefix csvw:    <http://www.w3.org/ns/csvw#> .
+@prefix dcat:    <http://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema:  <http://schema.org/> .
+@prefix spin:    <http://spinrdf.org/spin#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix yasgui:  <https://matdata.eu/ns/yasgui#> .
+
+# --- Managed queries (normally maintained in yasgui) ------------------------
+
+bnd:_ws_keyFigures_mq_keyFigure_trackLength a yasgui:ManagedQuery ;
+    rdfs:label "Total track length" .
+
+bnd:_ws_keyFigures_mq_keyFigure_trackLength_v1 a yasgui:ManagedQueryVersion ;
+    dcterms:isVersionOf bnd:_ws_keyFigures_mq_keyFigure_trackLength ;
+    dcterms:created "2026-03-06T08:00:00Z"^^xsd:dateTime ;
+    spin:text """PREFIX railml3: <http://ontology.railml.org/railml3#>
+PREFIX qudt:    <http://qudt.org/schema/qudt/>
+SELECT (SUM(?length) AS ?value)
+WHERE { ?track a railml3:Track ; railml3:hasLength/qudt:numericValue ?length . }""" .
+
+bnd:_ws_keyFigures_mq_keyFigure_switchCount a yasgui:ManagedQuery ;
+    rdfs:label "Number of switches" .
+
+bnd:_ws_keyFigures_mq_keyFigure_switchCount_v1 a yasgui:ManagedQueryVersion ;
+    dcterms:isVersionOf bnd:_ws_keyFigures_mq_keyFigure_switchCount ;
+    dcterms:created "2026-03-06T08:00:00Z"^^xsd:dateTime ;
+    spin:text """PREFIX railml3: <http://ontology.railml.org/railml3#>
+SELECT (COUNT(?switch) AS ?value)
+WHERE { ?switch a railml3:SwitchIS . }""" .
+
+bnd:_ws_keyFigures_mq_keyFigureTable_switchesByType a yasgui:ManagedQuery ;
+    rdfs:label "Switches by type" .
+
+bnd:_ws_keyFigures_mq_keyFigureTable_switchesByType_v1 a yasgui:ManagedQueryVersion ;
+    dcterms:isVersionOf bnd:_ws_keyFigures_mq_keyFigureTable_switchesByType ;
+    dcterms:created "2026-03-06T08:00:00Z"^^xsd:dateTime ;
+    spin:text """PREFIX railml3: <http://ontology.railml.org/railml3#>
+SELECT ?type (COUNT(?switch) AS ?count)
+WHERE { ?switch a railml3:SwitchIS ; railml3:hasType ?type . }
+GROUP BY ?type
+ORDER BY DESC(?count)""" .
+
+bnd:_ws_datasets_mq_signals a yasgui:ManagedQuery ;
+    rdfs:label "Signals" .
+
+bnd:_ws_datasets_mq_signals_v1 a yasgui:ManagedQueryVersion ;
+    dcterms:isVersionOf bnd:_ws_datasets_mq_signals ;
+    dcterms:created "2026-03-05T08:00:00Z"^^xsd:dateTime ;
+    spin:text """PREFIX railml3: <http://ontology.railml.org/railml3#>
+PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?signal ?label
+WHERE { ?signal a railml3:SignalIS . OPTIONAL { ?signal rdfs:label ?label } }
+ORDER BY ?signal""" .
+
+bnd:_ws_datasets_mq_tracks a yasgui:ManagedQuery ;
+    rdfs:label "Tracks" .
+
+bnd:_ws_datasets_mq_tracks_v1 a yasgui:ManagedQueryVersion ;
+    dcterms:isVersionOf bnd:_ws_datasets_mq_tracks ;
+    dcterms:created "2026-03-05T08:00:00Z"^^xsd:dateTime ;
+    spin:text """PREFIX railml3: <http://ontology.railml.org/railml3#>
+SELECT ?track WHERE { ?track a railml3:Track . } ORDER BY ?track""" .
+
+# --- Key figure sections ----------------------------------------------------
+
+bnd:_keyFiguresSection_general a bno:KeyFigureSection ;
+    dcterms:title "General"@en, "Generelt"@nb, "Generelt"@nn ;
+    schema:position 1 .
+
+bnd:_keyFiguresSection_infrastructure a bno:KeyFigureSection ;
+    dcterms:title "Infrastructure"@en, "Infrastruktur"@nb, "Infrastruktur"@nn ;
+    schema:position 2 .
+
+# --- Scalar key figures -----------------------------------------------------
+
+bnd:_keyFigure_trackLength a bno:KeyFigure ;
+    dcterms:isPartOf bnd:_keyFiguresSection_general ;
+    dcterms:title "Total track length"@en, "Total sporlengde"@nb, "Total sporlengd"@nn ;
+    schema:position 1 ;
+    schema:unitCode "KMT" ;
+    bno:usesManagedQuery bnd:_ws_keyFigures_mq_keyFigure_trackLength ;
+    dcat:distribution bnd:_dist_trackLength_20260306, bnd:_dist_trackLength_20260307 .
+
+bnd:_dist_trackLength_20260306 a dcat:Distribution ;
+    dcterms:created "2026-03-06T13:10:00Z"^^xsd:dateTime ;
+    schema:value "5354"^^xsd:decimal .
+
+bnd:_dist_trackLength_20260307 a dcat:Distribution ;
+    dcterms:created "2026-03-07T13:10:00Z"^^xsd:dateTime ;
+    schema:value "5356"^^xsd:decimal .
+
+bnd:_keyFigure_switchCount a bno:KeyFigure ;
+    dcterms:isPartOf bnd:_keyFiguresSection_infrastructure ;
+    dcterms:title "Number of switches"@en, "Antall sporveksler"@nb, "Talet på sporvekslar"@nn ;
+    schema:position 1 ;
+    bno:usesManagedQuery bnd:_ws_keyFigures_mq_keyFigure_switchCount .
+
+# --- Table key figures ------------------------------------------------------
+
+bnd:_keyFigureTable_switchesByType a bno:KeyFigureTable ;
+    dcterms:isPartOf bnd:_keyFiguresSection_infrastructure ;
+    dcterms:title "Switches by type"@en, "Sporveksler etter type"@nb, "Sporvekslar etter type"@nn ;
+    schema:position 2 ;
+    csvw:tableSchema bnd:_keyFigureTable_schema_switchesByType ;
+    bno:usesManagedQuery bnd:_ws_keyFigures_mq_keyFigureTable_switchesByType ;
+    dcat:distribution bnd:_dist_switchesByType_20260307 .
+
+bnd:_keyFigureTable_schema_switchesByType a csvw:Schema ;
+    csvw:column bnd:_keyFigureTable_col_switchesByType_type,
+                bnd:_keyFigureTable_col_switchesByType_count .
+
+bnd:_keyFigureTable_col_switchesByType_type a csvw:Column ;
+    csvw:name "type" ;
+    schema:position 1 .
+
+bnd:_keyFigureTable_col_switchesByType_count a csvw:Column ;
+    csvw:name "count" ;
+    schema:position 2 .
+
+bnd:_dist_switchesByType_20260307 a dcat:Distribution ;
+    dcterms:created "2026-03-07T13:10:00Z"^^xsd:dateTime ;
+    dcterms:format "text/csv" ;
+    schema:value "type,count\nordinary,1830\ndouble,74\n" .
+
+# --- Datasets (CSV exports) -------------------------------------------------
+
+bnd:_dataset_signals a dcat:Dataset ;
+    dcterms:title "Signals"@en, "Signaler"@nb ;
+    dcterms:description "A complete list of all signals in the DIM knowledge graph"@en,
+                        "En komplett liste over alle signaler i DIM kunnskapsgrafen"@nb ;
+    dcterms:modified "2026-03-05"^^xsd:date ;
+    bno:usesManagedQuery bnd:_ws_datasets_mq_signals ;
+    dcat:distribution bnd:_distribution_signals_20260307 .
+
+bnd:_distribution_signals_20260307 a dcat:Distribution ;
+    dcterms:created "2026-03-07T13:00:00Z"^^xsd:dateTime ;
+    schema:contentUrl "/data/datasets/signals.csv" ;
+    schema:name "signals.csv" ;
+    dcterms:format "text/csv" ;
+    dcat:byteSize 482113 .
+
+bnd:_dataset_tracks a dcat:Dataset ;
+    dcterms:title "Tracks"@en, "Spor"@nb ;
+    dcterms:description "All tracks in the DIM knowledge graph"@en,
+                        "Alle spor i DIM kunnskapsgrafen"@nb ;
+    dcterms:modified "2026-03-05"^^xsd:date ;
+    bno:usesManagedQuery bnd:_ws_datasets_mq_tracks .
