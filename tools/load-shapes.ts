@@ -5,10 +5,14 @@
  *
  * Uses the SPARQL 1.1 Graph Store Protocol endpoint (<dataset>/data).
  */
+import { setDefaultResultOrder } from 'node:dns'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
 import { DEFAULT_SHAPES_GRAPH } from '../src/config/config'
+
+// Fuseki behind a tunnel often listens on 127.0.0.1 only, and Node would try ::1 first.
+setDefaultResultOrder('ipv4first')
 
 async function main (): Promise<number> {
   const { values, positionals } = parseArgs({
