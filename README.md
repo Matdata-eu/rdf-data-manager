@@ -68,6 +68,7 @@ The shapes are meant to live in the named graph
 
 ```bash
 npm test                                                              # shapes vs. sample and invalid cases, form logic
+npm run lint                                                          # Standard style with TypeScript (npm run lint:fix repairs most findings)
 npm run validate-endpoint -- http://localhost:8030/jena-fuseki/metadata/   # reads shape targets only; --full, --no-distributions, --timeout, --json
 npm run load-shapes -- http://localhost:8030/jena-fuseki/metadata/         # PUT the shapes into their named graph
 ```
@@ -97,3 +98,8 @@ Annotations in the `rdm:` namespace (`https://matdata.eu/ns/rdf-data-manager#`):
 | `rdm:collapsed` | property shape | Start the field collapsed; without it, fields with more than 5 values start collapsed |
 | `rdm:pageSize` | property shape | Number of values shown before "Show more" (default 10) |
 | `rdm:languages` | property shape | Language tags the form offers for a text field |
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to run, test and submit changes, and
+[docs/adr/](docs/adr/) for the decisions behind the design.
