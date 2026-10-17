@@ -22,6 +22,14 @@ export interface PropertyGroup {
   order: number
 }
 
+/** One branch of a property's sh:or / sh:xone: the constraints a value may satisfy instead. */
+export interface PropertyAlternative {
+  datatype?: string
+  classes: string[]
+  nodeKind?: string
+  node?: string
+}
+
 export interface PropertyShape {
   id: Term
   key: string
@@ -63,6 +71,11 @@ export interface PropertyShape {
    * SPARQL query, so the app can offer to run it and show the result.
    */
   queryText?: string
+  /**
+   * sh:or / sh:xone branches. The field merges them: classes are offered together and the
+   * first datatype types new literals; validation still checks each branch.
+   */
+  alternatives?: PropertyAlternative[]
 }
 
 /** True when values of this property are nested nodes edited or shown in place. */
@@ -86,6 +99,13 @@ export interface NodeShape {
   orderBy?: string
   orderDescending: boolean
   properties: PropertyShape[]
+  /** sh:closed: the form shows triples outside the shape as "other properties" and says a check reports them. */
+  closed: boolean
+  /** sh:ignoredProperties, which a closed shape allows anyway. */
+  ignoredProperties: string[]
+  /** sh:targetSubjectsOf / sh:targetObjectsOf; validation uses them, the menu is by class only. */
+  targetSubjectsOf: string[]
+  targetObjectsOf: string[]
 }
 
 export interface ClassEntry {
@@ -150,6 +170,23 @@ export function text (map: LangMap, preferred: string[], fallback = ''): string 
   return map[''] ?? Object.values(map)[0] ?? fallback
 }
 
+function parseAlternatives (store: Store, id: Term): PropertyAlternative[] | undefined {
+  const heads = [...all(store, id, sh('or')), ...all(store, id, sh('xone'))]
+  if (!heads.length) return undefined
+  const out: PropertyAlternative[] = []
+  for (const head of heads) {
+    for (const alt of list(store, head)) {
+      out.push({
+        datatype: one(store, alt, sh('datatype'))?.value,
+        classes: all(store, alt, sh('class')).map(t => t.value),
+        nodeKind: one(store, alt, sh('nodeKind'))?.value,
+        node: one(store, alt, sh('node'))?.value
+      })
+    }
+  }
+  return out.length ? out : undefined
+}
+
 function parsePropertyShape (store: Store, id: Term): PropertyShape | undefined {
   const path = one(store, id, sh('path'))
   if (!path || path.termType !== 'NamedNode') return undefined
@@ -157,6 +194,8 @@ function parsePropertyShape (store: Store, id: Term): PropertyShape | undefined 
   const languages = one(store, id, rdm('languages'))
   const languageIn = one(store, id, sh('languageIn'))
   const inList = one(store, id, sh('in'))
+  const alternatives = parseAlternatives(store, id)
+  const alt = <K extends keyof PropertyAlternative>(k: K) => alternatives?.find(a => a[k] !== undefined && (!Array.isArray(a[k]) || a[k].length))?.[k]
   return {
     id,
     key: id.termType === 'BlankNode' ? `${path.value}#${id.value}` : id.value,
@@ -165,10 +204,10 @@ function parsePropertyShape (store: Store, id: Term): PropertyShape | undefined 
     description: langMap(all(store, id, sh('description'))),
     group: lit(sh('group')),
     order: num(one(store, id, sh('order'))) ?? 1000,
-    datatype: lit(sh('datatype')),
-    nodeKind: lit(sh('nodeKind')),
-    classes: all(store, id, sh('class')).map(t => t.value),
-    node: lit(sh('node')),
+    datatype: lit(sh('datatype')) ?? (alt('datatype') as string | undefined),
+    nodeKind: lit(sh('nodeKind')) ?? (alt('nodeKind') as string | undefined),
+    classes: [...new Set([...all(store, id, sh('class')).map(t => t.value), ...(alternatives ?? []).flatMap(a => a.classes)])],
+    node: lit(sh('node')) ?? (alt('node') as string | undefined),
     minCount: num(one(store, id, sh('minCount'))),
     maxCount: num(one(store, id, sh('maxCount'))),
     languageIn: languageIn ? list(store, languageIn).map(t => t.value) : undefined,
@@ -190,7 +229,8 @@ function parsePropertyShape (store: Store, id: Term): PropertyShape | undefined 
     pageSize: num(one(store, id, rdm('pageSize'))),
     orderBy: lit(rdm('orderBy')),
     orderDescending: bool(one(store, id, rdm('orderDescending'))),
-    queryText: lit(rdm('queryText'))
+    queryText: lit(rdm('queryText')),
+    alternatives
   }
 }
 
@@ -221,7 +261,11 @@ function parseNodeShape (store: Store, id: Term, seen = new Set<string>()): Node
     readOnly,
     orderBy: one(store, id, rdm('orderBy'))?.value,
     orderDescending: bool(one(store, id, rdm('orderDescending'))),
-    properties: readOnly ? properties.map(p => ({ ...p, readOnly: true })) : properties
+    properties: readOnly ? properties.map(p => ({ ...p, readOnly: true })) : properties,
+    closed: bool(one(store, id, sh('closed'))),
+    ignoredProperties: list(store, one(store, id, sh('ignoredProperties'))).map(t => t.value),
+    targetSubjectsOf: all(store, id, sh('targetSubjectsOf')).map(t => t.value),
+    targetObjectsOf: all(store, id, sh('targetObjectsOf')).map(t => t.value)
   }
 }
 
@@ -253,7 +297,11 @@ function mergeShapes (shapes: NodeShape[]): NodeShape {
     order: Math.min(...shapes.map(s => s.order)),
     hideFromMenu: shapes.some(s => s.hideFromMenu),
     readOnly: shapes.every(s => s.readOnly),
-    properties: dedupeByPath(shapes.flatMap(s => s.properties))
+    properties: dedupeByPath(shapes.flatMap(s => s.properties)),
+    closed: shapes.some(s => s.closed),
+    ignoredProperties: [...new Set(shapes.flatMap(s => s.ignoredProperties))],
+    targetSubjectsOf: [...new Set(shapes.flatMap(s => s.targetSubjectsOf))],
+    targetObjectsOf: [...new Set(shapes.flatMap(s => s.targetObjectsOf))]
   }
 }
 

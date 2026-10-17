@@ -132,6 +132,20 @@ npm run load-shapes -- http://localhost:8030/jena-fuseki/metadata/         # PUT
 - New IRIs are `dash:uriStart` + a local name the user types, checked against
   `rdm:localNamePattern`.
 
+### SHACL and DASH support
+
+| Construct | Effect in the form |
+|---|---|
+| `sh:targetClass`, `rdfs:label` on the node shape | A menu entry; shapes targeting the same class are merged |
+| `sh:node` on a node shape | Inherits the parent's property shapes |
+| `sh:property` with a predicate `sh:path` | A field; complex paths are validated only |
+| `sh:datatype`, `sh:class`, `sh:nodeKind`, `sh:in`, `sh:languageIn`, `sh:minCount`, `sh:maxCount`, `sh:pattern`, `sh:defaultValue` | Choose the editor, type new literals, offer instances or options, mark required fields |
+| `sh:or` / `sh:xone` on a property shape | One field: the classes of every branch are offered together, the first branch's datatype types new literals; each branch is still validated |
+| `sh:closed`, `sh:ignoredProperties` | Triples outside the shape are listed under "Other properties" and flagged; saving never touches them |
+| `sh:targetSubjectsOf`, `sh:targetObjectsOf` | Validated, but not a menu entry: the menu and the lists are by class |
+| `dash:editor`, `dash:viewer`, `dash:readOnly`, `dash:hidden`, `dash:singleLine`, `dash:uriStart` | Widget choice, read-only and hidden fields, IRI minting |
+| Everything else in SHACL Core | Validated by shacl-engine on save, import and "Check" |
+
 Annotations in the `rdm:` namespace (`https://matdata.eu/ns/rdf-data-manager#`):
 
 | Property | Used on | Meaning |

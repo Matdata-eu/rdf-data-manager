@@ -80,6 +80,11 @@ export const nb: Record<string, string> = {
   'SPARQL update ({d} removed, {i} added)': 'SPARQL-oppdatering ({d} fjernet, {i} lagt til)',
   type: 'type',
   '(nested node)': '(nøstet node)',
+  '1 other property': '1 annen egenskap',
+  '{n} other properties': '{n} andre egenskaper',
+  'These triples are outside the shape and are left alone when the resource is saved.': 'Disse triplene ligger utenfor shapen og røres ikke når ressursen lagres.',
+  'The shape is closed, so a check reports 1 of them.': 'Shapen er lukket, så en sjekk rapporterer 1 av dem.',
+  'The shape is closed, so a check reports {n} of them.': 'Shapen er lukket, så en sjekk rapporterer {n} av dem.',
   'Used by 1 resource': 'Brukes av 1 ressurs',
   'Used by {n} resources': 'Brukes av {n} ressurser',
   // Settings
