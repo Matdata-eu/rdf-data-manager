@@ -1,6 +1,6 @@
 {
   "name": "@rdf-data-manager/store-memory",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "An in-memory SPARQL store (Oxigraph, WebAssembly) behind the RDF Data Manager client interface, for the demo mode and for tests without a server",
   "keywords": [
     "rdf",
@@ -35,7 +35,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@rdf-data-manager/core": "0.1.0",
+    "@rdf-data-manager/core": "1.0.0",
     "oxigraph": "^0.5.11"
   }
 }

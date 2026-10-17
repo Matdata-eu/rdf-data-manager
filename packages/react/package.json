@@ -1,6 +1,6 @@
 {
   "name": "@rdf-data-manager/react",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "React form components and the widget registry of RDF Data Manager: forms generated from SHACL/DASH shapes",
   "keywords": [
     "rdf",
@@ -38,7 +38,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@rdf-data-manager/core": "0.1.0"
+    "@rdf-data-manager/core": "1.0.0"
   },
   "peerDependencies": {
     "react": "^19.0.0",

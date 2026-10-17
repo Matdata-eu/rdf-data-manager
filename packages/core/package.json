@@ -1,6 +1,6 @@
 {
   "name": "@rdf-data-manager/core",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Shape-driven form state, SPARQL diffing and SHACL validation for editing RDF data: the engine of RDF Data Manager, without any UI",
   "keywords": [
     "rdf",

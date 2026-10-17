@@ -1,6 +1,6 @@
 {
   "name": "@rdf-data-manager/widget-time",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Time widget for RDF Data Manager: calendar and clock editors for OWL-Time instants and intervals and for xsd date, time and duration datatypes",
   "keywords": [
     "rdf",
@@ -38,8 +38,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@rdf-data-manager/core": "0.1.0",
-    "@rdf-data-manager/react": "0.1.0"
+    "@rdf-data-manager/core": "1.0.0",
+    "@rdf-data-manager/react": "1.0.0"
   },
   "peerDependencies": {
     "react": "^19.0.0"

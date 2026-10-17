@@ -1,0 +1,8 @@
+{
+  "packages/app": "1.0.0",
+  "packages/core": "1.0.0",
+  "packages/react": "1.0.0",
+  "packages/widget-map": "0.2.0",
+  "packages/widget-time": "0.2.0",
+  "packages/store-memory": "0.2.0"
+}
