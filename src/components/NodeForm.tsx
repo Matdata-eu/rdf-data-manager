@@ -141,25 +141,25 @@ function Field ({ property, node, onChange, issues, subjects, depth }: {
         )}
         {visible.map(v => v.node
           ? (
-            <div key={v.id} className='nested'>
-              <div className='nested-header'>
-                <span className='mono small'>{(v.node.subject && v.node.subject.termType === 'NamedNode' ? localName(v.node.subject.value) : subjects.get(v.node.id) ? localName(subjects.get(v.node.id)!) : 'new')}</span>
-                {!readOnly && <button type='button' className='button ghost small' onClick={() => remove(v)}>Remove</button>}
+              <div key={v.id} className='nested'>
+                <div className='nested-header'>
+                  <span className='mono small'>{(v.node.subject && v.node.subject.termType === 'NamedNode' ? localName(v.node.subject.value) : subjects.get(v.node.id) ? localName(subjects.get(v.node.id)!) : 'new')}</span>
+                  {!readOnly && <button type='button' className='button ghost small' onClick={() => remove(v)}>Remove</button>}
+                </div>
+                <NodeForm node={v.node} onChange={n => replace({ ...v, node: n })} issues={issues} subjects={subjects} depth={depth + 1} />
               </div>
-              <NodeForm node={v.node} onChange={n => replace({ ...v, node: n })} issues={issues} subjects={subjects} depth={depth + 1} />
-            </div>
             )
           : (
-            <div key={v.id} className='value-row'>
-              {readOnly
-                ? <ValueView property={property} value={v} />
-                : (
-                  <>
-                    <Editor kind={kind === 'details' ? 'text' : kind} property={property} value={v} onChange={replace} id={`${id}-${v.id}`} invalid={own.some(i => i.severity === 'Violation')} />
-                    <button type='button' className='icon-button' title='Remove value' aria-label={`Remove ${label} value`} onClick={() => remove(v)}>×</button>
-                  </>
-                  )}
-            </div>
+              <div key={v.id} className='value-row'>
+                {readOnly
+                  ? <ValueView property={property} value={v} />
+                  : (
+                      <>
+                        <Editor kind={kind === 'details' ? 'text' : kind} property={property} value={v} onChange={replace} id={`${id}-${v.id}`} invalid={own.some(i => i.severity === 'Violation')} />
+                        <button type='button' className='icon-button' title='Remove value' aria-label={`Remove ${label} value`} onClick={() => remove(v)}>×</button>
+                      </>
+                    )}
+              </div>
             ))}
         {expanded && values.length > shown && (
           <button type='button' className='button ghost small show-more' onClick={() => setShown(values.length)}>
