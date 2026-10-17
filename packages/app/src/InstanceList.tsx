@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react'
-import { labelOf, localName, pickByLanguage, text } from '@rdf-data-manager/core'
+import { declaredPrefixes, labelOf, localName, pickByLanguage, text, toCsv, toTable, toTurtle } from '@rdf-data-manager/core'
 import { useAsync } from '@rdf-data-manager/react'
 import { useApp } from './context'
 import { href } from './router'
+import { download, fileSlug } from './download'
 
 export function InstanceList ({ classIri }: { classIri: string }) {
   const { model, repo, languages, revision } = useApp()
@@ -21,6 +22,23 @@ export function InstanceList ({ classIri }: { classIri: string }) {
   }, [instances, filter, languages])
 
   const title = entry ? labelOf(entry.label, classIri, languages) : localName(classIri)
+  const [exporting, setExporting] = useState(false)
+  const [exportError, setExportError] = useState<string>()
+
+  const exportAs = async (format: 'ttl' | 'csv') => {
+    if (!shape) return
+    setExporting(true)
+    setExportError(undefined)
+    try {
+      const quads = await repo.loadClassData(classIri, shape, model)
+      if (format === 'ttl') download(`${fileSlug(title)}.ttl`, toTurtle(quads, declaredPrefixes(model)), 'text/turtle')
+      else download(`${fileSlug(title)}.csv`, toCsv(toTable(classIri, shape, quads, languages)), 'text/csv')
+    } catch (e) {
+      setExportError(e instanceof Error ? e.message : String(e))
+    } finally {
+      setExporting(false)
+    }
+  }
 
   return (
     <section>
@@ -29,8 +47,22 @@ export function InstanceList ({ classIri }: { classIri: string }) {
           <h1>{title}</h1>
           {entry && <p className='muted'>{text(entry.comment, languages)}</p>}
         </div>
-        {shape && !shape.readOnly && <a className='button primary' href={href({ name: 'new', classIri })}>New</a>}
+        <div className='actions'>
+          {shape && <a className='button' href={href({ name: 'validation', classIri })}>Check</a>}
+          {shape && !shape.readOnly && <a className='button' href={href({ name: 'translations', classIri })}>Translations</a>}
+          {shape && (
+            <details className='menu'>
+              <summary className='button'>{exporting ? 'Exporting…' : 'Export'}</summary>
+              <div className='menu-items'>
+                <button type='button' disabled={exporting} onClick={() => void exportAs('ttl')}>Turtle (all triples)</button>
+                <button type='button' disabled={exporting} onClick={() => void exportAs('csv')}>CSV (one row per resource)</button>
+              </div>
+            </details>
+          )}
+          {shape && !shape.readOnly && <a className='button primary' href={href({ name: 'new', classIri })}>New</a>}
+        </div>
       </div>
+      {exportError && <div className='alert error' role='alert'>{exportError}</div>}
       <input
         type='search' className='filter' placeholder='Filter by label or IRI'
         value={filter} onChange={e => setFilter(e.target.value)} aria-label='Filter'

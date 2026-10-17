@@ -14,12 +14,13 @@
     "packages/react",
     "packages/widget-map",
     "packages/widget-time",
+    "packages/store-memory",
     "packages/app",
     "packages/shapes-dim"
   ],
   "scripts": {
     "dev": "npm run dev -w packages/app",
-    "build": "npm run build -w packages/core -w packages/react -w packages/widget-map -w packages/widget-time -w packages/app",
+    "build": "npm run build -w packages/core -w packages/react -w packages/widget-map -w packages/widget-time -w packages/store-memory -w packages/app",
     "preview": "npm run preview -w packages/app",
     "test": "vitest run",
     "lint": "eslint .",

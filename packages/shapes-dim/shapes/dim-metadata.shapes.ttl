@@ -170,6 +170,7 @@ bnd:_shape_usesManagedQuery a sh:PropertyShape ;
     sh:maxCount 1 ;
     dash:editor dash:InstancesSelectEditor ;
     dash:viewer dash:LabelViewer ;
+    rdm:queryText "^dcterms:isVersionOf/spin:text" ;
     sh:group bnd:_shapeGroup_query ;
     sh:order 1 .
 

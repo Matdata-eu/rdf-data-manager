@@ -6,6 +6,7 @@ import {
 import { useForm } from '../context'
 import { useAsync } from '../useAsync'
 import type { Widget, WidgetEditorProps } from './types'
+import { AutoComplete } from './AutoComplete'
 
 interface EditorProps extends WidgetEditorProps {
   kind: EditorKind
@@ -163,8 +164,12 @@ const EDITOR_IRI: Record<EditorKind, string> = {
  * rules would give it (see editorFor), so a shape without dash:editor gets the same
  * widget it always did, and a custom widget wins by scoring higher or by being named.
  */
-export const builtinWidgets: Widget[] = EDITOR_KINDS.filter(kind => kind !== 'details').map(kind => ({
-  id: EDITOR_IRI[kind],
-  score: p => editorFor(p) === kind ? 10 : 0,
-  Editor: props => <Editor {...props} kind={kind} />
-}))
+export const builtinWidgets: Widget[] = [
+  ...EDITOR_KINDS.filter(kind => kind !== 'details').map((kind): Widget => ({
+    id: EDITOR_IRI[kind],
+    score: p => editorFor(p) === kind ? 10 : 0,
+    Editor: props => <Editor {...props} kind={kind} />
+  })),
+  // Searches the endpoint instead of listing every instance; chosen by naming it in dash:editor.
+  { id: DASH.AutoCompleteEditor, score: p => editorFor(p) === 'instances' && p.classes.length > 0 ? 9 : 0, Editor: AutoComplete }
+]

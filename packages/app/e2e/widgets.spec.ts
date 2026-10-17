@@ -40,6 +40,8 @@ test('the map widget edits a geometry node and saves the WKT', async ({ page }) 
   await expect(page.locator('.leaflet-container')).toBeVisible()
   await wkt.fill('POINT (10.75 59.91)')
   await page.getByRole('button', { name: 'Save' }).click()
+  await expect(page.getByRole('status')).toContainText('Review')
+  await page.getByRole('status').getByRole('button', { name: 'Save' }).click()
   await expect(page.getByRole('status')).toContainText('Saved')
   const rows = await select(`SELECT ?w WHERE { <${EX}geometry/oslo-s> <http://www.opengis.net/ont/geosparql#asWKT> ?w }`)
   expect(rows.map(r => r.w.value)).toEqual(['POINT (10.75 59.91)'])
@@ -54,6 +56,8 @@ test('the time widget edits an interval and a duration', async ({ page }) => {
   const duration = page.getByRole('group', { name: 'Duration' })
   await duration.locator('input[type="number"]').nth(3).fill('7')
   await page.getByRole('button', { name: 'Save' }).click()
+  await expect(page.getByRole('status')).toContainText('Review')
+  await page.getByRole('status').getByRole('button', { name: 'Save' }).click()
   await expect(page.getByRole('status')).toContainText('Saved')
   const rows = await select(`SELECT ?d ?end WHERE {
     <${EX}event/maintenance-window> <${EX}duration> ?d ;

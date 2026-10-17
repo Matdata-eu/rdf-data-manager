@@ -32,6 +32,9 @@
       ],
       "@rdf-data-manager/widget-time": [
         "./packages/widget-time/src/index.tsx"
+      ],
+      "@rdf-data-manager/store-memory": [
+        "./packages/store-memory/src/index.ts"
       ]
     }
   }

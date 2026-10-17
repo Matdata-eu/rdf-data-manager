@@ -58,6 +58,11 @@ export interface PropertyShape {
   pageSize?: number
   orderBy?: string
   orderDescending: boolean
+  /**
+   * rdm:queryText: a SPARQL property path from a value of this property to the text of a
+   * SPARQL query, so the app can offer to run it and show the result.
+   */
+  queryText?: string
 }
 
 /** True when values of this property are nested nodes edited or shown in place. */
@@ -184,7 +189,8 @@ function parsePropertyShape (store: Store, id: Term): PropertyShape | undefined 
     collapsed: one(store, id, rdm('collapsed')) ? bool(one(store, id, rdm('collapsed'))) : undefined,
     pageSize: num(one(store, id, rdm('pageSize'))),
     orderBy: lit(rdm('orderBy')),
-    orderDescending: bool(one(store, id, rdm('orderDescending')))
+    orderDescending: bool(one(store, id, rdm('orderDescending'))),
+    queryText: lit(rdm('queryText'))
   }
 }
 

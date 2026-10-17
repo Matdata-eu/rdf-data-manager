@@ -3,7 +3,7 @@ import { Repository, ShapesValidator, preferredLanguages, type ShapesModel } fro
 import { FormContext, type WidgetRegistry } from '@rdf-data-manager/react'
 import { isConfigured, loadConfig, saveConfig, type AppConfig } from './config'
 import { AppContext, type AppServices } from './context'
-import { href, navigate, useRoute } from './router'
+import { classOf, href, navigate, useRoute } from './router'
 import { loadWidgets } from './widgets'
 import { Settings } from './Settings'
 import { Sidebar } from './Sidebar'
@@ -11,6 +11,11 @@ import { InstanceList } from './InstanceList'
 import { ResourcePage } from './ResourcePage'
 import { Home } from './Home'
 import { ErrorBoundary } from './ErrorBoundary'
+import { ValidationPage } from './ValidationPage'
+import { TranslationsPage } from './TranslationsPage'
+import { SearchPage } from './SearchPage'
+import { ImportPage } from './ImportPage'
+import { SearchBox } from './SearchBox'
 
 type Boot =
   | { status: 'config' }
@@ -83,6 +88,7 @@ export function App () {
       <header className='topbar'>
         <a className='brand' href='#/'><img src='./favicon.svg' alt='' />RDF <b>Data</b> Manager</a>
         {config?.queryUrl && <span className='endpoint' title={config.queryUrl}>{config.queryUrl}</span>}
+        {services && !showSettings && <SearchBox initial={route.name === 'search' ? route.query : ''} />}
         {!locked && <a className='button ghost' href='#/settings'>Settings</a>}
       </header>
       {boot.status === 'loading' && <main className='content'><p className='muted'>Loading shapes…</p></main>}
@@ -105,7 +111,7 @@ export function App () {
         <AppContext.Provider value={services}>
           <FormContext.Provider value={services}>
             <div className='layout'>
-              <Sidebar active={route.name === 'class' || route.name === 'resource' || route.name === 'new' ? route.classIri : undefined} />
+              <Sidebar active={classOf(route)} tool={route.name === 'validation' && !route.classIri ? 'validation' : route.name === 'import' ? 'import' : undefined} />
               <main className='content'>
                 {boot.status === 'ready' && boot.failedWidgets.length > 0 && (
                   <div className='alert warning' role='alert'>
@@ -117,6 +123,10 @@ export function App () {
                   {route.name === 'class' && <InstanceList key={route.classIri} classIri={route.classIri} />}
                   {route.name === 'resource' && <ResourcePage key={`${route.classIri} ${route.iri}`} classIri={route.classIri} iri={route.iri} />}
                   {route.name === 'new' && <ResourcePage key={`new ${route.classIri}`} classIri={route.classIri} />}
+                  {route.name === 'validation' && <ValidationPage key={route.classIri ?? '*'} classIri={route.classIri} />}
+                  {route.name === 'translations' && <TranslationsPage key={route.classIri} classIri={route.classIri} />}
+                  {route.name === 'search' && <SearchPage key={route.query} query={route.query} />}
+                  {route.name === 'import' && <ImportPage />}
                 </ErrorBoundary>
               </main>
             </div>

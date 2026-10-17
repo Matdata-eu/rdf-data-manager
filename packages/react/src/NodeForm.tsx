@@ -4,6 +4,7 @@ import {
   type Issue, type Literal, type NodeState, type PropertyShape, type ValueState
 } from '@rdf-data-manager/core'
 import { useForm } from './context'
+import { QueryPreview } from './QueryPreview'
 
 interface FormProps {
   node: NodeState
@@ -166,6 +167,7 @@ function Field ({ property, node, onChange, issues, subjects, depth }: {
                         <button type='button' className='icon-button' title='Remove value' aria-label={`Remove ${label} value`} onClick={() => remove(v)}>×</button>
                       </>
                     )}
+                {property.queryText && <QueryPreview property={property} value={v} />}
               </div>
             ))}
         {expanded && values.length > shown && (

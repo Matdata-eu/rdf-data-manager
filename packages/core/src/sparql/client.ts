@@ -11,6 +11,14 @@ export interface SparqlEndpoint {
 
 export type Bindings = Record<string, Term>
 
+/** What the repository needs from a SPARQL store: the protocol client, or an in-memory store. */
+export interface SparqlQueryClient {
+  select (query: string): Promise<Bindings[]>
+  ask (query: string): Promise<boolean>
+  construct (query: string): Promise<Quad[]>
+  update (update: string): Promise<void>
+}
+
 export class SparqlError extends Error {
   constructor (message: string, readonly status?: number, readonly body?: string) {
     super(message)
@@ -39,7 +47,7 @@ function fromJson (t: JsonTerm): Term {
 }
 
 /** Minimal SPARQL 1.1 protocol client (query + update) built on fetch. */
-export class SparqlClient {
+export class SparqlClient implements SparqlQueryClient {
   constructor (readonly endpoint: SparqlEndpoint, private readonly fetchImpl: typeof fetch = (...args) => fetch(...args)) {}
 
   private async post (url: string, field: 'query' | 'update', text: string, accept?: string): Promise<Response> {
