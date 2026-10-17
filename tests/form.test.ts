@@ -7,7 +7,7 @@ import {
   type NodeState
 } from '../src/form/state'
 import { buildUpdate, diffQuads } from '../src/data/update'
-import { blankNode, literal, namedNode, quad, quadKey } from '../src/rdf/terms'
+import { blankNode, isValidIri, literal, namedNode, quad, quadKey } from '../src/rdf/terms'
 import { readTurtle } from './helpers'
 
 const BND = 'https://data.banenor.no/data/'
@@ -124,5 +124,16 @@ describe('update builder', () => {
     const update = buildUpdate(diff, 'urn:g')
     expect(update).toContain('DELETE {\nGRAPH <urn:g> {\n  <urn:a> <urn:p> ?b_x1 .')
     expect(update).toContain('INSERT DATA {\nGRAPH <urn:g> {\n  <urn:a> <urn:p> "w"@en .')
+  })
+})
+
+describe('isValidIri', () => {
+  it('accepts absolute IRIs and rejects what cannot be written as <iri>', () => {
+    expect(isValidIri('https://data.banenor.no/data/_keyFigure_x')).toBe(true)
+    expect(isValidIri('urn:uuid:123')).toBe(true)
+    expect(isValidIri('_keyFigure_x')).toBe(false)
+    expect(isValidIri('https://example.org/a b')).toBe(false)
+    expect(isValidIri('https://example.org/a>')).toBe(false)
+    expect(isValidIri('https://example.org/a"')).toBe(false)
   })
 })
