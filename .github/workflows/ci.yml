@@ -19,3 +19,32 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+
+  browser:
+    name: Browser smoke test against Fuseki
+    runs-on: ubuntu-latest
+    services:
+      fuseki:
+        image: stain/jena-fuseki:5.1.0
+        env:
+          ADMIN_PASSWORD: admin
+          FUSEKI_DATASET_1: metadata
+        ports:
+          - 3030:3030
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
+        working-directory: packages/app
+        env:
+          FUSEKI_DATASET: http://localhost:3030/metadata/
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: packages/app/test-results
