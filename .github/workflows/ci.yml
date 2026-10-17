@@ -48,7 +48,7 @@ jobs:
         working-directory: packages/app
         env:
           FUSEKI_DATASET: http://localhost:3030/metadata/
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: playwright-report
