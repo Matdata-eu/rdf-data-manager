@@ -11,3 +11,4 @@ the fact; a change of mind gets a new record that supersedes the old one.
 | [0004](0004-shapes-in-named-graph.md) | Shapes live in a named graph next to the data by default |
 | [0005](0005-rdm-annotations.md) | App behaviour that DASH cannot express uses the `rdm:` vocabulary |
 | [0006](0006-single-stack.md) | One stack: TypeScript everywhere, including tools and tests |
+| [0007](0007-workspaces-and-widgets.md) | Workspace packages and a widget registry |
