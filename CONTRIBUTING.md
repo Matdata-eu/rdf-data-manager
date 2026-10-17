@@ -22,8 +22,10 @@ works out of the box (`docker run -p 3030:3030 stain/jena-fuseki`), then load
 
 - `npm run lint`, `npm run typecheck` and `npm test` pass. CI runs the same three plus a build.
 - Code follows [Standard style](https://standardjs.com/) with TypeScript (`npm run lint:fix` fixes most of it).
-- Behaviour that can be tested without a browser has a test in `tests/`. Shape rules get a
-  file in `tests/data/invalid/` with `# expect-shape` and `# expect-severity` headers.
+- Behaviour that can be tested without a browser has a test in the package's `tests/`.
+  Shape rules get a file in `packages/shapes-dim/tests/data/invalid/` with `# expect-shape`
+  and `# expect-severity` headers. Form components are tested with Testing Library; the
+  browser smoke test (`packages/app/e2e/`) runs in CI against a Fuseki.
 - A user-facing option or a new `rdm:` annotation is documented in the README.
 - Commits follow [Conventional Commits](https://www.conventionalcommits.org/):
   `feat(app): …`, `fix(shapes): …`, `docs: …`, `chore: …`, `test: …`, `ci: …`.
@@ -41,14 +43,19 @@ reasoning, and editing ontologies or shapes themselves.
 
 | Path | What |
 |---|---|
-| `src/shapes/` | Parses SHACL/DASH into the model that drives menus and forms |
-| `src/form/` | Editable form state, defaults, IRI minting, which triples a form manages |
-| `src/data/` | Loading resources, diffing, building SPARQL Update, preparing a save |
-| `src/validation/` | SHACL validation with shacl-engine |
-| `src/sparql/` | SPARQL protocol client |
-| `src/components/` | React UI |
-| `shapes/`, `examples/`, `tools/` | The DIM metadata shapes, sample data and endpoint tools |
-| `docs/adr/` | Architecture decision records |
+| `packages/core/src/shapes/` | Parses SHACL/DASH into the model that drives menus and forms |
+| `packages/core/src/form/` | Editable form state, defaults, IRI minting, which triples a form manages |
+| `packages/core/src/data/` | Loading resources, diffing, building SPARQL Update, preparing and guarding a save |
+| `packages/core/src/validation/` | SHACL validation with shacl-engine |
+| `packages/core/src/sparql/` | SPARQL protocol client |
+| `packages/react/src/` | `NodeForm`, the widget registry and the built-in widgets |
+| `packages/app/src/` | The app shell: router, settings, pages, theme |
+| `packages/app/e2e/` | Playwright smoke test against a Fuseki |
+| `packages/shapes-dim/` | The DIM metadata shapes, sample data, invalid cases and endpoint tools |
+| `docs/` | Architecture, widgets, configuration, decision records |
+
+The workspace packages resolve to each other's sources in dev, tests and the app build, so
+nothing needs building first; `npm run build` emits `dist/` for publishing.
 
 ## Reporting a security problem
 

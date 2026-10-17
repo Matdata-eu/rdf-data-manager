@@ -1,0 +1,71 @@
+/* Form styles of @rdf-data-manager/react. Colours, fonts, spacing and radii are the CSS
+   variables the host app defines (see the app's theme.css for the full list). */
+
+.group { margin: 0 0 var(--space-6); }
+fieldset.group {
+  background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-6) var(--space-4); margin: 0 0 var(--space-6); min-width: 0;
+}
+legend { font-size: 15px; line-height: 22px; font-weight: 500; color: var(--brand); padding: 0 var(--space-2); margin-left: calc(-1 * var(--space-2)); }
+
+
+/* Fields */
+.field { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: var(--space-1) var(--space-6); padding: var(--space-4) 0; }
+.field + .field { border-top: 1px solid var(--line); }
+.field-label { display: flex; flex-direction: column; gap: 2px; padding-top: var(--space-2); }
+.field-label label { font-size: 15px; line-height: 22px; font-weight: 500; }
+.hint { color: var(--ink-muted); font-size: 14px; line-height: 20px; }
+.required { color: var(--danger); margin-left: 2px; }
+.field-values { display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; }
+.value-row { display: flex; gap: var(--space-1); align-items: flex-start; }
+.value-row > :first-child { flex: 1; min-width: 0; }
+.value-row .value { padding: var(--space-2) 0; overflow-wrap: anywhere; }
+.with-lang { display: flex; gap: var(--space-2); align-items: flex-start; }
+.with-lang > :first-child { flex: 1; min-width: 0; }
+.lang-select, .lang-input { width: 5rem; flex: none; }
+
+/* Language tags are square plates: a literal's annotation */
+.lang-tag {
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+  min-width: 40px; height: 40px; padding: 0 var(--space-2);
+  font-family: var(--font-mono); font-size: 12px; color: var(--ink);
+  background: var(--surface-sunken); border-radius: var(--radius-sm);
+}
+.value .lang-tag { height: 24px; min-width: 0; margin-left: var(--space-2); vertical-align: 1px; }
+
+.add, .collapsed-summary, .show-more { align-self: flex-start; }
+.field.has-error .field-label label { color: var(--danger); }
+.issues { list-style: none; margin: 0; padding: 0; font-size: 14px; line-height: 22px; }
+.issues li { display: flex; gap: var(--space-2); align-items: baseline; }
+.issues li::before {
+  flex: none; font-size: 12px; font-weight: 600; padding: 0 var(--space-1); border-radius: var(--radius-sm);
+}
+.issues li.violation { color: var(--danger); }
+.issues li.violation::before { content: 'Error'; background: var(--danger-soft); }
+.issues li.warning { color: var(--amber-ink); }
+.issues li.warning::before { content: 'Warning'; background: var(--amber-soft); }
+
+.collapse-toggle {
+  align-self: flex-start; border: 0; background: none; padding: 0; margin-top: var(--space-1);
+  color: var(--brand); font: 500 14px/22px var(--font-sans); cursor: pointer;
+}
+.collapse-toggle:hover { text-decoration: underline; text-underline-offset: 4px; }
+.collapse-toggle:disabled { color: var(--ink-muted); cursor: default; text-decoration: none; }
+
+/* Nested nodes sit in a sunken well; their IRI is a resource chip (a ring) */
+.nested { border: 1px solid var(--line); border-radius: var(--radius-md); padding: var(--space-2) var(--space-4) var(--space-2); background: var(--surface); }
+.nested .field { grid-template-columns: 160px minmax(0, 1fr); padding: var(--space-3) 0; }
+.nested .nested { background: var(--surface-raised); }
+.nested-header { display: flex; justify-content: space-between; align-items: center; gap: var(--space-2); padding: var(--space-1) 0 var(--space-2); border-bottom: 1px solid var(--line); }
+.nested-header .mono {
+  display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 var(--space-3) 0 var(--space-2);
+  border: 1.5px solid var(--brand); border-radius: var(--radius-pill); background: var(--surface-raised);
+  font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+}
+.nested-header .mono::before { content: ''; flex: none; width: 6px; height: 6px; border: 2px solid var(--brand); border-radius: var(--radius-pill); }
+.node-form.depth-1 > .group:not(fieldset) { background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 0 var(--space-6); }
+
+@media (max-width: 760px) {
+  .field, .nested .field { grid-template-columns: 1fr; }
+}
+
