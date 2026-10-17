@@ -37,6 +37,27 @@ function groupsOf (node: NodeState, groups: Map<string, { label: Record<string, 
   return out.sort((a, b) => a.order - b.order)
 }
 
+/**
+ * Issues on the nodes nested inside a node, for a widget that edits that node as a whole
+ * and so has no fields to show them on. Each message is prefixed with the field it is about.
+ */
+function nestedIssues (node: NodeState, issues: Issue[], subjects: Map<string, string>, languages: string[], trail: string[] = []): Issue[] {
+  const subject = subjectOf(node, subjects)
+  const out: Issue[] = []
+  for (const i of issues) {
+    if (i.focusNode !== subject) continue
+    const p = node.shape.properties.find(p => p.path.value === i.path)
+    const where = [...trail, ...(p ? [text(p.name, languages) || localName(p.path.value)] : [])]
+    out.push(where.length ? { ...i, message: `${where.join(' › ')}: ${i.message}` } : i)
+  }
+  for (const p of node.shape.properties) {
+    for (const v of node.values[p.path.value] ?? []) {
+      if (v.node) out.push(...nestedIssues(v.node, issues, subjects, languages, [...trail, text(p.name, languages) || localName(p.path.value)]))
+    }
+  }
+  return out
+}
+
 function IssueList ({ issues }: { issues: Issue[] }) {
   if (!issues.length) return null
   return (
@@ -94,7 +115,11 @@ function Field ({ property, node, onChange, issues, subjects, depth }: {
   const description = text(property.description, languages)
   const id = `f-${node.id}-${property.key}`
   const subject = subjectOf(node, subjects)
-  const own = issues.filter(i => i.focusNode === subject && i.path === path)
+  const own = [
+    ...issues.filter(i => i.focusNode === subject && i.path === path),
+    // A widget that edits a nested node as a whole shows no fields of its own for these.
+    ...(NodeEditor !== undefined && !readOnly ? values.flatMap(v => v.node ? nestedIssues(v.node, issues, subjects, languages) : []) : [])
+  ]
   const required = (property.minCount ?? 0) > 0
   const canAdd = !readOnly && (property.maxCount === undefined || values.length < property.maxCount)
   const pageSize = property.pageSize ?? DEFAULT_PAGE_SIZE
