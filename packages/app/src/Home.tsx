@@ -1,12 +1,13 @@
 import { labelOf, text } from '@rdf-data-manager/core'
 import { useApp } from './context'
 import { href } from './router'
+import { t } from './i18n'
 
 export function Home () {
   const { model, languages } = useApp()
   return (
     <section>
-      <h1>Overview</h1>
+      <h1>{t('Overview')}</h1>
       <div className='cards'>
         {model.classes.map(c => (
           <a key={c.iri} className='card link' href={href({ name: 'class', classIri: c.iri })}>

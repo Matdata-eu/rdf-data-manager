@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Map as LeafletMap, Layer } from 'leaflet'
 import { allPositions, axisOrder, fromLatLng, parseWkt, toLatLng, writeWkt, type Wkt } from './wkt'
 import { mapOptions } from './options'
+import { useT } from '@rdf-data-manager/react'
 
 interface Props {
   /** The WKT literal being edited. */
@@ -14,6 +15,7 @@ interface Props {
 
 /** Shows a WKT geometry on a map. A point can be placed by clicking and moved by dragging. */
 export function MapEditor ({ wkt, onChange, id, invalid, readOnly }: Props) {
+  const t = useT()
   const host = useRef<HTMLDivElement>(null)
   const mapRef = useRef<LeafletMap>(null)
   const layerRef = useRef<Layer>(null)
@@ -31,9 +33,9 @@ export function MapEditor ({ wkt, onChange, id, invalid, readOnly }: Props) {
       return { error: e instanceof Error ? e.message : String(e) }
     }
     const order = axisOrder(geometry.crs)
-    if (!order) return { error: 'This coordinate reference system cannot be shown on the map; edit the text.' }
+    if (!order) return { error: t('This coordinate reference system cannot be shown on the map; edit the text.') }
     return { wkt: geometry, order }
-  }, [wkt])
+  }, [wkt, t])
   const error = parsed.error
 
   // Leaflet is loaded on first use, so forms without a geometry never pay for it.
@@ -114,18 +116,18 @@ export function MapEditor ({ wkt, onChange, id, invalid, readOnly }: Props) {
 
   return (
     <div className='rdm-map'>
-      <div ref={host} className='rdm-map-canvas' aria-label='Map' role='application' />
-      {!L && <p className='muted small'>Loading map…</p>}
+      <div ref={host} className='rdm-map-canvas' aria-label={t('Map')} role='application' />
+      {!L && <p className='muted small'>{t('Loading map…')}</p>}
       {error && <p className='rdm-map-error'>{error}</p>}
       {readOnly
         ? <code className='rdm-map-wkt'>{wkt}</code>
         : (
             <textarea
-              id={id} aria-label='WKT' aria-invalid={invalid} rows={2} className='rdm-map-wkt' spellCheck={false}
+              id={id} aria-label={t('WKT')} aria-invalid={invalid} rows={2} className='rdm-map-wkt' spellCheck={false}
               placeholder='POINT (10.75 59.91)' value={wkt} onChange={e => onChange?.(e.target.value)}
             />
           )}
-      {!readOnly && <span className='hint'>Click the map to place a point, drag it to move it, or edit the WKT text. Coordinates are longitude then latitude unless the literal names another CRS.</span>}
+      {!readOnly && <span className='hint'>{t('Click the map to place a point, drag it to move it, or edit the WKT text. Coordinates are longitude then latitude unless the literal names another CRS.')}</span>}
     </div>
   )
 }

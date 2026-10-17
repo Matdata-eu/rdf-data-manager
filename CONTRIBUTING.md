@@ -51,6 +51,7 @@ reasoning, and editing ontologies or shapes themselves.
 | `packages/core/src/sparql/` | SPARQL protocol client |
 | `packages/react/src/` | `NodeForm`, the widget registry and the built-in widgets |
 | `packages/app/src/` | The app shell: router, settings, pages, theme |
+| `packages/app/src/messages/` | UI message catalogues (Norwegian Bokmål); keys are the English text |
 | `packages/app/e2e/` | Playwright smoke test against a Fuseki |
 | `packages/shapes-dim/` | The DIM metadata shapes, sample data, invalid cases and endpoint tools |
 | `docs/` | Architecture, widgets, configuration, decision records |

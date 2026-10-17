@@ -8,6 +8,7 @@ import { UsedBy } from './UsedBy'
 import { NodeForm, useAsync } from '@rdf-data-manager/react'
 import { useApp } from './context'
 import { href, navigate } from './router'
+import { n, t } from './i18n'
 
 type Phase =
   | { name: 'editing' }
@@ -44,7 +45,7 @@ export function ResourcePage ({ classIri, iri }: { classIri: string; iri?: strin
   const className = entry ? labelOf(entry.label, classIri, languages) : localName(classIri)
 
   if (!shape) {
-    return <div className='alert error'>No shape targets <code>{classIri}</code>.</div>
+    return <div className='alert error'>{t('No shape targets')} <code>{classIri}</code>.</div>
   }
   return iri
     ? <ExistingResource shape={shape} classIri={classIri} className={className} iri={iri} />
@@ -56,12 +57,12 @@ function ExistingResource ({ shape, classIri, className, iri }: { shape: NodeSha
   const [version, setVersion] = useState(0)
   const [flash, setFlash] = useState<string>()
   const loaded = useAsync(() => loadForEditing(repo, model, shape, iri), [repo, model, shape, iri, version])
-  if (loaded.status === 'loading') return <p className='muted'>Loading…</p>
+  if (loaded.status === 'loading') return <p className='muted'>{t('Loading…')}</p>
   if (loaded.status === 'error') return <div className='alert error'>{loaded.error.message}</div>
   if (loaded.value.quads.length === 0) {
     return (
       <div className='alert error'>
-        <code>{iri}</code> was not found. <a href={href({ name: 'class', classIri })}>Back to {className}</a>
+        <code>{iri}</code> {t('was not found.')} <a href={href({ name: 'class', classIri })}>{t('Back to {class}', { class: className })}</a>
       </div>
     )
   }
@@ -105,7 +106,7 @@ function Editor ({ shape, classIri, className, iri, loaded, initial, flash, onSa
   const prepared = phase.name === 'blocked' || phase.name === 'saved' || phase.name === 'review' ? phase.prepared : undefined
   const subjects = useMemo(() => prepared ? collectSubjects(prepared.state) : new Map<string, string>(), [prepared])
   const issues = prepared?.report.issues ?? []
-  const title = titleOf(state, languages) ?? (iri ? localName(iri) : `New ${className.toLowerCase()}`)
+  const title = titleOf(state, languages) ?? (iri ? localName(iri) : t('New {class}', { class: className.toLowerCase() }))
 
   const change = (next: NodeState) => {
     setState(next)
@@ -116,19 +117,19 @@ function Editor ({ shape, classIri, className, iri, loaded, initial, flash, onSa
     if (!isNew) return true
     const part = localPart.trim()
     if (!part) {
-      setNameError('Enter an identifier.')
+      setNameError(t('Enter an identifier.'))
       return false
     }
     if (shape.uriStart && shape.localNamePattern && !new RegExp(shape.localNamePattern).test(part)) {
-      setNameError(text(shape.localNameDescription, languages) ? 'This identifier does not have the expected form.' : `The identifier must match ${shape.localNamePattern}.`)
+      setNameError(text(shape.localNameDescription, languages) ? t('This identifier does not have the expected form.') : t('The identifier must match {pattern}.', { pattern: shape.localNamePattern }))
       return false
     }
     if (!isValidIri(targetIri)) {
-      setNameError(shape.uriStart ? 'The identifier contains characters that are not allowed in an IRI.' : 'Enter an absolute IRI.')
+      setNameError(shape.uriStart ? t('The identifier contains characters that are not allowed in an IRI.') : t('Enter an absolute IRI.'))
       return false
     }
     if (await repo.exists(targetIri)) {
-      setNameError(`${targetIri} already exists.`)
+      setNameError(t('{iri} already exists.', { iri: targetIri }))
       return false
     }
     setNameError(undefined)
@@ -141,10 +142,10 @@ function Editor ({ shape, classIri, className, iri, loaded, initial, flash, onSa
       if (loaded) await assertUnchanged(repo, loaded, model)
       await repo.update(p.update)
       if (isNew && !(await repo.exists(p.iri))) {
-        throw new Error(`${p.iri} was not created: it already existed, or the endpoint refused the update.`)
+        throw new Error(t('{iri} was not created: it already existed, or the endpoint refused the update.', { iri: p.iri }))
       }
       const warnings = p.report.issues.filter(i => i.severity === 'Warning').length
-      const message = `Saved.${warnings ? ` ${warnings} warning${warnings > 1 ? 's' : ''}: ${p.report.issues.filter(i => i.severity === 'Warning').map(i => i.message).join(' ')}` : ''}`
+      const message = `${t('Saved.')}${warnings ? ` ${n(warnings, '1 warning', '{n} warnings')}: ${p.report.issues.filter(i => i.severity === 'Warning').map(i => i.message).join(' ')}` : ''}`
       setPhase({ name: 'saved', prepared: p })
       notifyChanged()
       if (isNew) navigate({ name: 'resource', classIri, iri: p.iri })
@@ -213,9 +214,9 @@ function Editor ({ shape, classIri, className, iri, loaded, initial, flash, onSa
         </div>
         {!readOnly && (
           <div className='actions'>
-            {!isNew && <button type='button' className='button danger' disabled={busy} onClick={() => void askDelete()}>Delete</button>}
+            {!isNew && <button type='button' className='button danger' disabled={busy} onClick={() => void askDelete()}>{t('Delete')}</button>}
             <button type='button' className='button primary' disabled={busy} onClick={() => void save()}>
-              {phase.name === 'saving' ? 'Checking…' : isNew ? 'Create' : 'Save'}
+              {phase.name === 'saving' ? t('Checking…') : isNew ? t('Create') : t('Save')}
             </button>
           </div>
         )}
@@ -223,60 +224,60 @@ function Editor ({ shape, classIri, className, iri, loaded, initial, flash, onSa
 
       {phase.name === 'error' && <div className='alert error' role='alert'>{phase.message}</div>}
       {phase.name === 'editing' && flash && <div className='alert success' role='status'>{flash}</div>}
-      {phase.name === 'unchanged' && <div className='alert info' role='status'>Nothing to save; no changes.</div>}
+      {phase.name === 'unchanged' && <div className='alert info' role='status'>{t('Nothing to save; no changes.')}</div>}
       {phase.name === 'saved' && (
         <div className='alert success' role='status'>
-          Saved.{warnings > 0 && ` ${warnings} warning${warnings > 1 ? 's' : ''} remain, shown below.`}
+          {t('Saved.')}{warnings > 0 && ` ${n(warnings, '1 warning remains, shown below.', '{n} warnings remain, shown below.')}`}
         </div>
       )}
       {phase.name === 'review' && (
         <div className='alert info review' role='status'>
           <p>
-            <strong>Review:</strong> {phase.prepared.diff.deletes.length} triple{phase.prepared.diff.deletes.length === 1 ? '' : 's'} removed,{' '}
-            {phase.prepared.diff.inserts.length} added{warnings > 0 && <>, with {warnings} warning{warnings > 1 ? 's' : ''} shown below</>}.
+            <strong>{t('Review:')}</strong> {n(phase.prepared.diff.deletes.length, '1 triple removed', '{n} triples removed')},{' '}
+            {t('{n} added', { n: phase.prepared.diff.inserts.length })}{warnings > 0 && n(warnings, ', with 1 warning shown below', ', with {n} warnings shown below')}.
           </p>
           <ChangeList prepared={phase.prepared} shape={shape} />
           <div className='actions'>
-            <button type='button' className='button primary' onClick={() => void write(phase.prepared)}>{isNew ? 'Create' : 'Save'}</button>
-            <button type='button' className='button' onClick={() => setPhase({ name: 'editing' })}>Keep editing</button>
+            <button type='button' className='button primary' onClick={() => void write(phase.prepared)}>{isNew ? t('Create') : t('Save')}</button>
+            <button type='button' className='button' onClick={() => setPhase({ name: 'editing' })}>{t('Keep editing')}</button>
           </div>
         </div>
       )}
       {phase.name === 'blocked' && (
         <div className='alert error' role='alert'>
           <p>
-            <strong>{violations} problem{violations > 1 ? 's' : ''}</strong> must be fixed before this conforms to the shapes
-            {warnings > 0 && <> (and {warnings} warning{warnings > 1 ? 's' : ''})</>}. They are marked below.
+            <strong>{n(violations, '1 problem', '{n} problems')}</strong> {t('must be fixed before this conforms to the shapes')}
+            {warnings > 0 && <> {n(warnings, '(and 1 warning)', '(and {n} warnings)')}</>}. {t('They are marked below.')}
           </p>
           <div className='actions'>
-            <button type='button' className='button' onClick={() => void save()}>Check again</button>
-            <button type='button' className='button danger' onClick={() => void write(phase.prepared)}>Save anyway</button>
+            <button type='button' className='button' onClick={() => void save()}>{t('Check again')}</button>
+            <button type='button' className='button danger' onClick={() => void write(phase.prepared)}>{t('Save anyway')}</button>
           </div>
         </div>
       )}
       {phase.name === 'confirmDelete' && (
         <div className='alert warning' role='alert'>
           <p>
-            Delete <strong>{title}</strong> and its {loaded?.quads.length ?? 0} triples?
+            {t('Delete {title} and its {n} triples?', { title, n: loaded?.quads.length ?? 0 })}
             {phase.references > 0
-              ? <> {phase.references} triple{phase.references > 1 ? 's' : ''} elsewhere still point to it and will be left dangling.</>
-              : ' Nothing else refers to it.'}
+              ? <> {n(phase.references, '1 triple elsewhere still points to it and will be left dangling.', '{n} triples elsewhere still point to it and will be left dangling.')}</>
+              : ` ${t('Nothing else refers to it.')}`}
           </p>
           <div className='actions'>
-            <button type='button' className='button' onClick={() => setPhase({ name: 'editing' })}>Cancel</button>
-            <button type='button' className='button danger' onClick={() => void remove()}>Delete</button>
+            <button type='button' className='button' onClick={() => setPhase({ name: 'editing' })}>{t('Cancel')}</button>
+            <button type='button' className='button danger' onClick={() => void remove()}>{t('Delete')}</button>
           </div>
         </div>
       )}
 
       {isNew && (
         <div className='card identifier'>
-          <label htmlFor='local-name'>Identifier<span className='required'>*</span></label>
+          <label htmlFor='local-name'>{t('Identifier')}<span className='required'>*</span></label>
           <div className='row'>
             {shape.uriStart && <span className='mono prefix' title={shape.uriStart}>{shape.uriStart}</span>}
             <input
               id='local-name' className='mono' value={localPart} aria-invalid={Boolean(nameError)}
-              placeholder={shape.uriStart ? 'local name' : 'https://…'}
+              placeholder={shape.uriStart ? t('local name') : 'https://…'}
               onChange={e => { setLocalPart(e.target.value); setNameError(undefined) }}
             />
           </div>
@@ -291,7 +292,7 @@ function Editor ({ shape, classIri, className, iri, loaded, initial, flash, onSa
 
       {prepared && (
         <details className='update-preview' open={showUpdate} onToggle={e => setShowUpdate((e.target as HTMLDetailsElement).open)}>
-          <summary>SPARQL update ({prepared.diff.deletes.length} removed, {prepared.diff.inserts.length} added)</summary>
+          <summary>{t('SPARQL update ({d} removed, {i} added)', { d: prepared.diff.deletes.length, i: prepared.diff.inserts.length })}</summary>
           <pre>{prepared.update}</pre>
         </details>
       )}

@@ -15,7 +15,7 @@ well). All keys are optional.
 | `updateUrl` | SPARQL update endpoint; defaults to `queryUrl` | `https://data.example.org/metadata/update` |
 | `dataGraph` | Named graph holding the data; empty for the default graph | `""` |
 | `shapes` | `{"source": "endpoint", "graph": "<iri>"}` or `{"source": "url", "url": "<url>"}` | `{"source": "endpoint", "graph": "https://data.banenor.no/data/_shapes_metadata"}` |
-| `language` | Preferred language tag for labels | `nb` |
+| `language` | Preferred language tag for labels and for the interface itself (`nb`/`nn` show Norwegian) | `nb` |
 | `languages` | Language tags offered in Settings (default `["en"]`); the shapes' `rdm:languages` are added | `["en", "nb", "nn"]` |
 | `widgets` | Widgets to load: `"map"`, `"time"` (bundled, loaded on demand) or URLs of ES modules, see [WIDGETS.md](WIDGETS.md) | `["map", "time"]` |
 | `timeoutMs` | Request timeout in milliseconds (default 120000) | `60000` |

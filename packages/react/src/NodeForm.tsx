@@ -3,7 +3,7 @@ import {
   editorFor, isLangEditor, localName, newId, newNestedValue, text, viewerFor,
   type Issue, type Literal, type NodeState, type PropertyShape, type ValueState
 } from '@rdf-data-manager/core'
-import { useForm } from './context'
+import { useForm, useT } from './context'
 import { QueryPreview } from './QueryPreview'
 
 interface FormProps {
@@ -82,6 +82,7 @@ function Field ({ property, node, onChange, issues, subjects, depth }: {
   depth: number
 }) {
   const { model, languages, registry } = useForm()
+  const t = useT()
   const path = property.path.value
   const values = node.values[path] ?? []
   const kind = editorFor(property)
@@ -125,14 +126,14 @@ function Field ({ property, node, onChange, issues, subjects, depth }: {
     <div className={`field${own.some(i => i.severity === 'Violation') ? ' has-error' : ''}`}>
       <div className='field-label'>
         <label htmlFor={expanded && values[0] && !values[0].node ? `${id}-${values[0].id}` : undefined}>
-          {label}{required && !readOnly && <span className='required' title='Required'>*</span>}
+          {label}{required && !readOnly && <span className='required' title={t('Required')}>*</span>}
         </label>
         {(values.length > COLLAPSE_ABOVE || property.collapsed !== undefined) && values.length > 0 && (
           <button
             type='button' className='collapse-toggle' aria-expanded={expanded}
             onClick={() => setOpen(!expanded)} disabled={own.length > 0}
           >
-            {expanded ? '▾' : '▸'} {values.length} {values.length === 1 ? 'value' : 'values'}
+            {expanded ? '▾' : '▸'} {values.length === 1 ? t('1 value') : t('{n} values', { n: values.length })}
           </button>
         )}
         {description && <span className='hint'>{description}</span>}
@@ -140,15 +141,15 @@ function Field ({ property, node, onChange, issues, subjects, depth }: {
       <div className='field-values'>
         {!expanded && (
           <button type='button' className='button ghost small collapsed-summary' onClick={() => setOpen(true)}>
-            {values.length === 1 ? 'Show' : `Show ${values.length} ${label.toLowerCase()}`}
+            {values.length === 1 ? t('Show') : t('Show {n} {label}', { n: values.length, label: label.toLowerCase() })}
           </button>
         )}
         {visible.map(v => v.node
           ? (
               <div key={v.id} className='nested'>
                 <div className='nested-header'>
-                  <span className='mono small'>{(v.node.subject && v.node.subject.termType === 'NamedNode' ? localName(v.node.subject.value) : subjects.get(v.node.id) ? localName(subjects.get(v.node.id)!) : 'new')}</span>
-                  {!readOnly && <button type='button' className='button ghost small' onClick={() => remove(v)}>Remove</button>}
+                  <span className='mono small'>{(v.node.subject && v.node.subject.termType === 'NamedNode' ? localName(v.node.subject.value) : subjects.get(v.node.id) ? localName(subjects.get(v.node.id)!) : t('new'))}</span>
+                  {!readOnly && <button type='button' className='button ghost small' onClick={() => remove(v)}>{t('Remove')}</button>}
                 </div>
                 {NodeEditor !== undefined && !readOnly
                   ? <NodeEditor property={property} value={v} onChange={replace} id={`${id}-${v.id}`} invalid={own.some(i => i.severity === 'Violation')} />
@@ -164,7 +165,7 @@ function Field ({ property, node, onChange, issues, subjects, depth }: {
                         {Editor !== undefined
                           ? <Editor property={property} value={v} onChange={replace} id={`${id}-${v.id}`} invalid={own.some(i => i.severity === 'Violation')} />
                           : <input id={`${id}-${v.id}`} aria-invalid={own.some(i => i.severity === 'Violation')} value={v.text} onChange={e => replace({ ...v, text: e.target.value })} />}
-                        <button type='button' className='icon-button' title='Remove value' aria-label={`Remove ${label} value`} onClick={() => remove(v)}>×</button>
+                        <button type='button' className='icon-button' title={t('Remove value')} aria-label={t('Remove {label} value', { label })} onClick={() => remove(v)}>×</button>
                       </>
                     )}
                 {property.queryText && <QueryPreview property={property} value={v} />}
@@ -172,12 +173,12 @@ function Field ({ property, node, onChange, issues, subjects, depth }: {
             ))}
         {expanded && values.length > shown && (
           <button type='button' className='button ghost small show-more' onClick={() => setShown(values.length)}>
-            Show all ({values.length - shown} more)
+            {t('Show all ({n} more)', { n: values.length - shown })}
           </button>
         )}
         {canAdd && (expanded || values.length === 0) && (
           <button type='button' className='button ghost small add' onClick={add}>
-            + Add {kind === 'details' ? label.toLowerCase() : 'value'}
+            {kind === 'details' ? t('+ Add {label}', { label: label.toLowerCase() }) : t('+ Add value')}
           </button>
         )}
         <IssueList issues={own} />

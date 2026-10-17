@@ -3,7 +3,7 @@ import {
   DASH, EDITOR_KINDS, editorFor, localName, namedNode, pickByLanguage, toNT,
   type EditorKind, type InstanceSummary, type Repository
 } from '@rdf-data-manager/core'
-import { useForm } from '../context'
+import { useForm, useT } from '../context'
 import { useAsync } from '../useAsync'
 import type { Widget, WidgetEditorProps } from './types'
 import { AutoComplete } from './AutoComplete'
@@ -33,13 +33,14 @@ function loadOptions (repo: Repository, classes: string[], revision: number): Pr
 }
 
 function LanguageInput ({ property, value, onChange }: Pick<EditorProps, 'property' | 'value' | 'onChange'>) {
+  const t = useT()
   const choices = property.languages ?? property.languageIn
   const fixed = Boolean(property.languages?.includes(value.lang ?? '') && property.uniqueLang)
-  if (fixed) return <span className='lang-tag' title='Language'>{value.lang}</span>
+  if (fixed) return <span className='lang-tag' title={t('Language')}>{value.lang}</span>
   if (choices) {
     const options = value.lang && !choices.includes(value.lang) ? [...choices, value.lang] : choices
     return (
-      <select className='lang-select' value={value.lang ?? ''} aria-label='Language' onChange={e => onChange({ ...value, lang: e.target.value || undefined })}>
+      <select className='lang-select' value={value.lang ?? ''} aria-label={t('Language')} onChange={e => onChange({ ...value, lang: e.target.value || undefined })}>
         <option value=''>–</option>
         {options.map(l => <option key={l} value={l}>{l}</option>)}
       </select>
@@ -47,7 +48,7 @@ function LanguageInput ({ property, value, onChange }: Pick<EditorProps, 'proper
   }
   return (
     <input
-      className='lang-input' value={value.lang ?? ''} placeholder='lang' aria-label='Language'
+      className='lang-input' value={value.lang ?? ''} placeholder={t('lang')} aria-label={t('Language')}
       onChange={e => onChange({ ...value, lang: e.target.value.trim() || undefined })}
     />
   )
@@ -55,6 +56,7 @@ function LanguageInput ({ property, value, onChange }: Pick<EditorProps, 'proper
 
 function InstancesSelect ({ property, value, onChange, id, invalid }: WidgetEditorProps) {
   const { repo, revision, languages } = useForm()
+  const t = useT()
   const options = useAsync(() => loadOptions(repo, property.classes, revision), [repo, property.classes.join(' '), revision])
   const items = useMemo(() => {
     if (options.status !== 'ready') return []
@@ -72,7 +74,7 @@ function InstancesSelect ({ property, value, onChange, id, invalid }: WidgetEdit
         onChange({ ...value, text: picked, term: picked ? namedNode(picked) : undefined })
       }}
     >
-      <option value=''>{options.status === 'loading' ? 'Loading…' : '— choose —'}</option>
+      <option value=''>{options.status === 'loading' ? t('Loading…') : t('— choose —')}</option>
       {current && !known && <option value={current}>{localName(current)}</option>}
       {items.map(i => <option key={i.iri} value={i.iri} title={i.iri}>{i.label}</option>)}
     </select>

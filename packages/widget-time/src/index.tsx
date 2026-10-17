@@ -1,5 +1,5 @@
 import { firstNode, firstText, newNestedValue, withNode, withText, type NodeState, type PropertyShape, type ShapesModel, type Term } from '@rdf-data-manager/core'
-import { useForm, type Widget, type WidgetEditorProps } from '@rdf-data-manager/react'
+import { useForm, useT, type Widget, type WidgetEditorProps } from '@rdf-data-manager/react'
 import { LiteralEditor } from './editors'
 import { DATE, DATE_TIME, DATE_TIME_STAMP, TIME_DATATYPES, XSD } from './xsd'
 import './time.css'
@@ -44,8 +44,9 @@ function instantProperty (node: NodeState): PropertyShape | undefined {
 }
 
 function InstantEditor ({ node, onChange, id, invalid }: { node: NodeState; onChange: (n: NodeState) => void; id: string; invalid?: boolean }) {
+  const t = useT()
   const p = instantProperty(node)
-  if (!p) return <span className='muted'>This instant shape has no time:inXSD… property.</span>
+  if (!p) return <span className='muted'>{t('This instant shape has no time:inXSD… property.')}</span>
   const path = p.path.value
   return (
     <LiteralEditor
@@ -56,10 +57,11 @@ function InstantEditor ({ node, onChange, id, invalid }: { node: NodeState; onCh
 }
 
 function IntervalEditor ({ node, onChange, id, invalid, model }: { node: NodeState; onChange: (n: NodeState) => void; id: string; invalid?: boolean; model: ShapesModel }) {
-  const ends: Array<[string, string]> = [[HAS_BEGINNING, 'From'], [HAS_END, 'To']]
+  const t = useT()
+  const ends: Array<[string, string, string]> = [[HAS_BEGINNING, t('From'), t('Set from')], [HAS_END, t('To'), t('Set to')]]
   return (
-    <div className='rdm-time-interval' role='group' aria-label='Interval'>
-      {ends.map(([path, label], i) => {
+    <div className='rdm-time-interval' role='group' aria-label={t('Interval')}>
+      {ends.map(([path, label, setLabel], i) => {
         const has = node.shape.properties.some(p => p.path.value === path)
         if (!has) return null
         const end = firstNode(node, path)
@@ -69,7 +71,7 @@ function IntervalEditor ({ node, onChange, id, invalid, model }: { node: NodeSta
             <label htmlFor={endId}>{label}</label>
             {end
               ? <InstantEditor node={end} id={endId} invalid={invalid} onChange={n => onChange(withNode(node, path, n, model))} />
-              : <button type='button' className='button ghost small' aria-label={`Set ${label.toLowerCase()}`} onClick={() => onChange(addEnd(node, path, model))}>+ Set</button>}
+              : <button type='button' className='button ghost small' aria-label={setLabel} onClick={() => onChange(addEnd(node, path, model))}>{t('+ Set')}</button>}
           </div>
         )
       })}

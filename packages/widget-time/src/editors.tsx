@@ -1,3 +1,4 @@
+import { useT } from '@rdf-data-manager/react'
 import {
   DATE, DATE_TIME, DATE_TIME_STAMP, DURATION, G_YEAR, G_YEAR_MONTH, TIME, ZONES,
   joinDateTime, localZone, parseDuration, splitDateTime, writeDuration, type Duration
@@ -33,6 +34,7 @@ export function LiteralEditor ({ datatype, text, onChange, id, invalid }: Litera
 }
 
 function DateTimeEditor ({ text, onChange, id, invalid, zoneRequired }: Omit<LiteralProps, 'datatype'> & { zoneRequired: boolean }) {
+  const t = useT()
   const parts = splitDateTime(text)
   const zone = parts.zone || (zoneRequired ? localZone() : '')
   const zones = ZONES.includes(zone) || !zone ? ZONES : [...ZONES, zone]
@@ -43,10 +45,10 @@ function DateTimeEditor ({ text, onChange, id, invalid, zoneRequired }: Omit<Lit
         onChange={e => onChange(joinDateTime({ local: e.target.value, zone: e.target.value ? zone : '' }))}
       />
       <select
-        aria-label='Time zone' value={zone} className='rdm-time-zone'
+        aria-label={t('Time zone')} value={zone} className='rdm-time-zone'
         onChange={e => onChange(joinDateTime({ local: parts.local, zone: e.target.value }))}
       >
-        {!zoneRequired && <option value=''>no zone</option>}
+        {!zoneRequired && <option value=''>{t('no zone')}</option>}
         {zones.map(z => <option key={z} value={z}>{z === 'Z' ? 'UTC' : `UTC${z}`}</option>)}
       </select>
     </div>
@@ -58,22 +60,23 @@ const DURATION_FIELDS: Array<[keyof Omit<Duration, 'negative'>, string]> = [
 ]
 
 function DurationEditor ({ text, onChange, id, invalid }: Omit<LiteralProps, 'datatype'>) {
+  const t = useT()
   const d = parseDuration(text)
   const set = (patch: Partial<Duration>) => onChange(writeDuration({ ...d, ...patch }))
   return (
-    <div className='rdm-time-duration' role='group' aria-label='Duration'>
+    <div className='rdm-time-duration' role='group' aria-label={t('Duration')}>
       {DURATION_FIELDS.map(([key, label], i) => (
         <label key={key} className='rdm-time-part'>
           <input
             id={i === 0 ? id : undefined} aria-invalid={invalid} type='number' min='0' step={key === 'seconds' ? 'any' : '1'}
             value={d[key]} placeholder='0' onChange={e => set({ [key]: e.target.value })}
           />
-          <span>{label}</span>
+          <span>{t(label)}</span>
         </label>
       ))}
       <label className='rdm-time-part'>
         <input type='checkbox' checked={d.negative} onChange={e => set({ negative: e.target.checked })} />
-        <span>negative</span>
+        <span>{t('negative')}</span>
       </label>
       <code className='rdm-time-lexical'>{text || 'P…'}</code>
     </div>
