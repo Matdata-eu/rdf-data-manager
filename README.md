@@ -37,8 +37,8 @@ docker run -p 8080:8080 -e RDM_DATASET=http://host.docker.internal:3030/metadata
 docker compose up --build                                       # the app next to a Fuseki, for a local trial
 ```
 
-Every push to `main` deploys to GitHub Pages; releases are cut by Release Please from the
-conventional commit history and publish the npm package and the container image.
+Every push to `main` deploys to GitHub Pages. Publishing a GitHub release with a `vX.Y.Z`
+tag publishes the npm packages and the container image at that version.
 
 Open Settings and enter the endpoint (for Fuseki, the dataset URL fills in the query and
 update URLs) and where the shapes come from: a named graph in the endpoint, a Turtle URL
