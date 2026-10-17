@@ -1,7 +1,7 @@
 # Changelog
 
-Releases are cut by Release Please from the conventional commit messages on `main`; each
-release adds its section here. The entries below summarise what the first release carries.
+Each GitHub release adds its section here, written from the conventional commit messages
+on `main`. The entries below summarise what the first release carries.
 
 ## Unreleased
 
