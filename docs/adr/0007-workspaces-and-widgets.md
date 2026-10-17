@@ -27,6 +27,6 @@ list) moved out of the generic code into configuration and the shapes package.
 
 - Widgets are developed in this repository for now and published from it; moving one to
   its own repository later is a directory move.
-- The three public packages share one version (Release Please, linked versions).
+- The three public packages share one version, set from the release tag when a GitHub release is published.
 - In development the packages resolve to each other's sources; `dist/` exists only for
   publishing.
