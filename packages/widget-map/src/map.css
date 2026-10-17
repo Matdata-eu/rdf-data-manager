@@ -4,3 +4,7 @@
 code.rdm-map-wkt { overflow-wrap: anywhere; }
 .rdm-map-error { color: var(--danger, #b00020); margin: 0; font-size: 14px; }
 .rdm-map-marker { width: 16px; height: 16px; border-radius: 50%; background: var(--brand, #0563bb); border: 2px solid #fff; box-shadow: 0 0 0 1px var(--brand, #0563bb); }
+.rdm-map-tools { display: flex; flex-wrap: wrap; gap: var(--space-2, 8px); }
+.rdm-map-tools [aria-pressed='true'] { background: var(--brand-soft, #e6f0fa); border-color: var(--brand, #0563bb); color: var(--brand, #0563bb); }
+.rdm-map.drawing .leaflet-container { cursor: crosshair; }
+.rdm-map-vertex { width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; background: #fff; border: 2px solid var(--brand, #0563bb); cursor: move; }
