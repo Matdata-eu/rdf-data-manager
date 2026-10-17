@@ -15,7 +15,8 @@ npm test
 
 Node 22 or later. There is no backend: the app talks to a SPARQL endpoint from the browser.
 For a local endpoint, [Apache Jena Fuseki](https://jena.apache.org/documentation/fuseki2/)
-works out of the box (`docker run -p 3030:3030 stain/jena-fuseki`), then load
+works out of the box (`fuseki-server --mem --update /metadata` from the Apache
+release, or `docker compose up fuseki` for a container), then load
 `shapes/dim-metadata.shapes.ttl` and `examples/dim-metadata.sample.ttl` or your own data.
 
 ## Before you open a pull request
