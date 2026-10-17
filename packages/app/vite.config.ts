@@ -13,7 +13,8 @@ const alias = {
   '@rdf-data-manager/core': fileURLToPath(new URL('../core/src/index.ts', import.meta.url)),
   '@rdf-data-manager/react': fileURLToPath(new URL('../react/src/index.ts', import.meta.url)),
   '@rdf-data-manager/widget-map': fileURLToPath(new URL('../widget-map/src/index.tsx', import.meta.url)),
-  '@rdf-data-manager/widget-time': fileURLToPath(new URL('../widget-time/src/index.tsx', import.meta.url))
+  '@rdf-data-manager/widget-time': fileURLToPath(new URL('../widget-time/src/index.tsx', import.meta.url)),
+  '@rdf-data-manager/store-memory': fileURLToPath(new URL('../store-memory/src/index.ts', import.meta.url))
 }
 
 export default defineConfig({

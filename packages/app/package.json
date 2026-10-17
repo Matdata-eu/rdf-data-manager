@@ -46,6 +46,7 @@
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "@rdf-data-manager/widget-map": "0.1.0",
-    "@rdf-data-manager/widget-time": "0.1.0"
+    "@rdf-data-manager/widget-time": "0.1.0",
+    "@rdf-data-manager/store-memory": "0.1.0"
   }
 }

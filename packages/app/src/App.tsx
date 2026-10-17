@@ -39,15 +39,27 @@ export function App () {
   const [revision, setRevision] = useState(0)
   const route = useRoute()
 
-  const start = useCallback(async (config: AppConfig) => {
-    setBoot({ status: 'loading', config })
+  const start = useCallback(async (requested: AppConfig) => {
+    setBoot({ status: 'loading', config: requested })
     try {
-      const repo = new Repository(config)
+      let config = requested
+      let repo: Repository
+      if (requested.demo) {
+        // The demo runs on an in-browser store, loaded on demand so the normal app never pays for it.
+        const { findDemo, startDemo } = await import('./demo')
+        const demo = findDemo(requested.demo)
+        if (!demo) throw new Error(`There is no demo called "${requested.demo}".`)
+        const started = await startDemo(demo, requested)
+        config = started.config
+        repo = new Repository(config, started.client)
+      } else {
+        repo = new Repository(config)
+      }
       const [model, { registry, failed }] = await Promise.all([repo.loadShapes(), loadWidgets(config.widgets)])
       const validator = new ShapesValidator(model.quads)
       setBoot({ status: 'ready', config, repo, model, validator, registry, failedWidgets: failed })
     } catch (error) {
-      setBoot({ status: 'error', config, error: error instanceof Error ? error : new Error(String(error)) })
+      setBoot({ status: 'error', config: requested, error: error instanceof Error ? error : new Error(String(error)) })
     }
   }, [])
 
@@ -87,7 +99,9 @@ export function App () {
     <div className='app'>
       <header className='topbar'>
         <a className='brand' href='#/'><img src='./favicon.svg' alt='' />RDF <b>Data</b> Manager</a>
-        {config?.queryUrl && <span className='endpoint' title={config.queryUrl}>{config.queryUrl}</span>}
+        {config?.demo
+          ? <span className='endpoint demo-badge' title='The data lives in this browser tab; nothing is sent anywhere, and a reload starts over.'>Demo: changes stay in this tab</span>
+          : config?.queryUrl && <span className='endpoint' title={config.queryUrl}>{config.queryUrl}</span>}
         {services && !showSettings && <SearchBox initial={route.name === 'search' ? route.query : ''} />}
         {!locked && <a className='button ghost' href='#/settings'>Settings</a>}
       </header>
