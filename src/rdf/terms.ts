@@ -88,6 +88,15 @@ export function pickByLanguage (literals: Term[], preferred: string[]): Term | u
   return lits.find(l => !l.language) ?? lits[0] ?? literals[0]
 }
 
+/**
+ * True for an absolute IRI that can be written as <iri> in SPARQL and Turtle: a scheme,
+ * and none of the characters those syntaxes exclude (whitespace, <>"{}|^` and controls).
+ */
+export function isValidIri (iri: string): boolean {
+  // eslint-disable-next-line no-control-regex
+  return /^[a-z][a-z0-9+.-]*:[^\u0000-\u0020<>"{}|^`\\]*$/i.test(iri)
+}
+
 /** Short, readable form of an IRI: the part after the last '#' or '/'. */
 export function localName (iri: string): string {
   const m = /[^#/]*$/.exec(iri)
