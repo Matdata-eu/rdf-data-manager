@@ -1,0 +1,22 @@
+# Local trial: the app next to a Fuseki with an in-memory dataset.
+#   docker compose up --build
+#   npm run load-shapes -- http://localhost:3030/metadata/      # shapes into their graph
+#   curl -X POST -H 'Content-Type: text/turtle' --data-binary @examples/dim-metadata.sample.ttl http://localhost:3030/metadata/data
+# then open http://localhost:8080/
+services:
+  fuseki:
+    image: stain/jena-fuseki:5.1.0
+    environment:
+      ADMIN_PASSWORD: admin
+      FUSEKI_DATASET_1: metadata
+    ports:
+      - "3030:3030"
+  app:
+    build: .
+    environment:
+      RDM_DATASET: http://localhost:3030/metadata/
+      RDM_SHAPES_GRAPH: https://data.banenor.no/data/_shapes_metadata
+    ports:
+      - "8080:8080"
+    depends_on:
+      - fuseki
