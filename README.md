@@ -38,7 +38,8 @@ conventional commit history and publish the npm package and the container image.
 
 Open Settings and enter the endpoint (for Fuseki, the dataset URL fills in the query and
 update URLs) and where the shapes come from: a named graph in the endpoint, a Turtle URL
-or a local file. Settings are kept in the browser. They can also be passed in the URL,
+or a local file. For the DIM metadata the shapes graph is
+`https://data.banenor.no/data/_shapes_metadata`. Settings are kept in the browser. They can also be passed in the URL,
 e.g. `?dataset=http://localhost:3030/metadata/&shapesGraph=https://…`, or served as a
 `config.json` next to `index.html` (`"locked": true` hides Settings).
 
@@ -59,16 +60,29 @@ What the app does:
 - Validates the would-be stored data with the shapes before every save (in the browser,
   with [shacl-engine](https://github.com/rdf-ext/shacl-engine)). Violations block the save
   unless you choose "Save anyway"; warnings are shown after saving.
+- Refuses to save over someone else's edit: a resource that changed since it was opened
+  must be reloaded first, and creating an IRI that appeared in the meantime fails.
 - Writes only the triples the form manages, as a minimal `DELETE DATA` / `INSERT DATA`
   update, so properties outside the shapes are left alone.
+
+## Packages
+
+The repository is an npm workspace ([docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)):
+
+| Package | What | npm |
+|---|---|---|
+| [packages/core](packages/core) | Shapes model, form state, diff and SPARQL Update, SPARQL client, SHACL validation. Plain TypeScript, no UI | `@rdf-data-manager/core` |
+| [packages/react](packages/react) | `NodeForm` and the widget registry; forms for any React app ([docs/WIDGETS.md](docs/WIDGETS.md)) | `@rdf-data-manager/react` |
+| [packages/app](packages/app) | The app: router, settings, theme, `config.json`, runtime widget loading | `rdf-data-manager` |
+| [packages/shapes-dim](packages/shapes-dim) | The Bane NOR DIM shapes, sample data, invalid test cases and endpoint tools | private |
 
 ## Shapes
 
 | File | Content |
 |---|---|
-| [shapes/dim-metadata.shapes.ttl](shapes/dim-metadata.shapes.ttl) | SHACL/DASH shapes for `dcat:Dataset`, `bno:KeyFigure`, `bno:KeyFigureTable`, `bno:KeyFigureSection`, `csvw:Column` and (read-only) `dcat:Distribution` |
-| [examples/dim-metadata.sample.ttl](examples/dim-metadata.sample.ttl) | Sample metadata that conforms to the shapes |
-| [tests/data/invalid/](tests/data/invalid/) | One file per rule the shapes must catch |
+| [packages/shapes-dim/shapes/dim-metadata.shapes.ttl](packages/shapes-dim/shapes/dim-metadata.shapes.ttl) | SHACL/DASH shapes for `dcat:Dataset`, `bno:KeyFigure`, `bno:KeyFigureTable`, `bno:KeyFigureSection`, `csvw:Column` and (read-only) `dcat:Distribution` |
+| [packages/shapes-dim/examples/dim-metadata.sample.ttl](packages/shapes-dim/examples/dim-metadata.sample.ttl) | Sample metadata that conforms to the shapes |
+| [packages/shapes-dim/tests/data/invalid/](packages/shapes-dim/tests/data/invalid/) | One file per rule the shapes must catch |
 
 Datasets, key figures and key figure tables need exactly one title and one description in
 each of English (`en`), Bokmål (`nb`) and Nynorsk (`nn`). Key figure sections need an English
@@ -78,8 +92,9 @@ The shapes are meant to live in the named graph
 `<https://data.banenor.no/data/_shapes_metadata>` of `/metadata`, next to the data.
 
 ```bash
-npm test                                                              # shapes vs. sample and invalid cases, form logic
+npm test                                                              # shapes vs. sample and invalid cases, form logic, form components
 npm run lint                                                          # Standard style with TypeScript (npm run lint:fix repairs most findings)
+FUSEKI_DATASET=http://localhost:3030/metadata/ npx playwright test    # browser smoke test, from packages/app, against a Fuseki
 npm run validate-endpoint -- http://localhost:8030/jena-fuseki/metadata/   # reads shape targets only; --full, --no-distributions, --timeout, --json
 npm run load-shapes -- http://localhost:8030/jena-fuseki/metadata/         # PUT the shapes into their named graph
 ```
@@ -89,7 +104,8 @@ npm run load-shapes -- http://localhost:8030/jena-fuseki/metadata/         # PUT
 - Every class targeted by a node shape with an `rdfs:label` becomes a menu entry, in
   `rdm:order`. Shapes targeting the same class are merged.
 - Property shapes give the form fields: `sh:group` and `sh:order` place them,
-  `dash:editor` / `dash:viewer` choose the widget, `dash:readOnly` disables editing.
+  `dash:editor` / `dash:viewer` choose the widget (any registered widget, built-in or added
+  through `config.json`; see [docs/WIDGETS.md](docs/WIDGETS.md)), `dash:readOnly` disables editing.
 - Nested resources (a table's columns) use `dash:DetailsEditor` with `sh:node`.
 - New IRIs are `dash:uriStart` + a local name the user types, checked against
   `rdm:localNamePattern`.

@@ -1,48 +1,31 @@
 {
-  "name": "rdf-data-manager",
+  "name": "rdf-data-manager-monorepo",
   "version": "0.1.0",
-  "description": "CRUD web application for RDF data behind a SPARQL endpoint, driven by SHACL/DASH shapes",
+  "private": true,
   "license": "MIT",
   "type": "module",
-  "keywords": [
-    "rdf",
-    "sparql",
-    "shacl",
-    "dash",
-    "linked-data",
-    "forms",
-    "crud"
-  ],
-  "homepage": "https://github.com/Matdata-eu/rdf-data-manager#readme",
+  "description": "CRUD web application for RDF data behind a SPARQL endpoint, driven by SHACL/DASH shapes",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Matdata-eu/rdf-data-manager.git"
   },
-  "bugs": {
-    "url": "https://github.com/Matdata-eu/rdf-data-manager/issues"
-  },
-  "bin": {
-    "rdf-data-manager": "bin/rdf-data-manager.js"
-  },
-  "files": [
-    "dist",
-    "bin",
-    "shapes",
-    "examples",
-    "docs/CONFIG.md",
-    "public/config.schema.json"
+  "workspaces": [
+    "packages/core",
+    "packages/react",
+    "packages/app",
+    "packages/shapes-dim"
   ],
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "preview": "vite preview",
+    "dev": "npm run dev -w packages/app",
+    "build": "npm run build -w packages/core -w packages/react -w packages/app",
+    "preview": "npm run preview -w packages/app",
     "test": "vitest run",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "prepare": "simple-git-hooks",
     "typecheck": "tsc -b",
-    "validate-endpoint": "tsx tools/validate-endpoint.ts",
-    "load-shapes": "tsx tools/load-shapes.ts"
+    "validate-endpoint": "npm run validate-endpoint -w packages/shapes-dim --",
+    "load-shapes": "npm run load-shapes -w packages/shapes-dim --",
+    "prepare": "simple-git-hooks"
   },
   "engines": {
     "node": ">=20"
@@ -53,17 +36,10 @@
   "lint-staged": {
     "*.{ts,tsx,js}": "eslint --fix"
   },
-  "dependencies": {
-    "@fontsource/barlow": "^5.3.0",
-    "@fontsource/jetbrains-mono": "^5.3.0",
-    "@rdfjs/data-model": "^2.1.2",
-    "@rdfjs/dataset": "^2.0.3",
-    "n3": "^2.13.12",
-    "react": "^19.3.1",
-    "react-dom": "^19.3.1",
-    "shacl-engine": "^1.1.3"
-  },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@rdfjs/types": "^2.0.1",
+    "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@types/n3": "^1.26.4",
     "@types/node": "^22.20.5",

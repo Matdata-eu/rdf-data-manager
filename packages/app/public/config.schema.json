@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://matdata.eu/ns/rdf-data-manager/config.schema.json",
+  "title": "RDF Data Manager deployment configuration",
+  "description": "config.json next to index.html. Every key is optional; the user's saved settings and URL parameters win unless locked is true.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "queryUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "SPARQL query endpoint"
+    },
+    "updateUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "SPARQL update endpoint; defaults to queryUrl"
+    },
+    "dataGraph": {
+      "type": "string",
+      "description": "Named graph holding the data; empty for the default graph"
+    },
+    "shapes": {
+      "description": "Where the SHACL/DASH shapes come from",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source",
+            "graph"
+          ],
+          "properties": {
+            "source": {
+              "const": "endpoint"
+            },
+            "graph": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source",
+            "url"
+          ],
+          "properties": {
+            "source": {
+              "const": "url"
+            },
+            "url": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        }
+      ]
+    },
+    "language": {
+      "type": "string",
+      "description": "Preferred language tag for labels, e.g. en, nb, nn"
+    },
+    "timeoutMs": {
+      "type": "integer",
+      "minimum": 1000,
+      "description": "Request timeout in milliseconds"
+    },
+    "locked": {
+      "type": "boolean",
+      "description": "true hides Settings and ignores saved settings and URL parameters"
+    },
+    "languages": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Language tags offered in Settings; the shapes' rdm:languages are added"
+    },
+    "widgets": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uri"
+      },
+      "description": "URLs of ES modules whose default export is a Widget or an array of Widgets"
+    }
+  }
+}

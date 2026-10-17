@@ -24,6 +24,16 @@ elif [ -n "$RDM_SHAPES_GRAPH" ]; then
   add shapes "{\"source\":\"endpoint\",\"graph\":$(str "$RDM_SHAPES_GRAPH")}"
 fi
 add language "$([ -n "$RDM_LANGUAGE" ] && str "$RDM_LANGUAGE")"
+list() { # comma-separated -> JSON array of strings
+  [ -z "$1" ] && return 0
+  printf '['; first=1
+  for item in $(printf '%s' "$1" | tr ',' ' '); do
+    [ $first = 0 ] && printf ','; first=0; str "$item"
+  done
+  printf ']'
+}
+add languages "$(list "$RDM_LANGUAGES")"
+add widgets "$(list "$RDM_WIDGETS")"
 add timeoutMs "$RDM_TIMEOUT_MS"
 add locked "$RDM_LOCKED"
 json="$json}"

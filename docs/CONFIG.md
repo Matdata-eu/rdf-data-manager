@@ -6,7 +6,7 @@ in `config.json`, only that file counts and Settings is hidden.
 
 ## config.json
 
-Schema: [`config.schema.json`](../public/config.schema.json) (served next to the app as
+Schema: [`config.schema.json`](../packages/app/public/config.schema.json) (served next to the app as
 well). All keys are optional.
 
 | Key | Meaning | Example |
@@ -16,6 +16,8 @@ well). All keys are optional.
 | `dataGraph` | Named graph holding the data; empty for the default graph | `""` |
 | `shapes` | `{"source": "endpoint", "graph": "<iri>"}` or `{"source": "url", "url": "<url>"}` | `{"source": "endpoint", "graph": "https://data.banenor.no/data/_shapes_metadata"}` |
 | `language` | Preferred language tag for labels | `nb` |
+| `languages` | Language tags offered in Settings (default `["en"]`); the shapes' `rdm:languages` are added | `["en", "nb", "nn"]` |
+| `widgets` | URLs of ES modules that add widgets, see [WIDGETS.md](WIDGETS.md) | `["https://cdn.example.org/rdm-widget-map.js"]` |
 | `timeoutMs` | Request timeout in milliseconds (default 120000) | `60000` |
 | `locked` | Hide Settings and ignore browser and URL settings | `true` |
 
@@ -46,6 +48,8 @@ entrypoint writes `config.json` from environment variables; unset ones are left 
 | `RDM_DATA_GRAPH` | `dataGraph` |
 | `RDM_SHAPES_GRAPH` or `RDM_SHAPES_URL` | `shapes` |
 | `RDM_LANGUAGE` | `language` |
+| `RDM_LANGUAGES` | `languages` (comma-separated) |
+| `RDM_WIDGETS` | `widgets` (comma-separated URLs) |
 | `RDM_TIMEOUT_MS` | `timeoutMs` |
 | `RDM_LOCKED` | `locked` (`true` or `false`) |
 

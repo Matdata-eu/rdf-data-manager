@@ -1,0 +1,49 @@
+{
+  "name": "rdf-data-manager",
+  "version": "0.1.0",
+  "description": "CRUD web application for RDF data behind a SPARQL endpoint, driven by SHACL/DASH shapes",
+  "keywords": [
+    "rdf",
+    "sparql",
+    "shacl",
+    "dash",
+    "linked-data",
+    "forms",
+    "crud"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Matdata-eu/rdf-data-manager.git"
+  },
+  "homepage": "https://github.com/Matdata-eu/rdf-data-manager#readme",
+  "bugs": {
+    "url": "https://github.com/Matdata-eu/rdf-data-manager/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "rdf-data-manager": "bin/rdf-data-manager.js"
+  },
+  "files": [
+    "dist",
+    "bin",
+    "public/config.schema.json"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@rdf-data-manager/core": "0.1.0",
+    "@rdf-data-manager/react": "0.1.0",
+    "@fontsource/barlow": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  }
+}

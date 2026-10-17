@@ -18,13 +18,14 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     outputs:
-      released: ${{ steps.release.outputs.release_created }}
-      tag: ${{ steps.release.outputs.tag_name }}
+      released: ${{ steps.release.outputs.releases_created }}
+      tag: ${{ steps.release.outputs['packages/app--tag_name'] }}
     steps:
       - id: release
         uses: googleapis/release-please-action@v4
         with:
-          release-type: node
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
 
   npm:
     needs: release-please
@@ -39,7 +40,7 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: npm ci
       - run: npm run build
-      - run: npm publish --provenance --access public
+      - run: npm publish --workspaces --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
