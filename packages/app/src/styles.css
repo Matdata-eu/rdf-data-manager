@@ -199,6 +199,10 @@ input[type='radio'], input[type='checkbox'] { width: auto; height: auto; accent-
 .data-table.summary td.warning { color: var(--amber-ink); }
 
 /* Used by */
+.other-properties { margin-top: var(--space-6); }
+.other-properties summary { cursor: pointer; color: var(--ink-muted); font-size: 14px; }
+.other-properties .data-table { margin-top: var(--space-2); }
+.other-properties tr.violation th { color: var(--danger); }
 .used-by { margin-top: var(--space-6); }
 .used-by summary { cursor: pointer; color: var(--ink-muted); font-size: 14px; }
 .used-by ul { margin: var(--space-2) 0 0; padding-left: var(--space-5); }

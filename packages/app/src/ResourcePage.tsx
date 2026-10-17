@@ -5,6 +5,7 @@ import {
   type LoadedResource, type NodeShape, type NodeState, type PreparedSave
 } from '@rdf-data-manager/core'
 import { UsedBy } from './UsedBy'
+import { OtherProperties } from './OtherProperties'
 import { NodeForm, useAsync } from '@rdf-data-manager/react'
 import { useApp } from './context'
 import { href, navigate } from './router'
@@ -296,6 +297,7 @@ function Editor ({ shape, classIri, className, iri, loaded, initial, flash, onSa
           <pre>{prepared.update}</pre>
         </details>
       )}
+      {loaded && <OtherProperties quads={loaded.quads} iri={loaded.iri} shape={shape} />}
       {loaded && <UsedBy iri={loaded.iri} owned={ownedOf(loaded)} />}
     </section>
   )
