@@ -115,6 +115,26 @@ describe('form state', () => {
 })
 
 describe('update builder', () => {
+  it('replaces a changed blank node as a whole, anchored from its parent', () => {
+    const a = namedNode('urn:a')
+    const p = namedNode('urn:p')
+    const q = namedNode('urn:q')
+    const [b0, b1] = [blankNode('b0'), blankNode('b1')]
+    const before = [quad(a, p, b0), quad(b0, q, b1), quad(b1, q, literal('old')), quad(a, q, literal('kept')), quad(a, q, literal('x'))]
+    const after = [quad(a, p, b0), quad(b0, q, b1), quad(b1, q, literal('new')), quad(a, q, literal('kept')), quad(a, q, literal('y'))]
+    const diff = diffQuads(before, after)
+    expect(diff.deletes).toHaveLength(4)
+    expect(diff.inserts).toHaveLength(4)
+    expect(diff.deletes.map(x => x.object.value)).toContain('x')
+    expect(diff.inserts.map(x => x.object.value)).toContain('y')
+    expect(diff.deletes.map(quadKey)).toContain(quadKey(quad(a, p, b0)))
+    expect(diff.inserts.map(x => x.object.value)).toContain('new')
+    const update = buildUpdate(diff)
+    expect(update).toContain('<urn:a> <urn:p> ?b_b0 .')
+    expect(update).toContain('?b_b1 <urn:q> "old" .')
+    expect(update).toContain('_:b1 <urn:q> "new" .')
+  })
+
   it('deletes blank-node triples with a pattern and wraps a data graph', () => {
     const b = blankNode('x1')
     const diff = {

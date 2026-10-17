@@ -5,13 +5,54 @@ export interface Diff {
   inserts: Quad[]
 }
 
+/**
+ * The quads to delete and insert to turn `before` into `after`.
+ *
+ * A blank node has no identity outside its graph, so a changed triple of one cannot be
+ * swapped on its own: the delete would match by value and the insert would mint a new,
+ * unconnected node. Every blank node touched by a change is therefore replaced as a
+ * whole: all of its triples (and those of blank nodes reachable from it, and the triple
+ * that links it from its parent) are deleted and the new ones inserted.
+ */
 export function diffQuads (before: Quad[], after: Quad[]): Diff {
   const beforeKeys = new Map(before.map(q => [quadKey(q), q]))
   const afterKeys = new Map(after.map(q => [quadKey(q), q]))
-  return {
-    deletes: [...beforeKeys].filter(([k]) => !afterKeys.has(k)).map(([, q]) => q),
-    inserts: [...afterKeys].filter(([k]) => !beforeKeys.has(k)).map(([, q]) => q)
+  const deletes = [...beforeKeys].filter(([k]) => !afterKeys.has(k)).map(([, q]) => q)
+  const inserts = [...afterKeys].filter(([k]) => !beforeKeys.has(k)).map(([, q]) => q)
+  const touched = new Set<string>()
+  for (const q of [...deletes, ...inserts]) for (const b of blanksOf(q)) touched.add(b)
+  if (!touched.size) return { deletes, inserts }
+  return { deletes: merge(deletes, closure(before, touched)), inserts: merge(inserts, closure(after, touched)) }
+}
+
+function merge (a: Quad[], b: Quad[]): Quad[] {
+  const seen = new Set(a.map(quadKey))
+  return [...a, ...b.filter(q => !seen.has(quadKey(q)))]
+}
+
+function blanksOf (q: Quad): string[] {
+  return [q.subject, q.object].filter(t => t.termType === 'BlankNode').map(t => t.value)
+}
+
+/** All quads of a set that mention a blank node in `seeds`, following blank nodes transitively. */
+function closure (quads: Quad[], seeds: Set<string>): Quad[] {
+  const blanks = new Set<string>()
+  const out: Quad[] = []
+  const taken = new Set<string>()
+  const queue = [...seeds]
+  while (queue.length) {
+    const b = queue.pop()!
+    if (blanks.has(b)) continue
+    blanks.add(b)
+    for (const q of quads) {
+      const own = blanksOf(q)
+      if (!own.includes(b) || taken.has(quadKey(q))) continue
+      taken.add(quadKey(q))
+      out.push(q)
+      for (const other of own) if (!blanks.has(other)) queue.push(other)
+    }
   }
+  return out
 }
 
 function hasBlank (q: Quad): boolean {
