@@ -146,7 +146,8 @@ npm run load-shapes -- http://localhost:8030/jena-fuseki/metadata/         # PUT
 | `dash:editor`, `dash:viewer`, `dash:readOnly`, `dash:hidden`, `dash:singleLine`, `dash:uriStart` | Widget choice, read-only and hidden fields, IRI minting |
 | Everything else in SHACL Core | Validated by shacl-engine on save, import and "Check" |
 
-Annotations in the `rdm:` namespace (`https://matdata.eu/ns/rdf-data-manager#`):
+Annotations in the `rdm:` namespace (`https://matdata.eu/ns/rdf-data-manager#`, defined in
+[vocab/rdf-data-manager.ttl](vocab/rdf-data-manager.ttl)):
 
 | Property | Used on | Meaning |
 |---|---|---|
