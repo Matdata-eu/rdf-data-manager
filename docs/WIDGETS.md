@@ -95,7 +95,8 @@ load is reported in the app and the built-in editors are used instead.
 | `time` | [`@rdf-data-manager/widget-time`](../packages/widget-time) | `xsd:dateTimeStamp`, `xsd:time`, `xsd:gYear`, `xsd:gYearMonth` and `xsd:duration` literals, and OWL-Time nodes: a `time:Instant` becomes one field, a `time:Interval` a from/to pair, each built from the nested shape (`time:hasBeginning` / `time:hasEnd`, `time:inXSDDateTimeStamp` and friends). |
 
 Both are named in shapes as `dash:editor rdm:MapEditor` / `rdm:TimeEditor`, and otherwise
-win by score. [examples/geo-time](../examples/geo-time) has shapes and data to try them.
+win by score. [examples/geo-time](../examples/geo-time) has shapes and data to try them;
+[examples/showcase](../examples/showcase) also draws lines and polygons and uses every time datatype.
 
 A widget that needs a large library (a map) should import it lazily inside the component
 (`React.lazy` or a dynamic `import()`), so a form without such a property never loads it.

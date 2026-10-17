@@ -37,7 +37,7 @@ well). All keys are optional.
 `&graph=<data graph>`, `&shapesGraph=<iri>` or `&shapesUrl=<url>`, `&lang=<tag>`,
 `&widgets=map,time`.
 
-`?demo=dim` or `?demo=geo-time` runs a bundled dataset in a store inside the browser
+`?demo=showcase`, `?demo=dim` or `?demo=geo-time` runs a bundled dataset in a store inside the browser
 (Oxigraph compiled to WebAssembly, loaded on demand): nothing is sent anywhere, and a
 reload starts over. Settings offers the same under "Try a demo". Deployments that set
 `"demo"` in `config.json` start in that demo.

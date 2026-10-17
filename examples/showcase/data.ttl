@@ -1,0 +1,385 @@
+# Data for the feature tour (shapes.ttl). Coordinates and facts are approximate.
+# A few resources break the shapes on purpose so the validation report has something to
+# show; README.md lists them.
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix schema:  <http://schema.org/> .
+@prefix geo:     <http://www.opengis.net/ont/geosparql#> .
+@prefix time:    <http://www.w3.org/2006/time#> .
+@prefix ex:      <https://example.org/showcase/> .
+@prefix st:      <https://example.org/showcase/station/> .
+@prefix line:    <https://example.org/showcase/line/> .
+@prefix sec:     <https://example.org/showcase/section/> .
+@prefix org:     <https://example.org/showcase/org/> .
+@prefix person:  <https://example.org/showcase/person/> .
+@prefix query:   <https://example.org/showcase/query/> .
+
+# ---------------------------------------------------------------------------
+# Stations
+# ---------------------------------------------------------------------------
+
+st:oslo-s a ex:Station ;
+    rdfs:label "Oslo Central"@en, "Oslo sentralstasjon"@nb, "Oslo sentralstasjon"@nn ;
+    rdfs:comment "The main station of Oslo and the busiest in Norway."@en,
+        "Hovedstasjonen i Oslo og den travleste i Norge."@nb ;
+    ex:code "OSL" ;
+    ex:category ex:Hub ;
+    ex:status "open" ;
+    ex:opened "1980-06-01"^^xsd:date ;
+    ex:homepage <https://www.banenor.no/reise-og-trafikk/stasjoner/oslo-s/> ;
+    ex:platforms 19 ;
+    ex:stepFree true ;
+    ex:passengersPerDay 150000.0 ;
+    ex:internalNote "Hidden in the form (dash:hidden), still in the data." ;
+    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "POINT (10.7522 59.9108)"^^geo:wktLiteral ] ;
+    dcterms:created "2026-01-05"^^xsd:date ;
+    dcterms:modified "2026-09-30"^^xsd:date .
+
+st:nationaltheatret a ex:Station ;
+    rdfs:label "Nationaltheatret"@en, "Nationaltheatret"@nb, "Nationaltheatret"@nn ;
+    ex:code "NTH" ;
+    ex:category ex:Interchange ;
+    ex:status "open" ;
+    ex:opened "1980-06-01"^^xsd:date ;
+    ex:platforms 4 ;
+    ex:stepFree true ;
+    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "POINT (10.7315 59.9145)"^^geo:wktLiteral ] .
+
+# Violation: the code does not match the pattern.
+st:skoyen a ex:Station ;
+    rdfs:label "Skøyen"@en, "Skøyen"@nb, "Skøyen"@nn ;
+    ex:code "Sk" ;
+    ex:category ex:Local ;
+    ex:status "open" ;
+    ex:platforms 4 ;
+    ex:stepFree true ;
+    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "POINT (10.6789 59.9222)"^^geo:wktLiteral ] .
+
+st:lysaker a ex:Station ;
+    rdfs:label "Lysaker"@en, "Lysaker"@nb, "Lysaker"@nn ;
+    ex:code "LYS" ;
+    ex:category ex:Interchange ;
+    ex:status "open" ;
+    ex:platforms 4 ;
+    ex:stepFree true ;
+    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "POINT (10.6375 59.9128)"^^geo:wktLiteral ] .
+
+st:sandvika a ex:Station ;
+    rdfs:label "Sandvika"@en, "Sandvika"@nb, "Sandvika"@nn ;
+    ex:code "SV" ;
+    ex:category ex:Interchange ;
+    ex:status "open" ;
+    ex:platforms 4 ;
+    ex:stepFree true ;
+    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "POINT (10.5243 59.8913)"^^geo:wktLiteral ] .
+
+st:asker a ex:Station ;
+    rdfs:label "Asker"@en, "Asker"@nb, "Asker"@nn ;
+    ex:code "ASR" ;
+    ex:category ex:Interchange ;
+    ex:status "open" ;
+    ex:platforms 6 ;
+    ex:stepFree true ;
+    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "POINT (10.4348 59.8333)"^^geo:wktLiteral ] .
+
+# Warning: no Bokmål name.
+st:drammen a ex:Station ;
+    rdfs:label "Drammen"@en, "Drammen"@nn ;
+    ex:code "DR" ;
+    ex:category ex:Hub ;
+    ex:status "open" ;
+    ex:platforms 5 ;
+    ex:stepFree true ;
+    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "POINT (10.2045 59.7404)"^^geo:wktLiteral ] .
+
+# Warning: replaced by Drammen but not marked closed.
+st:brakeroya a ex:Station ;
+    rdfs:label "Brakerøya"@en, "Brakerøya"@nb, "Brakerøya"@nn ;
+    ex:code "BRK" ;
+    ex:category ex:Halt ;
+    ex:status "open" ;
+    ex:platforms 2 ;
+    ex:stepFree false ;
+    ex:replacedBy st:drammen ;
+    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "POINT (10.2335 59.7481)"^^geo:wktLiteral ] .
+
+st:oslo-o a ex:Station ;
+    rdfs:label "Oslo East"@en, "Oslo Østbanestasjon"@nb, "Oslo Austbanestasjon"@nn ;
+    rdfs:comment "Closed in 1980 when Oslo Central opened."@en, "Stengt i 1980 da Oslo S åpnet."@nb ;
+    ex:code "OSLO" ;
+    ex:category ex:Hub ;
+    ex:status "closed" ;
+    ex:opened "1854-09-01"^^xsd:date ;
+    ex:replacedBy st:oslo-s ;
+    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "POINT (10.7530 59.9113)"^^geo:wktLiteral ] .
+
+st:lillestrom a ex:Station ;
+    rdfs:label "Lillestrøm"@en, "Lillestrøm"@nb, "Lillestrøm"@nn ;
+    ex:code "LLS" ;
+    ex:category ex:Hub ;
+    ex:status "open" ;
+    ex:platforms 8 ;
+    ex:stepFree true ;
+    ex:passengersPerDay 22000.0 ;
+    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "POINT (11.0490 59.9534)"^^geo:wktLiteral ] .
+
+st:gardermoen a ex:Station ;
+    rdfs:label "Oslo Airport"@en, "Oslo lufthavn"@nb, "Oslo lufthamn"@nn ;
+    ex:code "GAR" ;
+    ex:category ex:Interchange ;
+    ex:status "open" ;
+    ex:opened "1998-10-08"^^xsd:date ;
+    ex:platforms 4 ;
+    ex:stepFree true ;
+    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "POINT (11.0969 60.1939)"^^geo:wktLiteral ] .
+
+# Warning: open, but the number of platforms is missing.
+st:bryn a ex:Station ;
+    rdfs:label "Bryn"@en, "Bryn"@nb, "Bryn"@nn ;
+    ex:code "BRY" ;
+    ex:category ex:Halt ;
+    ex:status "open" ;
+    ex:stepFree false ;
+    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "POINT (10.8150 59.9090)"^^geo:wktLiteral ] .
+
+st:honefoss a ex:Station ;
+    rdfs:label "Hønefoss"@en, "Hønefoss"@nb, "Hønefoss"@nn ;
+    ex:code "HFS" ;
+    ex:category ex:Local ;
+    ex:status "open" ;
+    ex:platforms 3 ;
+    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "POINT (10.2580 60.1680)"^^geo:wktLiteral ] .
+
+st:finse a ex:Station ;
+    rdfs:label "Finse"@en, "Finse"@nb, "Finse"@nn ;
+    rdfs:comment "The highest station on the Norwegian network, 1222 m above sea level."@en,
+        "Den høyeste stasjonen på det norske jernbanenettet."@nb ;
+    ex:code "FIN" ;
+    ex:category ex:Halt ;
+    ex:status "open" ;
+    ex:opened "1909-11-27"^^xsd:date ;
+    ex:platforms 2 ;
+    ex:stepFree false ;
+    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "POINT (7.5032 60.6014)"^^geo:wktLiteral ] .
+
+st:myrdal a ex:Station ;
+    rdfs:label "Myrdal"@en, "Myrdal"@nb, "Myrdal"@nn ;
+    ex:code "MYR" ;
+    ex:category ex:Interchange ;
+    ex:status "open" ;
+    ex:platforms 3 ;
+    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "POINT (7.1213 60.7350)"^^geo:wktLiteral ] .
+
+st:voss a ex:Station ;
+    rdfs:label "Voss"@en, "Voss"@nb, "Voss"@nn ;
+    ex:code "VSS" ;
+    ex:category ex:Interchange ;
+    ex:status "open" ;
+    ex:platforms 3 ;
+    ex:stepFree true ;
+    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "POINT (6.4170 60.6290)"^^geo:wktLiteral ] .
+
+st:bergen a ex:Station ;
+    rdfs:label "Bergen"@en, "Bergen stasjon"@nb, "Bergen stasjon"@nn ;
+    ex:code "BRG" ;
+    ex:category ex:Hub ;
+    ex:status "open" ;
+    ex:opened "1913-05-01"^^xsd:date ;
+    ex:platforms 7 ;
+    ex:stepFree true ;
+    ex:passengersPerDay 9500.5 ;
+    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "POINT (5.3328 60.3903)"^^geo:wktLiteral ] .
+
+st:fleischer a ex:Station ;
+    rdfs:label "Fleischer's"@en, "Fleischers"@nb, "Fleischers"@nn ;
+    ex:code "FLE" ;
+    ex:category ex:Halt ;
+    ex:status "planned" ;
+    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "POINT (6.4160 60.6280)"^^geo:wktLiteral ] .
+
+# ---------------------------------------------------------------------------
+# Lines, with nested sections that have their own IRIs
+# ---------------------------------------------------------------------------
+
+line:l1 a ex:Line ;
+    rdfs:label "Spikkestad–Lillestrøm"@en, "Spikkestad–Lillestrøm"@nb, "Spikkestad–Lillestrøm"@nn ;
+    rdfs:comment "Local trains through the Oslo tunnel."@en, "Lokaltog gjennom Oslotunnelen."@nb ;
+    ex:number "L1" ;
+    ex:operator org:vy ;
+    ex:electrified true ;
+    ex:gauge 1435 ;
+    ex:lengthKm 62.5 ;
+    ex:serves st:asker, st:sandvika, st:lysaker, st:skoyen, st:nationaltheatret, st:oslo-s, st:lillestrom ;
+    ex:section sec:l1-01, sec:l1-02, sec:l1-03 ;
+    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "LINESTRING (10.4348 59.8333, 10.5243 59.8913, 10.6375 59.9128, 10.6789 59.9222, 10.7315 59.9145, 10.7522 59.9108, 11.0490 59.9534)"^^geo:wktLiteral ] ;
+    dcterms:created "2026-01-05"^^xsd:date .
+
+sec:l1-01 a ex:Section ; ex:sectionCode "l1-01" ; ex:position 1 ; ex:from st:asker ; ex:to st:lysaker ; ex:maxSpeed 130 .
+sec:l1-02 a ex:Section ; ex:sectionCode "l1-02" ; ex:position 2 ; ex:from st:lysaker ; ex:to st:oslo-s ; ex:maxSpeed 80 .
+sec:l1-03 a ex:Section ; ex:sectionCode "l1-03" ; ex:position 3 ; ex:from st:oslo-s ; ex:to st:lillestrom ; ex:maxSpeed 210 .
+
+line:f4 a ex:Line ;
+    rdfs:label "Bergen Line"@en, "Bergensbanen"@nb, "Bergensbanen"@nn ;
+    rdfs:comment "Long-distance trains across Hardangervidda."@en, "Fjerntog over Hardangervidda."@nb ;
+    ex:number "F4" ;
+    ex:operator org:sj-norge ;
+    ex:electrified true ;
+    ex:gauge 1435 ;
+    ex:lengthKm 496.0 ;
+    ex:serves st:oslo-s, st:drammen, st:brakeroya, st:honefoss, st:finse, st:myrdal, st:voss, st:bergen ;
+    ex:section sec:f4-01, sec:f4-02 ;
+    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "LINESTRING (10.7522 59.9108, 10.2045 59.7404, 10.2580 60.1680, 7.5032 60.6014, 7.1213 60.7350, 6.4170 60.6290, 5.3328 60.3903)"^^geo:wktLiteral ] .
+
+sec:f4-01 a ex:Section ; ex:sectionCode "f4-01" ; ex:position 1 ; ex:from st:oslo-s ; ex:to st:honefoss ; ex:maxSpeed 160 .
+sec:f4-02 a ex:Section ; ex:sectionCode "f4-02" ; ex:position 2 ; ex:from st:honefoss ; ex:to st:bergen ; ex:maxSpeed 130 .
+
+line:flytoget a ex:Line ;
+    rdfs:label "Airport Express"@en, "Flytoget"@nb, "Flytoget"@nn ;
+    ex:number "FX1" ;
+    ex:operator org:flytoget ;
+    ex:electrified true ;
+    ex:gauge 1435 ;
+    ex:lengthKm 48.8 ;
+    ex:serves st:drammen, st:asker, st:sandvika, st:lysaker, st:skoyen, st:nationaltheatret, st:oslo-s, st:lillestrom, st:gardermoen ;
+    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "LINESTRING (10.7522 59.9108, 11.0490 59.9534, 11.0969 60.1939)"^^geo:wktLiteral ] .
+
+# Operated by a person rather than an organisation (sh:xone).
+line:m1 a ex:Line ;
+    rdfs:label "Old Voss Line"@en, "Gamle Vossebanen"@nb, "Gamle Vossebanen"@nn ;
+    rdfs:comment "A museum railway run by volunteers."@en, "En museumsbane drevet av frivillige."@nb ;
+    ex:number "M1" ;
+    ex:operator person:ola-hansen ;
+    ex:electrified false ;
+    ex:gauge 1067 ;
+    ex:lengthKm 18.0 ;
+    ex:serves st:voss, st:fleischer ;
+    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "LINESTRING (6.4170 60.6290, 6.4160 60.6280)"^^geo:wktLiteral ] .
+
+# ---------------------------------------------------------------------------
+# Areas
+# ---------------------------------------------------------------------------
+
+<https://example.org/showcase/area/oslo-hub> a ex:Area ;
+    rdfs:label "Oslo hub"@en, "Oslo-knutepunktet"@nb, "Oslo-knutepunktet"@nn ;
+    rdfs:comment "The stations in and around central Oslo."@en ;
+    ex:maintainedBy org:bane-nor ;
+    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "POLYGON ((10.60 59.89, 10.85 59.89, 10.85 59.96, 10.60 59.96, 10.60 59.89))"^^geo:wktLiteral ] .
+
+<https://example.org/showcase/area/hardangervidda> a ex:Area ;
+    rdfs:label "Hardangervidda"@en, "Hardangervidda"@nb, "Hardangervidda"@nn ;
+    rdfs:comment "The mountain plateau the Bergen Line crosses."@en ;
+    ex:maintainedBy org:bane-nor ;
+    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "POLYGON ((7.0 60.45, 7.9 60.45, 8.1 60.70, 7.4 60.80, 7.0 60.70, 7.0 60.45))"^^geo:wktLiteral ] .
+
+# ---------------------------------------------------------------------------
+# Track closures: an OWL-Time interval and the other time datatypes
+# ---------------------------------------------------------------------------
+
+<https://example.org/showcase/closure/finse-summer-2026> a ex:Closure ;
+    rdfs:label "Finse track renewal"@en, "Sporfornyelse Finse"@nb, "Spornyving Finse"@nn ;
+    rdfs:comment "Night closures while the track over the mountain is renewed."@en ;
+    ex:affects line:f4, st:finse ;
+    ex:contact person:kari-nordmann ;
+    time:hasTime [
+        a time:Interval ;
+        time:hasBeginning [ a time:Instant ; time:inXSDDate "2026-06-20"^^xsd:date ] ;
+        time:hasEnd [ a time:Instant ; time:inXSDDate "2026-07-05"^^xsd:date ]
+    ] ;
+    ex:dailyStart "22:30:00"^^xsd:time ;
+    ex:duration "PT6H30M"^^xsd:duration ;
+    ex:budgetYear "2026"^^xsd:gYear ;
+    ex:announcedIn "2026-01"^^xsd:gYearMonth ;
+    ex:reported "2026-01-15"^^xsd:date ;
+    dcterms:created "2026-01-15"^^xsd:date .
+
+<https://example.org/showcase/closure/oslo-tunnel-2026> a ex:Closure ;
+    rdfs:label "Oslo tunnel inspection"@en, "Inspeksjon av Oslotunnelen"@nb, "Inspeksjon av Oslotunnelen"@nn ;
+    ex:affects st:oslo-s, st:nationaltheatret ;
+    ex:contact person:kari-nordmann ;
+    time:hasTime [
+        a time:Interval ;
+        time:hasBeginning [ a time:Instant ; time:inXSDDate "2026-11-07"^^xsd:date ] ;
+        time:hasEnd [ a time:Instant ; time:inXSDDate "2026-11-08"^^xsd:date ]
+    ] ;
+    ex:dailyStart "01:00:00"^^xsd:time ;
+    ex:duration "PT4H"^^xsd:duration ;
+    ex:budgetYear "2026"^^xsd:gYear ;
+    ex:reported "2026-02-01"^^xsd:date .
+
+# ---------------------------------------------------------------------------
+# Organisations and people
+# ---------------------------------------------------------------------------
+
+org:bane-nor a schema:Organization ;
+    schema:name "Bane NOR" ;
+    schema:url <https://www.banenor.no/> ;
+    schema:email "post@banenor.no" ;
+    schema:foundingDate "2017-01-01"^^xsd:date ;
+    schema:identifier "917082308" .
+
+# Violation: ex:legacyId is not allowed by the closed shape; the form lists it under other properties.
+org:vy a schema:Organization ;
+    schema:name "Vy" ;
+    schema:url <https://www.vy.no/> ;
+    schema:email "kundeservice@vy.no", "presse@vy.no" ;
+    ex:legacyId "NSB-01" .
+
+org:sj-norge a schema:Organization ;
+    schema:name "SJ Norge" ;
+    schema:url <https://www.sj.no/> .
+
+org:flytoget a schema:Organization ;
+    schema:name "Flytoget" ;
+    schema:url <https://flytoget.no/> ;
+    schema:foundingDate "1992-11-23"^^xsd:date .
+
+person:kari-nordmann a schema:Person ;
+    schema:name "Kari Nordmann" ;
+    schema:jobTitle "Possession planner" ;
+    schema:worksFor org:bane-nor ;
+    schema:email "kari.nordmann@example.org" ;
+    schema:telephone "+47 22 00 00 00" .
+
+person:ola-hansen a schema:Person ;
+    schema:name "Ola Hansen" ;
+    schema:jobTitle "Volunteer, museum railway" ;
+    schema:email "ola@example.org" .
+
+# ---------------------------------------------------------------------------
+# Stored queries and a report that runs one
+# ---------------------------------------------------------------------------
+
+query:busiest-stations a ex:Query ;
+    rdfs:label "Stations by number of platforms"@en, "Stasjoner etter antall plattformer"@nb, "Stasjonar etter tal på plattformer"@nn ;
+    ex:text """PREFIX ex: <https://example.org/showcase/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?station ?name ?platforms
+WHERE {
+  ?station a ex:Station ;
+           rdfs:label ?name ;
+           ex:platforms ?platforms .
+  FILTER (lang(?name) = "en")
+}
+ORDER BY DESC(?platforms)""" .
+
+query:stations-per-line a ex:Query ;
+    rdfs:label "Stations per line"@en, "Stasjoner per linje"@nb, "Stasjonar per linje"@nn ;
+    ex:text """PREFIX ex: <https://example.org/showcase/>
+SELECT ?number (COUNT(?station) AS ?stations)
+WHERE {
+  ?line a ex:Line ;
+        ex:number ?number ;
+        ex:serves ?station .
+}
+GROUP BY ?number
+ORDER BY DESC(?stations)""" .
+
+<https://example.org/showcase/report/platforms> a ex:Report ;
+    rdfs:label "Platform overview"@en, "Plattformoversikt"@nb, "Plattformoversyn"@nn ;
+    rdfs:comment "Open the report and press \"Preview query result\" under the query."@en ;
+    ex:usesQuery query:busiest-stations .
+
+<https://example.org/showcase/report/line-sizes> a ex:Report ;
+    rdfs:label "Line sizes"@en, "Linjestørrelser"@nb, "Linjestorleikar"@nn ;
+    ex:usesQuery query:stations-per-line .

@@ -1,0 +1,675 @@
+# Feature tour: a small railway network whose shapes use every editor, viewer, widget and
+# SHACL feature the app supports, so each one can be seen in the demo (?demo=showcase).
+# README.md in this folder says where to look for each feature; data.ttl matches.
+@prefix sh:      <http://www.w3.org/ns/shacl#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dash:    <http://datashapes.org/dash#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix schema:  <http://schema.org/> .
+@prefix geo:     <http://www.opengis.net/ont/geosparql#> .
+@prefix time:    <http://www.w3.org/2006/time#> .
+@prefix rdm:     <https://matdata.eu/ns/rdf-data-manager#> .
+@prefix ex:      <https://example.org/showcase/> .
+
+# Prefixes for the SPARQL constraints and rdm:queryText below.
+ex: a <http://www.w3.org/2002/07/owl#Ontology> ;
+    sh:declare
+        [ sh:prefix "ex" ; sh:namespace "https://example.org/showcase/"^^xsd:anyURI ] ,
+        [ sh:prefix "rdfs" ; sh:namespace "http://www.w3.org/2000/01/rdf-schema#"^^xsd:anyURI ] ,
+        [ sh:prefix "schema" ; sh:namespace "http://schema.org/"^^xsd:anyURI ] .
+
+# ---------------------------------------------------------------------------
+# Property groups: sections of the form, in sh:order
+# ---------------------------------------------------------------------------
+
+ex:GeneralGroup a sh:PropertyGroup ; rdfs:label "General"@en, "Generelt"@nb, "Generelt"@nn ; sh:order 1 .
+ex:LocationGroup a sh:PropertyGroup ; rdfs:label "Location"@en, "Plassering"@nb, "Plassering"@nn ; sh:order 2 .
+ex:FacilitiesGroup a sh:PropertyGroup ; rdfs:label "Facilities"@en, "Fasiliteter"@nb, "Fasilitetar"@nn ; sh:order 3 .
+ex:NetworkGroup a sh:PropertyGroup ; rdfs:label "Network"@en, "Nettverk"@nb, "Nettverk"@nn ; sh:order 4 .
+ex:TimeGroup a sh:PropertyGroup ; rdfs:label "When"@en, "Når"@nb, "Når"@nn ; sh:order 5 .
+ex:RecordGroup a sh:PropertyGroup ; rdfs:label "Record"@en, "Registrering"@nb, "Registrering"@nn ; sh:order 9 .
+
+# ---------------------------------------------------------------------------
+# Shared property shapes
+# ---------------------------------------------------------------------------
+
+# A name in each of the three languages, one per language, picked from a list.
+ex:name a sh:PropertyShape ;
+    sh:path rdfs:label ;
+    sh:name "Name"@en, "Navn"@nb, "Namn"@nn ;
+    sh:description "One name per language."@en, "Ett navn per språk."@nb ;
+    sh:datatype rdf:langString ;
+    sh:languageIn ( "en" "nb" "nn" ) ;
+    sh:uniqueLang true ;
+    sh:minCount 1 ;
+    rdm:languages ( "en" "nb" "nn" ) ;
+    dash:editor dash:TextFieldWithLangEditor ;
+    sh:group ex:GeneralGroup ;
+    sh:order 1 .
+
+ex:description a sh:PropertyShape ;
+    sh:path rdfs:comment ;
+    sh:name "Description"@en, "Beskrivelse"@nb, "Skildring"@nn ;
+    sh:datatype rdf:langString ;
+    sh:languageIn ( "en" "nb" "nn" ) ;
+    sh:uniqueLang true ;
+    dash:editor dash:TextAreaWithLangEditor ;
+    sh:group ex:GeneralGroup ;
+    sh:order 2 .
+
+# Filled in once with today's date and never edited.
+ex:created a sh:PropertyShape ;
+    sh:path dcterms:created ;
+    sh:name "Created"@en, "Opprettet"@nb, "Oppretta"@nn ;
+    sh:datatype xsd:date ;
+    sh:maxCount 1 ;
+    rdm:defaultValue rdm:today ;
+    dash:readOnly true ;
+    sh:group ex:RecordGroup ;
+    sh:order 1 .
+
+# Set to today on every save.
+ex:modified a sh:PropertyShape ;
+    sh:path dcterms:modified ;
+    sh:name "Modified"@en, "Endret"@nb, "Endra"@nn ;
+    sh:datatype xsd:date ;
+    sh:maxCount 1 ;
+    rdm:updateOnSave true ;
+    dash:readOnly true ;
+    sh:group ex:RecordGroup ;
+    sh:order 2 .
+
+# Kept in the data and validated, but not shown in the form.
+ex:internalNote a sh:PropertyShape ;
+    sh:path ex:internalNote ;
+    sh:datatype xsd:string ;
+    dash:hidden true .
+
+# The geometry is a nested node edited on a map (point, line or polygon).
+ex:location a sh:PropertyShape ;
+    sh:path geo:hasGeometry ;
+    sh:name "Location"@en, "Plassering"@nb, "Plassering"@nn ;
+    sh:class geo:Geometry ;
+    sh:node ex:GeometryShape ;
+    sh:nodeKind sh:BlankNode ;
+    sh:maxCount 1 ;
+    dash:editor dash:DetailsEditor ;
+    sh:group ex:LocationGroup ;
+    sh:order 1 .
+
+ex:GeometryShape a sh:NodeShape ;
+    sh:targetClass geo:Geometry ;
+    sh:property [
+        sh:path geo:asWKT ; sh:name "WKT"@en ; sh:datatype geo:wktLiteral ; sh:minCount 1 ; sh:maxCount 1
+    ] .
+
+# ---------------------------------------------------------------------------
+# Station: text, language, pattern, number range, boolean, date, enums, URI, map
+# ---------------------------------------------------------------------------
+
+ex:StationShape a sh:NodeShape ;
+    sh:targetClass ex:Station ;
+    rdfs:label "Station"@en, "Stasjon"@nb, "Stasjon"@nn ;
+    rdfs:comment "A place where trains stop. Shows most of the editors for literals, enumerations and the map."@en,
+        "Et sted der tog stopper."@nb ;
+    rdm:order 1 ;
+    rdm:orderBy rdfs:label ;
+    dash:uriStart "https://example.org/showcase/station/" ;
+    rdm:localNamePattern "^[a-z][a-z0-9-]*$" ;
+    rdm:localNameDescription "Lower case letters, digits and hyphens, for example oslo-s."@en,
+        "Små bokstaver, sifre og bindestrek, for eksempel oslo-s."@nb ;
+    sh:property ex:name, ex:description, ex:created, ex:modified, ex:internalNote, ex:location ;
+    sh:property [
+        sh:path ex:code ;
+        sh:name "Station code"@en, "Stasjonskode"@nb, "Stasjonskode"@nn ;
+        sh:description "Two to five capital letters."@en, "To til fem store bokstaver."@nb ;
+        sh:datatype xsd:string ;
+        sh:pattern "^[A-Z]{2,5}$" ;
+        sh:message "A station code is two to five capital letters."@en ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        dash:singleLine true ;
+        sh:group ex:GeneralGroup ;
+        sh:order 3
+    ] ;
+    sh:property [
+        sh:path ex:category ;
+        sh:name "Category"@en, "Kategori"@nb, "Kategori"@nn ;
+        sh:in ( ex:Hub ex:Interchange ex:Local ex:Halt ) ;
+        sh:maxCount 1 ;
+        sh:group ex:GeneralGroup ;
+        sh:order 4
+    ] ;
+    sh:property [
+        sh:path ex:status ;
+        sh:name "Status"@en, "Status"@nb, "Status"@nn ;
+        sh:in ( "planned" "open" "closed" ) ;
+        sh:defaultValue "open" ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:group ex:GeneralGroup ;
+        sh:order 5
+    ] ;
+    sh:property [
+        sh:path ex:opened ;
+        sh:name "Opened"@en, "Åpnet"@nb, "Opna"@nn ;
+        sh:datatype xsd:date ;
+        sh:maxCount 1 ;
+        sh:group ex:GeneralGroup ;
+        sh:order 6
+    ] ;
+    sh:property [
+        sh:path ex:homepage ;
+        sh:name "Web page"@en, "Nettside"@nb, "Nettside"@nn ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+        dash:editor dash:URIEditor ;
+        dash:viewer dash:URIViewer ;
+        sh:group ex:GeneralGroup ;
+        sh:order 7
+    ] ;
+    sh:property [
+        sh:path ex:platforms ;
+        sh:name "Platforms"@en, "Plattformer"@nb, "Plattformer"@nn ;
+        sh:description "Between 1 and 30."@en, "Mellom 1 og 30."@nb ;
+        sh:datatype xsd:integer ;
+        sh:minInclusive 1 ;
+        sh:maxInclusive 30 ;
+        sh:maxCount 1 ;
+        sh:group ex:FacilitiesGroup ;
+        sh:order 1
+    ] ;
+    sh:property [
+        sh:path ex:stepFree ;
+        sh:name "Step-free access"@en, "Trinnfri tilgang"@nb, "Trinnfri tilgang"@nn ;
+        sh:datatype xsd:boolean ;
+        sh:maxCount 1 ;
+        sh:group ex:FacilitiesGroup ;
+        sh:order 2
+    ] ;
+    sh:property [
+        sh:path ex:passengersPerDay ;
+        sh:name "Passengers per day"@en, "Passasjerer per dag"@nb, "Passasjerar per dag"@nn ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0 ;
+        sh:maxCount 1 ;
+        sh:group ex:FacilitiesGroup ;
+        sh:order 3
+    ] ;
+    sh:property [
+        sh:path ex:replacedBy ;
+        sh:name "Replaced by"@en, "Erstattet av"@nb, "Erstatta av"@nn ;
+        sh:class ex:Station ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+        dash:editor dash:InstancesSelectEditor ;
+        dash:viewer dash:LabelViewer ;
+        sh:group ex:NetworkGroup ;
+        sh:order 1
+    ] .
+
+# Warnings, not violations: sh:severity applies to the shape that carries it, here a
+# second shape on the same class with SPARQL constraints.
+ex:StationWarningShape a sh:NodeShape ;
+    sh:targetClass ex:Station ;
+    sh:severity sh:Warning ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "The station has no Bokmål (nb) name."@en ;
+        sh:prefixes ex: ;
+        sh:select """
+            SELECT $this ?path
+            WHERE {
+                $this a ex:Station .
+                BIND (rdfs:label AS ?path)
+                FILTER NOT EXISTS { $this rdfs:label ?name . FILTER (lang(?name) = "nb") }
+            }
+        """
+    ] .
+
+# One SPARQL constraint per shape: the validator merges several on the same shape. A
+# condition across properties: only an open station must say how many platforms it has.
+ex:StationPlatformsShape a sh:NodeShape ;
+    sh:targetClass ex:Station ;
+    sh:severity sh:Warning ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "An open station should say how many platforms it has."@en ;
+        sh:prefixes ex: ;
+        sh:select """
+            SELECT $this ?path
+            WHERE {
+                $this ex:status "open" .
+                BIND (ex:platforms AS ?path)
+                FILTER NOT EXISTS { $this ex:platforms ?platforms }
+            }
+        """
+    ] .
+
+# Targets by predicate rather than class: anything that says it was replaced must be closed.
+ex:ReplacedShape a sh:NodeShape ;
+    sh:targetSubjectsOf ex:replacedBy ;
+    sh:property [
+        sh:path ex:status ;
+        sh:severity sh:Warning ;
+        sh:hasValue "closed" ;
+        sh:message "Something that has been replaced should have the status closed."@en
+    ] .
+
+# ---------------------------------------------------------------------------
+# Line: many references with search, nested numbered sections, sh:xone, a drawn line
+# ---------------------------------------------------------------------------
+
+ex:LineShape a sh:NodeShape ;
+    sh:targetClass ex:Line ;
+    rdfs:label "Line"@en, "Linje"@nb, "Linje"@nn ;
+    rdfs:comment "A railway line: stations it serves, nested sections and its route on a map."@en,
+        "En jernbanelinje."@nb ;
+    rdm:order 2 ;
+    rdm:orderBy ex:number ;
+    dash:uriStart "https://example.org/showcase/line/" ;
+    rdm:localNamePattern "^[a-z0-9][a-z0-9-]*$" ;
+    sh:property ex:name, ex:description, ex:created, ex:modified, ex:location ;
+    sh:property [
+        sh:path ex:number ;
+        sh:name "Line number"@en, "Linjenummer"@nb, "Linjenummer"@nn ;
+        sh:datatype xsd:string ;
+        sh:pattern "^[A-Z]{0,2}[0-9]{1,3}$" ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:group ex:GeneralGroup ;
+        sh:order 3
+    ] ;
+    sh:property [
+        sh:path ex:operator ;
+        sh:name "Operator"@en, "Operatør"@nb, "Operatør"@nn ;
+        sh:description "An organisation or a person."@en, "En organisasjon eller en person."@nb ;
+        sh:xone ( [ sh:class schema:Organization ] [ sh:class schema:Person ] ) ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+        dash:viewer dash:LabelViewer ;
+        sh:group ex:GeneralGroup ;
+        sh:order 4
+    ] ;
+    sh:property [
+        sh:path ex:electrified ;
+        sh:name "Electrified"@en, "Elektrifisert"@nb, "Elektrifisert"@nn ;
+        sh:datatype xsd:boolean ;
+        sh:maxCount 1 ;
+        dash:editor dash:BooleanSelectEditor ;
+        sh:group ex:GeneralGroup ;
+        sh:order 5
+    ] ;
+    sh:property [
+        sh:path ex:gauge ;
+        sh:name "Gauge (mm)"@en, "Sporvidde (mm)"@nb, "Sporvidd (mm)"@nn ;
+        sh:in ( 1435 1067 1000 ) ;
+        sh:defaultValue 1435 ;
+        sh:maxCount 1 ;
+        sh:group ex:GeneralGroup ;
+        sh:order 6
+    ] ;
+    sh:property [
+        sh:path ex:lengthKm ;
+        sh:name "Length (km)"@en, "Lengde (km)"@nb, "Lengd (km)"@nn ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0 ;
+        sh:maxCount 1 ;
+        sh:group ex:GeneralGroup ;
+        sh:order 7
+    ] ;
+    sh:property [
+        sh:path ex:serves ;
+        sh:name "Stations served"@en, "Betjente stasjoner"@nb, "Stasjonar som vert betente"@nn ;
+        sh:description "Searched as you type; long lists start collapsed and show a few at a time."@en,
+            "Søk mens du skriver; lange lister starter lukket og viser noen få om gangen."@nb ;
+        sh:class ex:Station ;
+        sh:nodeKind sh:IRI ;
+        dash:editor dash:AutoCompleteEditor ;
+        dash:viewer dash:LabelViewer ;
+        rdm:orderBy rdfs:label ;
+        rdm:pageSize 4 ;
+        sh:group ex:NetworkGroup ;
+        sh:order 1
+    ] ;
+    sh:property [
+        sh:path ex:section ;
+        sh:name "Sections"@en, "Strekninger"@nb, "Strekningar"@nn ;
+        sh:description "Nested nodes with their own IRIs, ordered by position."@en,
+            "Nestede noder med egne IRI-er, sortert etter posisjon."@nb ;
+        sh:class ex:Section ;
+        sh:node ex:SectionShape ;
+        sh:nodeKind sh:IRI ;
+        dash:editor dash:DetailsEditor ;
+        dash:viewer dash:DetailsViewer ;
+        rdm:orderBy ex:position ;
+        rdm:collapsed false ;
+        sh:group ex:NetworkGroup ;
+        sh:order 2
+    ] .
+
+ex:SectionShape a sh:NodeShape ;
+    sh:targetClass ex:Section ;
+    rdfs:label "Section"@en, "Strekning"@nb, "Strekning"@nn ;
+    rdm:hideFromMenu true ;
+    dash:uriStart "https://example.org/showcase/section/" ;
+    rdm:localNameProperty ex:sectionCode ;
+    sh:property [
+        sh:path ex:sectionCode ;
+        sh:name "Code"@en, "Kode"@nb, "Kode"@nn ;
+        sh:description "Completes the section's IRI when it is created."@en, "Fullfører strekningens IRI når den opprettes."@nb ;
+        sh:datatype xsd:string ;
+        sh:pattern "^[a-z0-9-]+$" ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:order 1
+    ] ;
+    sh:property [
+        sh:path ex:position ;
+        sh:name "Position"@en, "Posisjon"@nb, "Posisjon"@nn ;
+        sh:datatype xsd:integer ;
+        sh:minInclusive 1 ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:order 2
+    ] ;
+    sh:property [
+        sh:path ex:from ; sh:name "From"@en, "Fra"@nb, "Frå"@nn ;
+        sh:class ex:Station ; sh:nodeKind sh:IRI ; sh:minCount 1 ; sh:maxCount 1 ; sh:order 3
+    ] ;
+    sh:property [
+        sh:path ex:to ; sh:name "To"@en, "Til"@nb, "Til"@nn ;
+        sh:class ex:Station ; sh:nodeKind sh:IRI ; sh:minCount 1 ; sh:maxCount 1 ; sh:order 4
+    ] ;
+    sh:property [
+        sh:path ex:maxSpeed ;
+        sh:name "Line speed (km/h)"@en, "Strekningshastighet (km/t)"@nb, "Strekningsfart (km/t)"@nn ;
+        sh:datatype xsd:integer ;
+        sh:minInclusive 10 ;
+        sh:maxInclusive 330 ;
+        sh:maxCount 1 ;
+        sh:order 5
+    ] .
+
+# ---------------------------------------------------------------------------
+# Area: a polygon on the map
+# ---------------------------------------------------------------------------
+
+ex:AreaShape a sh:NodeShape ;
+    sh:targetClass ex:Area ;
+    rdfs:label "Area"@en, "Område"@nb, "Område"@nn ;
+    rdfs:comment "A region drawn as a polygon, maintained by an organisation."@en, "Et område tegnet som et polygon."@nb ;
+    rdm:order 3 ;
+    dash:uriStart "https://example.org/showcase/area/" ;
+    rdm:localNamePattern "^[a-z][a-z0-9-]*$" ;
+    sh:property ex:name, ex:description, ex:location ;
+    sh:property [
+        sh:path ex:maintainedBy ;
+        sh:name "Maintained by"@en, "Vedlikeholdt av"@nb, "Halde ved like av"@nn ;
+        sh:class schema:Organization ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+        sh:group ex:GeneralGroup ;
+        sh:order 3
+    ] .
+
+# ---------------------------------------------------------------------------
+# Closure: OWL-Time interval, xsd:time, gYear, gYearMonth, duration, sh:or
+# ---------------------------------------------------------------------------
+
+ex:ClosureShape a sh:NodeShape ;
+    sh:targetClass ex:Closure ;
+    rdfs:label "Track closure"@en, "Sporbrudd"@nb, "Sporbrot"@nn ;
+    rdfs:comment "A planned closure for maintenance: the calendar and clock editors."@en, "Et planlagt sporbrudd."@nb ;
+    rdm:order 4 ;
+    rdm:orderBy ex:reported ;
+    rdm:orderDescending true ;
+    dash:uriStart "https://example.org/showcase/closure/" ;
+    rdm:localNamePattern "^[a-z0-9][a-z0-9-]*$" ;
+    sh:property ex:name, ex:description, ex:created, ex:modified ;
+    sh:property [
+        sh:path ex:affects ;
+        sh:name "Affects"@en, "Gjelder"@nb, "Gjeld"@nn ;
+        sh:description "Lines or stations: the choices of both branches of sh:or are offered together."@en,
+            "Linjer eller stasjoner: valgene fra begge grenene av sh:or vises sammen."@nb ;
+        sh:or ( [ sh:class ex:Line ] [ sh:class ex:Station ] ) ;
+        sh:nodeKind sh:IRI ;
+        sh:minCount 1 ;
+        dash:viewer dash:LabelViewer ;
+        sh:group ex:GeneralGroup ;
+        sh:order 3
+    ] ;
+    sh:property [
+        sh:path time:hasTime ;
+        sh:name "Period"@en, "Periode"@nb, "Periode"@nn ;
+        sh:class time:Interval ;
+        sh:node ex:IntervalShape ;
+        sh:nodeKind sh:BlankNode ;
+        sh:maxCount 1 ;
+        dash:editor dash:DetailsEditor ;
+        sh:group ex:TimeGroup ;
+        sh:order 1
+    ] ;
+    sh:property [
+        sh:path ex:dailyStart ;
+        sh:name "Starts each night at"@en, "Starter hver natt kl."@nb, "Byrjar kvar natt kl."@nn ;
+        sh:datatype xsd:time ;
+        sh:maxCount 1 ;
+        sh:group ex:TimeGroup ;
+        sh:order 2
+    ] ;
+    sh:property [
+        sh:path ex:duration ;
+        sh:name "Duration each night"@en, "Varighet per natt"@nb, "Varigheit per natt"@nn ;
+        sh:datatype xsd:duration ;
+        sh:maxCount 1 ;
+        sh:group ex:TimeGroup ;
+        sh:order 3
+    ] ;
+    sh:property [
+        sh:path ex:budgetYear ;
+        sh:name "Budget year"@en, "Budsjettår"@nb, "Budsjettår"@nn ;
+        sh:datatype xsd:gYear ;
+        sh:maxCount 1 ;
+        sh:group ex:TimeGroup ;
+        sh:order 4
+    ] ;
+    sh:property [
+        sh:path ex:announcedIn ;
+        sh:name "Announced in"@en, "Varslet i"@nb, "Varsla i"@nn ;
+        sh:datatype xsd:gYearMonth ;
+        sh:maxCount 1 ;
+        sh:group ex:TimeGroup ;
+        sh:order 5
+    ] ;
+    sh:property [
+        sh:path ex:reported ;
+        sh:name "Reported"@en, "Meldt"@nb, "Meld"@nn ;
+        sh:description "A date, or a date and time: sh:or of two datatypes."@en, "En dato, eller dato og klokkeslett."@nb ;
+        sh:or ( [ sh:datatype xsd:date ] [ sh:datatype xsd:dateTime ] ) ;
+        sh:maxCount 1 ;
+        sh:group ex:TimeGroup ;
+        sh:order 6
+    ] ;
+    sh:property [
+        sh:path ex:contact ;
+        sh:name "Contact"@en, "Kontakt"@nb, "Kontakt"@nn ;
+        sh:class schema:Person ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+        dash:editor dash:InstancesSelectEditor ;
+        sh:group ex:GeneralGroup ;
+        sh:order 4
+    ] .
+
+ex:IntervalShape a sh:NodeShape ;
+    sh:targetClass time:Interval ;
+    sh:property [
+        sh:path time:hasBeginning ; sh:name "Beginning"@en ; sh:class time:Instant ; sh:node ex:InstantShape ;
+        sh:nodeKind sh:BlankNode ; sh:maxCount 1 ; sh:order 1 ; dash:editor dash:DetailsEditor
+    ] ;
+    sh:property [
+        sh:path time:hasEnd ; sh:name "End"@en ; sh:class time:Instant ; sh:node ex:InstantShape ;
+        sh:nodeKind sh:BlankNode ; sh:maxCount 1 ; sh:order 2 ; dash:editor dash:DetailsEditor
+    ] .
+
+ex:InstantShape a sh:NodeShape ;
+    sh:targetClass time:Instant ;
+    sh:property [
+        sh:path time:inXSDDate ; sh:name "Date"@en ; sh:datatype xsd:date ; sh:minCount 1 ; sh:maxCount 1
+    ] .
+
+# ---------------------------------------------------------------------------
+# Organisation and person: a closed shape, sh:or on a literal, read-only viewers
+# ---------------------------------------------------------------------------
+
+ex:OrganisationShape a sh:NodeShape ;
+    sh:targetClass schema:Organization ;
+    rdfs:label "Organisation"@en, "Organisasjon"@nb, "Organisasjon"@nn ;
+    rdfs:comment "Closed shape: a property it does not list is reported as a violation."@en,
+        "Lukket form: egenskaper som ikke er nevnt rapporteres."@nb ;
+    rdm:order 5 ;
+    rdm:orderBy schema:name ;
+    dash:uriStart "https://example.org/showcase/org/" ;
+    rdm:localNamePattern "^[a-z][a-z0-9-]*$" ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type dcterms:created dcterms:modified ) ;
+    sh:property [
+        sh:path schema:name ;
+        sh:name "Name"@en, "Navn"@nb, "Namn"@nn ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:order 1
+    ] ;
+    sh:property [
+        sh:path schema:url ;
+        sh:name "Web site"@en, "Nettsted"@nb, "Nettstad"@nn ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+        dash:viewer dash:URIViewer ;
+        sh:order 2
+    ] ;
+    sh:property [
+        sh:path schema:email ;
+        sh:name "E-mail"@en, "E-post"@nb, "E-post"@nn ;
+        sh:datatype xsd:string ;
+        sh:pattern "^[^@\\s]+@[^@\\s]+\\.[a-z]{2,}$" ;
+        sh:flags "i" ;
+        sh:order 3
+    ] ;
+    sh:property [
+        sh:path schema:foundingDate ;
+        sh:name "Founded"@en, "Grunnlagt"@nb, "Grunnlagd"@nn ;
+        sh:datatype xsd:date ;
+        sh:maxCount 1 ;
+        dash:editor dash:DatePickerEditor ;
+        sh:order 4
+    ] ;
+    sh:property [
+        sh:path schema:identifier ;
+        sh:name "Organisation number"@en, "Organisasjonsnummer"@nb, "Organisasjonsnummer"@nn ;
+        sh:description "Nine digits; shown, not edited."@en, "Ni sifre; vises, men redigeres ikke."@nb ;
+        sh:datatype xsd:string ;
+        sh:pattern "^[0-9]{9}$" ;
+        sh:maxCount 1 ;
+        dash:readOnly true ;
+        dash:viewer dash:LiteralViewer ;
+        sh:order 5
+    ] .
+
+ex:PersonShape a sh:NodeShape ;
+    sh:targetClass schema:Person ;
+    rdfs:label "Person"@en, "Person"@nb, "Person"@nn ;
+    rdfs:comment "A contact person."@en, "En kontaktperson."@nb ;
+    rdm:order 6 ;
+    rdm:orderBy schema:name ;
+    dash:uriStart "https://example.org/showcase/person/" ;
+    rdm:localNamePattern "^[a-z][a-z0-9-]*$" ;
+    sh:property [
+        sh:path schema:name ;
+        sh:name "Name"@en, "Navn"@nb, "Namn"@nn ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:order 1
+    ] ;
+    sh:property [
+        sh:path schema:jobTitle ;
+        sh:name "Role"@en, "Rolle"@nb, "Rolle"@nn ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        sh:order 2
+    ] ;
+    sh:property [
+        sh:path schema:worksFor ;
+        sh:name "Works for"@en, "Arbeider for"@nb, "Arbeider for"@nn ;
+        sh:class schema:Organization ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+        sh:order 3
+    ] ;
+    sh:property [
+        sh:path schema:email ;
+        sh:name "E-mail"@en, "E-post"@nb, "E-post"@nn ;
+        sh:datatype xsd:string ;
+        sh:pattern "^[^@\\s]+@[^@\\s]+\\.[a-z]{2,}$" ;
+        sh:flags "i" ;
+        sh:maxCount 1 ;
+        sh:order 4
+    ] ;
+    sh:property [
+        sh:path schema:telephone ;
+        sh:name "Phone"@en, "Telefon"@nb, "Telefon"@nn ;
+        sh:datatype xsd:string ;
+        sh:pattern "^\\+?[0-9 ]{8,15}$" ;
+        sh:order 5
+    ] .
+
+# ---------------------------------------------------------------------------
+# Report and query: rdm:queryText runs a stored SPARQL query from the form
+# ---------------------------------------------------------------------------
+
+ex:ReportShape a sh:NodeShape ;
+    sh:targetClass ex:Report ;
+    rdfs:label "Report"@en, "Rapport"@nb, "Rapport"@nn ;
+    rdfs:comment "Points at a stored query; the form can run it and show the rows."@en, "Peker på en lagret spørring."@nb ;
+    rdm:order 7 ;
+    dash:uriStart "https://example.org/showcase/report/" ;
+    rdm:localNamePattern "^[a-z][a-z0-9-]*$" ;
+    sh:property ex:name, ex:description ;
+    sh:property [
+        sh:path ex:usesQuery ;
+        sh:name "Query"@en, "Spørring"@nb, "Spørjing"@nn ;
+        sh:class ex:Query ;
+        sh:nodeKind sh:IRI ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        dash:editor dash:InstancesSelectEditor ;
+        dash:viewer dash:LabelViewer ;
+        rdm:queryText "ex:text" ;
+        sh:group ex:GeneralGroup ;
+        sh:order 3
+    ] .
+
+ex:QueryShape a sh:NodeShape ;
+    sh:targetClass ex:Query ;
+    rdfs:label "Query"@en, "Spørring"@nb, "Spørjing"@nn ;
+    rdfs:comment "A stored SPARQL query."@en, "En lagret SPARQL-spørring."@nb ;
+    rdm:order 8 ;
+    dash:uriStart "https://example.org/showcase/query/" ;
+    rdm:localNamePattern "^[a-z][a-z0-9-]*$" ;
+    sh:property ex:name ;
+    sh:property [
+        sh:path ex:text ;
+        sh:name "SPARQL"@en, "SPARQL"@nb, "SPARQL"@nn ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        dash:singleLine false ;
+        dash:editor dash:TextAreaEditor ;
+        sh:group ex:GeneralGroup ;
+        sh:order 3
+    ] .
