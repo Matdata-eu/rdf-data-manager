@@ -31,3 +31,11 @@ test('shows the interface in Norwegian when the language is nb', async ({ page }
   await expect(page.getByRole('link', { name: 'Innstillinger' })).toBeVisible()
   await expect(page.getByRole('navigation', { name: 'Klasser' })).toBeVisible()
 })
+
+test('saves an edited event in the places demo without false problems on its interval', async ({ page }) => {
+  await page.goto('/?demo=geo-time#/resource/https%3A%2F%2Fexample.org%2Fgeo-time%2FEvent/https%3A%2F%2Fexample.org%2Fgeo-time%2Fevent%2Fmaintenance-window')
+  await expect(page.getByRole('heading', { name: 'Maintenance window' })).toBeVisible()
+  await page.getByRole('group', { name: 'Duration' }).getByRole('spinbutton', { name: 'hours' }).fill('10')
+  await page.getByRole('button', { name: 'Save' }).click()
+  await expect(page.getByRole('status')).toContainText('Review')
+})
