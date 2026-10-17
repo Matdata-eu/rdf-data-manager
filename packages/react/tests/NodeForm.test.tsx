@@ -80,4 +80,27 @@ describe('NodeForm', () => {
     renderForm(state, services(registry))
     expect(screen.getAllByTestId('shout').length).toBe(3)
   })
+
+  it('shows problems inside a node that a widget edits as a whole on that widget\'s field', () => {
+    const geo = join(dirname(fileURLToPath(import.meta.url)), '../../../examples/geo-time')
+    const parse = (f: string) => new Parser().parse(readFileSync(join(geo, f), 'utf8'))
+    const geoModel = buildShapesModel(parse('shapes.ttl'))
+    const data = new Store(parse('data.ttl'))
+    const EX = 'https://example.org/geo-time/'
+    const TIME = 'http://www.w3.org/2006/time#'
+    const shape = geoModel.shapeForClass(`${EX}Event`)!
+    const state = stateFromQuads(namedNode(`${EX}event/maintenance-window`), shape, data, geoModel)
+    const interval = state.values[`${TIME}hasTime`][0].node!
+    const beginning = interval.values[`${TIME}hasBeginning`][0].node!
+    const Calendar: Widget['Editor'] = () => <div data-testid='calendar' />
+    const registry = new WidgetRegistry([...builtinWidgets, { id: 'https://example.org/widget#Calendar', score: p => p.path.value === `${TIME}hasTime` ? 20 : 0, Editor: Calendar }])
+    const issue = { focusNode: beginning.subject!.value, path: `${TIME}inXSDDateTimeStamp`, severity: 'Violation' as const, message: 'A value is required.' }
+    render(
+      <FormContext.Provider value={{ repo, model: geoModel, languages: ['en'], revision: 0, registry }}>
+        <NodeForm node={state} onChange={() => {}} issues={[issue]} subjects={new Map()} />
+      </FormContext.Provider>
+    )
+    expect(screen.getByTestId('calendar')).toBeInTheDocument()
+    expect(screen.getByText('Beginning › At: A value is required.')).toBeInTheDocument()
+  })
 })

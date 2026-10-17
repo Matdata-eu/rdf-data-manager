@@ -83,7 +83,14 @@ export class ShapesValidator {
    */
   async validate (dataQuads: Quad[]): Promise<Report> {
     const report = await this.validator.validate({ dataset: rdfDataset.dataset(dataQuads) })
-    const issues = flatten(report.results)
+    // A node reached both by a target and through sh:node is checked twice; report each problem once.
+    const seen = new Set<string>()
+    const issues = flatten(report.results).filter(i => {
+      const key = JSON.stringify([i.focusNode, i.path, i.severity, i.sourceShape, i.constraint, i.message, i.value])
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
     return {
       conforms: !issues.some(i => i.severity === 'Violation'),
       issues
