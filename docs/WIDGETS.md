@@ -91,7 +91,7 @@ load is reported in the app and the built-in editors are used instead.
 
 | Widget | Package | Claims |
 |---|---|---|
-| `map` | [`@rdf-data-manager/widget-map`](../packages/widget-map) | `geo:wktLiteral` / `geo:asWKT` literals and nested `geo:Geometry` nodes (`geo:hasGeometry`). Points are placed by clicking and moved by dragging; other geometries are drawn and edited as WKT text. CRS84 and EPSG:4326 are shown; other CRSs stay editable as text. Tiles come from OpenStreetMap by default (`configureMap` changes the tile URL). |
+| `map` | [`@rdf-data-manager/widget-map`](../packages/widget-map) | `geo:wktLiteral` / `geo:asWKT` literals and nested `geo:Geometry` nodes (`geo:hasGeometry`). A click places a point; the Line and Polygon tools draw a linestring or polygon vertex by vertex (Finish, Undo point, Cancel), replacing the current geometry; every vertex of the shown geometry can be dragged. Multi-geometries are shown and their vertices dragged, and anything else can be edited as WKT text. CRS84 and EPSG:4326 are shown; other CRSs stay editable as text. Tiles come from OpenStreetMap by default (`configureMap` changes the tile URL). |
 | `time` | [`@rdf-data-manager/widget-time`](../packages/widget-time) | `xsd:dateTimeStamp`, `xsd:time`, `xsd:gYear`, `xsd:gYearMonth` and `xsd:duration` literals, and OWL-Time nodes: a `time:Instant` becomes one field, a `time:Interval` a from/to pair, each built from the nested shape (`time:hasBeginning` / `time:hasEnd`, `time:inXSDDateTimeStamp` and friends). |
 
 Both are named in shapes as `dash:editor rdm:MapEditor` / `rdm:TimeEditor`, and otherwise
