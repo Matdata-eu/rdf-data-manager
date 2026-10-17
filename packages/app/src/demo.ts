@@ -5,6 +5,8 @@ import dimShapes from '../../shapes-dim/shapes/dim-metadata.shapes.ttl?raw'
 import dimData from '../../shapes-dim/examples/dim-metadata.sample.ttl?raw'
 import geoShapes from '../../../examples/geo-time/shapes.ttl?raw'
 import geoData from '../../../examples/geo-time/data.ttl?raw'
+import showcaseShapes from '../../../examples/showcase/shapes.ttl?raw'
+import showcaseData from '../../../examples/showcase/data.ttl?raw'
 
 export interface Demo extends DemoInfo {
   shapes: string
@@ -16,7 +18,8 @@ export interface Demo extends DemoInfo {
 /** Datasets bundled with the app that run in an in-browser store: nothing is sent anywhere. */
 const content: Record<string, Omit<Demo, keyof DemoInfo>> = {
   dim: { shapes: dimShapes, data: dimData, widgets: [], languages: ['en', 'nb', 'nn'] },
-  'geo-time': { shapes: geoShapes, data: geoData, widgets: ['map', 'time'], languages: ['en'] }
+  'geo-time': { shapes: geoShapes, data: geoData, widgets: ['map', 'time'], languages: ['en'] },
+  showcase: { shapes: showcaseShapes, data: showcaseData, widgets: ['map', 'time'], languages: ['en', 'nb', 'nn'] }
 }
 
 export function findDemo (name: string): Demo | undefined {

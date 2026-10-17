@@ -15,7 +15,8 @@ release adds its section here. The entries below summarise what the first releas
   "Used by" references, Turtle and CSV export, Turtle import checked against the shapes,
   managed-query preview, "Other properties" for triples outside the shape.
 - `sh:or` / `sh:xone` fields, `sh:closed` awareness, predicate targets parsed.
-- Demo mode in the browser with an Oxigraph store (`?demo=dim`, `?demo=geo-time`).
+- Demo mode in the browser with an Oxigraph store (`?demo=showcase`, a feature tour of
+  every editor, widget and SHACL feature; `?demo=dim`; `?demo=geo-time`).
 - Interface in Norwegian Bokmål (`nb`; `nn` falls back to it) besides English.
 - Packages: `rdf-data-manager` (app), `@rdf-data-manager/core`, `@rdf-data-manager/react`,
   `@rdf-data-manager/widget-map`, `@rdf-data-manager/widget-time`,
