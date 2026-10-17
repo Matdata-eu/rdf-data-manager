@@ -21,22 +21,27 @@ jobs:
       - run: npm run build
 
   browser:
-    name: Browser smoke test against Fuseki
+    name: Browser tests against Fuseki
     runs-on: ubuntu-latest
-    services:
-      fuseki:
-        image: stain/jena-fuseki:5.1.0
-        env:
-          ADMIN_PASSWORD: admin
-          FUSEKI_DATASET_1: metadata
-        ports:
-          - 3030:3030
+    env:
+      FUSEKI_VERSION: 5.2.0
+      FUSEKI_SHA512: 650d4576927cb4e330c372c46f76dde3fbd683b59cc692bac501b545097402c58c2254b25502e4225ba6f7d4c79ee12c5e43b78124115dbbe6371c487aa8604f
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
+      # The Apache release, run as a plain process: writable without authentication, which
+      # the ready-made container images are not.
+      - name: Start Fuseki
+        run: |
+          curl -sSfL -o fuseki.tar.gz "https://archive.apache.org/dist/jena/binaries/apache-jena-fuseki-${FUSEKI_VERSION}.tar.gz"
+          echo "${FUSEKI_SHA512}  fuseki.tar.gz" | sha512sum -c -
+          tar xzf fuseki.tar.gz
+          (cd "apache-jena-fuseki-${FUSEKI_VERSION}" && nohup ./fuseki-server --mem --update /metadata > "$RUNNER_TEMP/fuseki.log" 2>&1 &)
+          for i in $(seq 1 60); do curl -sf http://localhost:3030/$/ping > /dev/null && exit 0; sleep 1; done
+          cat "$RUNNER_TEMP/fuseki.log"; exit 1
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test

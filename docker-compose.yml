@@ -1,20 +1,23 @@
-# Local trial: the app next to a Fuseki with an in-memory dataset.
+# Local trial: the app next to a Fuseki with an in-memory dataset "ds" that accepts
+# updates without a login (fine on your own machine, not for a shared server).
 #   docker compose up --build
-#   npm run load-shapes -- http://localhost:3030/metadata/      # shapes into their graph
-#   curl -X POST -H 'Content-Type: text/turtle' --data-binary @packages/shapes-dim/examples/dim-metadata.sample.ttl http://localhost:3030/metadata/data
+#   npm run load-shapes -- http://localhost:3030/ds/      # shapes into their graph
+#   curl -X POST -H 'Content-Type: text/turtle' --data-binary @packages/shapes-dim/examples/dim-metadata.sample.ttl http://localhost:3030/ds/data
 # then open http://localhost:8080/
 services:
   fuseki:
-    image: stain/jena-fuseki:5.1.0
+    image: secoresearch/fuseki:5.2.0
     environment:
       ADMIN_PASSWORD: admin
-      FUSEKI_DATASET_1: metadata
+      ENABLE_DATA_WRITE: "true"
+      ENABLE_UPDATE: "true"
+      ENABLE_UPLOAD: "true"
     ports:
       - "3030:3030"
   app:
     build: .
     environment:
-      RDM_DATASET: http://localhost:3030/metadata/
+      RDM_DATASET: http://localhost:3030/ds/
       RDM_SHAPES_GRAPH: https://data.banenor.no/data/_shapes_metadata
       RDM_LANGUAGES: en,nb,nn
     ports:
