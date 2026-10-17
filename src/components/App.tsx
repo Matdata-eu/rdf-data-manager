@@ -11,6 +11,7 @@ import { Sidebar } from './Sidebar'
 import { InstanceList } from './InstanceList'
 import { ResourcePage } from './ResourcePage'
 import { Home } from './Home'
+import { ErrorBoundary } from './ErrorBoundary'
 
 type Boot =
   | { status: 'config' }
@@ -90,10 +91,12 @@ export function App () {
           <div className='layout'>
             <Sidebar active={route.name === 'class' || route.name === 'resource' || route.name === 'new' ? route.classIri : undefined} />
             <main className='content'>
-              {route.name === 'home' && <Home />}
-              {route.name === 'class' && <InstanceList key={route.classIri} classIri={route.classIri} />}
-              {route.name === 'resource' && <ResourcePage key={`${route.classIri} ${route.iri}`} classIri={route.classIri} iri={route.iri} />}
-              {route.name === 'new' && <ResourcePage key={`new ${route.classIri}`} classIri={route.classIri} />}
+              <ErrorBoundary resetKey={window.location.hash}>
+                {route.name === 'home' && <Home />}
+                {route.name === 'class' && <InstanceList key={route.classIri} classIri={route.classIri} />}
+                {route.name === 'resource' && <ResourcePage key={`${route.classIri} ${route.iri}`} classIri={route.classIri} iri={route.iri} />}
+                {route.name === 'new' && <ResourcePage key={`new ${route.classIri}`} classIri={route.classIri} />}
+              </ErrorBoundary>
             </main>
           </div>
         </AppContext.Provider>
