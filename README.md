@@ -25,6 +25,17 @@ npm install
 npm run dev        # http://localhost:5173
 ```
 
+Other ways to run it (details in [docs/CONFIG.md](docs/CONFIG.md)):
+
+```bash
+npx rdf-data-manager --port 8080 --config ./config.json          # the npm package serves the built app
+docker run -p 8080:8080 -e RDM_DATASET=http://host.docker.internal:3030/metadata/ ghcr.io/matdata-eu/rdf-data-manager
+docker compose up --build                                       # the app next to a Fuseki, for a local trial
+```
+
+Every push to `main` deploys to GitHub Pages; releases are cut by Release Please from the
+conventional commit history and publish the npm package and the container image.
+
 Open Settings and enter the endpoint (for Fuseki, the dataset URL fills in the query and
 update URLs) and where the shapes come from: a named graph in the endpoint, a Turtle URL
 or a local file. Settings are kept in the browser. They can also be passed in the URL,
@@ -32,7 +43,7 @@ e.g. `?dataset=http://localhost:3030/metadata/&shapesGraph=https://…`, or serv
 `config.json` next to `index.html` (`"locked": true` hides Settings).
 
 The look follows the [MatData design system](https://claude.ai/artifact/TtLC5gbV1pXHbZX22cPxCx):
-Barlow and JetBrains Mono (from Google Fonts), and light and dark themes. All colours,
+Barlow and JetBrains Mono (bundled, so no outside network is needed), and light and dark themes. All colours,
 fonts, spacing and radii are CSS variables in [src/theme.css](src/theme.css), so another
 organisation can restyle the app by replacing that one file.
 
