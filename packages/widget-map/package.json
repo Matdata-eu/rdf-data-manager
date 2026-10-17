@@ -1,0 +1,51 @@
+{
+  "name": "@rdf-data-manager/widget-map",
+  "version": "0.1.0",
+  "description": "Map widget for RDF Data Manager: shows and edits GeoSPARQL WKT geometries (geo:asWKT, geo:hasGeometry) on a Leaflet map",
+  "keywords": [
+    "rdf",
+    "shacl",
+    "dash",
+    "geosparql",
+    "wkt",
+    "leaflet",
+    "widget"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Matdata-eu/rdf-data-manager.git"
+  },
+  "homepage": "https://github.com/Matdata-eu/rdf-data-manager#readme",
+  "bugs": {
+    "url": "https://github.com/Matdata-eu/rdf-data-manager/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@rdf-data-manager/core": "0.1.0",
+    "@rdf-data-manager/react": "0.1.0",
+    "leaflet": "^1.9.4"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.22"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  }
+}

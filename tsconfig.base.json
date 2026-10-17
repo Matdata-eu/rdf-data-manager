@@ -26,6 +26,12 @@
       ],
       "@rdf-data-manager/react": [
         "./packages/react/src/index.ts"
+      ],
+      "@rdf-data-manager/widget-map": [
+        "./packages/widget-map/src/index.tsx"
+      ],
+      "@rdf-data-manager/widget-time": [
+        "./packages/widget-time/src/index.tsx"
       ]
     }
   }

@@ -275,3 +275,35 @@ export function touch (node: NodeState): NodeState {
 export function isEmptyValue (v: ValueState): boolean {
   return !v.node && v.text.trim() === '' && !v.term
 }
+
+/** The text of the first value of a property on a node, for widgets that edit nested nodes. */
+export function firstText (node: NodeState, path: string): string {
+  return node.values[path]?.[0]?.text ?? ''
+}
+
+/**
+ * Returns the node with the values of a property replaced by one text (or by nothing
+ * when the text is empty). The first existing value is kept and edited so its term and
+ * language survive.
+ */
+export function withText (node: NodeState, path: string, text: string, lang?: string): NodeState {
+  const current = node.values[path] ?? []
+  const values = text.trim() === ''
+    ? []
+    : [{ ...(current[0] ?? { id: newId() }), text, ...(lang !== undefined ? { lang } : {}) }]
+  return { ...node, values: { ...node.values, [path]: values } }
+}
+
+/** The nested node of the first value of a property, if the property is edited as nested nodes. */
+export function firstNode (node: NodeState, path: string): NodeState | undefined {
+  return node.values[path]?.[0]?.node
+}
+
+/** Returns the node with the first nested value of a property replaced (or added when there was none). */
+export function withNode (node: NodeState, path: string, nested: NodeState | undefined, model: ShapesModel): NodeState {
+  const p = node.shape.properties.find(x => x.path.value === path)
+  const current = node.values[path] ?? []
+  if (!nested) return { ...node, values: { ...node.values, [path]: current.slice(1) } }
+  const first = current[0] ?? (p ? newNestedValue(p, model) : undefined) ?? { id: newId(), text: '' }
+  return { ...node, values: { ...node.values, [path]: [{ ...first, node: nested }, ...current.slice(1)] } }
+}

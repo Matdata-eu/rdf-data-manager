@@ -17,7 +17,7 @@ well). All keys are optional.
 | `shapes` | `{"source": "endpoint", "graph": "<iri>"}` or `{"source": "url", "url": "<url>"}` | `{"source": "endpoint", "graph": "https://data.banenor.no/data/_shapes_metadata"}` |
 | `language` | Preferred language tag for labels | `nb` |
 | `languages` | Language tags offered in Settings (default `["en"]`); the shapes' `rdm:languages` are added | `["en", "nb", "nn"]` |
-| `widgets` | URLs of ES modules that add widgets, see [WIDGETS.md](WIDGETS.md) | `["https://cdn.example.org/rdm-widget-map.js"]` |
+| `widgets` | Widgets to load: `"map"`, `"time"` (bundled, loaded on demand) or URLs of ES modules, see [WIDGETS.md](WIDGETS.md) | `["map", "time"]` |
 | `timeoutMs` | Request timeout in milliseconds (default 120000) | `60000` |
 | `locked` | Hide Settings and ignore browser and URL settings | `true` |
 
@@ -49,7 +49,7 @@ entrypoint writes `config.json` from environment variables; unset ones are left 
 | `RDM_SHAPES_GRAPH` or `RDM_SHAPES_URL` | `shapes` |
 | `RDM_LANGUAGE` | `language` |
 | `RDM_LANGUAGES` | `languages` (comma-separated) |
-| `RDM_WIDGETS` | `widgets` (comma-separated URLs) |
+| `RDM_WIDGETS` | `widgets` (comma-separated: `map`, `time` or URLs) |
 | `RDM_TIMEOUT_MS` | `timeoutMs` |
 | `RDM_LOCKED` | `locked` (`true` or `false`) |
 

@@ -74,6 +74,8 @@ The repository is an npm workspace ([docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 | [packages/core](packages/core) | Shapes model, form state, diff and SPARQL Update, SPARQL client, SHACL validation. Plain TypeScript, no UI | `@rdf-data-manager/core` |
 | [packages/react](packages/react) | `NodeForm` and the widget registry; forms for any React app ([docs/WIDGETS.md](docs/WIDGETS.md)) | `@rdf-data-manager/react` |
 | [packages/app](packages/app) | The app: router, settings, theme, `config.json`, runtime widget loading | `rdf-data-manager` |
+| [packages/widget-map](packages/widget-map) | Map editor for GeoSPARQL geometries (Leaflet), loaded on demand | `@rdf-data-manager/widget-map` |
+| [packages/widget-time](packages/widget-time) | Calendar and clock editors for XSD date/time types and OWL-Time nodes | `@rdf-data-manager/widget-time` |
 | [packages/shapes-dim](packages/shapes-dim) | The Bane NOR DIM shapes, sample data, invalid test cases and endpoint tools | private |
 
 ## Shapes

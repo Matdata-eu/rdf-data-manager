@@ -82,10 +82,9 @@
     "widgets": {
       "type": "array",
       "items": {
-        "type": "string",
-        "format": "uri"
+        "type": "string"
       },
-      "description": "URLs of ES modules whose default export is a Widget or an array of Widgets"
+      "description": "Widgets to load: the bundled names map and time, or URLs of ES modules whose default export is a Widget or an array of Widgets"
     }
   }
 }

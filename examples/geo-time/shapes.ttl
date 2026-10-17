@@ -1,0 +1,75 @@
+# Example shapes for the map and time widgets: a place with a geometry and an event with
+# an interval. Load with ?shapesUrl=… or pick the file in Settings; data.ttl matches.
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix geo:  <http://www.opengis.net/ont/geosparql#> .
+@prefix time: <http://www.w3.org/2006/time#> .
+@prefix rdm:  <https://matdata.eu/ns/rdf-data-manager#> .
+@prefix ex:   <https://example.org/geo-time/> .
+
+ex:PlaceShape a sh:NodeShape ;
+    sh:targetClass ex:Place ;
+    rdfs:label "Place"@en ;
+    rdfs:comment "Something with a location. The geometry is edited on a map."@en ;
+    rdm:order 1 ;
+    dash:uriStart "https://example.org/geo-time/place/" ;
+    rdm:localNamePattern "^[a-z][a-z0-9-]*$" ;
+    sh:property [
+        sh:path rdfs:label ; sh:name "Name"@en ; sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ; sh:order 1
+    ] ;
+    sh:property [
+        sh:path geo:hasGeometry ; sh:name "Location"@en ;
+        sh:class geo:Geometry ; sh:node ex:GeometryShape ; sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ; sh:order 2 ; dash:editor dash:DetailsEditor
+    ] .
+
+ex:GeometryShape a sh:NodeShape ;
+    sh:targetClass geo:Geometry ;
+    dash:uriStart "https://example.org/geo-time/geometry/" ;
+    sh:property [
+        sh:path geo:asWKT ; sh:name "WKT"@en ; sh:datatype geo:wktLiteral ; sh:minCount 1 ; sh:maxCount 1
+    ] .
+
+ex:EventShape a sh:NodeShape ;
+    sh:targetClass ex:Event ;
+    rdfs:label "Event"@en ;
+    rdfs:comment "Something that happens somewhere for a while."@en ;
+    rdm:order 2 ;
+    dash:uriStart "https://example.org/geo-time/event/" ;
+    rdm:localNamePattern "^[a-z][a-z0-9-]*$" ;
+    sh:property [
+        sh:path rdfs:label ; sh:name "Name"@en ; sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ; sh:order 1
+    ] ;
+    sh:property [
+        sh:path ex:at ; sh:name "Place"@en ; sh:class ex:Place ; sh:nodeKind sh:IRI ; sh:maxCount 1 ; sh:order 2
+    ] ;
+    sh:property [
+        sh:path time:hasTime ; sh:name "When"@en ;
+        sh:class time:Interval ; sh:node ex:IntervalShape ; sh:nodeKind sh:BlankNode ;
+        sh:maxCount 1 ; sh:order 3 ; dash:editor dash:DetailsEditor
+    ] ;
+    sh:property [
+        sh:path ex:duration ; sh:name "Duration"@en ; sh:datatype xsd:duration ; sh:maxCount 1 ; sh:order 4
+    ] ;
+    sh:property [
+        sh:path ex:year ; sh:name "Year"@en ; sh:datatype xsd:gYear ; sh:maxCount 1 ; sh:order 5
+    ] .
+
+ex:IntervalShape a sh:NodeShape ;
+    sh:targetClass time:Interval ;
+    sh:property [
+        sh:path time:hasBeginning ; sh:name "Beginning"@en ; sh:class time:Instant ; sh:node ex:InstantShape ;
+        sh:nodeKind sh:BlankNode ; sh:maxCount 1 ; sh:order 1 ; dash:editor dash:DetailsEditor
+    ] ;
+    sh:property [
+        sh:path time:hasEnd ; sh:name "End"@en ; sh:class time:Instant ; sh:node ex:InstantShape ;
+        sh:nodeKind sh:BlankNode ; sh:maxCount 1 ; sh:order 2 ; dash:editor dash:DetailsEditor
+    ] .
+
+ex:InstantShape a sh:NodeShape ;
+    sh:targetClass time:Instant ;
+    sh:property [
+        sh:path time:inXSDDateTimeStamp ; sh:name "At"@en ; sh:datatype xsd:dateTimeStamp ; sh:minCount 1 ; sh:maxCount 1
+    ] .
