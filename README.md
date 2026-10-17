@@ -63,7 +63,20 @@ What the app does:
 - Refuses to save over someone else's edit: a resource that changed since it was opened
   must be reloaded first, and creating an IRI that appeared in the meantime fails.
 - Writes only the triples the form manages, as a minimal `DELETE DATA` / `INSERT DATA`
-  update, so properties outside the shapes are left alone.
+  update, so properties outside the shapes are left alone. Before writing, it shows the
+  changes in plain words (what is removed, what is added) for a last look.
+- Checks all stored data of a class, or of every class, against the shapes and lists
+  each problem with a link to the resource ("Check" on a class page, "Check all data" in
+  the sidebar).
+- Edits every translation of a class in one grid, with a filter for missing languages;
+  each row is saved through the same checks as the form.
+- Searches across all classes from the top bar, and shows on every resource what else
+  refers to it ("Used by").
+- Exports a class as Turtle (all triples) or CSV (one row per resource), and imports
+  Turtle after checking it against the shapes, replacing resources that already exist.
+- Previews the result of a SPARQL query a value points at (`rdm:queryText`, for the DIM
+  managed queries), and offers `dash:AutoCompleteEditor` for classes with too many
+  instances for a select.
 
 ## Packages
 
@@ -76,6 +89,7 @@ The repository is an npm workspace ([docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 | [packages/app](packages/app) | The app: router, settings, theme, `config.json`, runtime widget loading | `rdf-data-manager` |
 | [packages/widget-map](packages/widget-map) | Map editor for GeoSPARQL geometries (Leaflet), loaded on demand | `@rdf-data-manager/widget-map` |
 | [packages/widget-time](packages/widget-time) | Calendar and clock editors for XSD date/time types and OWL-Time nodes | `@rdf-data-manager/widget-time` |
+| [packages/store-memory](packages/store-memory) | An in-memory SPARQL store (Oxigraph, WebAssembly) behind the same client interface, for tests and the demo | `@rdf-data-manager/store-memory` |
 | [packages/shapes-dim](packages/shapes-dim) | The Bane NOR DIM shapes, sample data, invalid test cases and endpoint tools | private |
 
 ## Shapes
@@ -127,6 +141,7 @@ Annotations in the `rdm:` namespace (`https://matdata.eu/ns/rdf-data-manager#`):
 | `rdm:collapsed` | property shape | Start the field collapsed; without it, fields with more than 5 values start collapsed |
 | `rdm:pageSize` | property shape | Number of values shown before "Show more" (default 10) |
 | `rdm:languages` | property shape | Language tags the form offers for a text field |
+| `rdm:queryText` | property shape | SPARQL property path from a value to the text of a query, which the form offers to run and preview |
 
 ## Contributing
 

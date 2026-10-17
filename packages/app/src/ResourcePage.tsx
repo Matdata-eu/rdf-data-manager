@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react'
 import {
-  LABEL_PROPERTIES, assertUnchanged, buildDelete, emptyState, isValidIri, labelOf, literal, loadForEditing, localName,
+  LABEL_PROPERTIES, assertUnchanged, buildDelete, describeChanges, emptyState, isValidIri, labelOf, literal, loadForEditing, localName,
   ownedOf, pickByLanguage, prepareSave, text, withLanguageSlots,
   type LoadedResource, type NodeShape, type NodeState, type PreparedSave
 } from '@rdf-data-manager/core'
+import { UsedBy } from './UsedBy'
 import { NodeForm, useAsync } from '@rdf-data-manager/react'
 import { useApp } from './context'
 import { href, navigate } from './router'
@@ -12,6 +13,7 @@ type Phase =
   | { name: 'editing' }
   | { name: 'saving' }
   | { name: 'blocked'; prepared: PreparedSave }
+  | { name: 'review'; prepared: PreparedSave }
   | { name: 'saved'; prepared: PreparedSave }
   | { name: 'unchanged' }
   | { name: 'confirmDelete'; references: number }
@@ -100,7 +102,7 @@ function Editor ({ shape, classIri, className, iri, loaded, initial, flash, onSa
 
   const isNew = !iri
   const targetIri = iri ?? (shape.uriStart ? `${shape.uriStart}${localPart.trim()}` : localPart.trim())
-  const prepared = phase.name === 'blocked' || phase.name === 'saved' ? phase.prepared : undefined
+  const prepared = phase.name === 'blocked' || phase.name === 'saved' || phase.name === 'review' ? phase.prepared : undefined
   const subjects = useMemo(() => prepared ? collectSubjects(prepared.state) : new Map<string, string>(), [prepared])
   const issues = prepared?.report.issues ?? []
   const title = titleOf(state, languages) ?? (iri ? localName(iri) : `New ${className.toLowerCase()}`)
@@ -168,7 +170,7 @@ function Editor ({ shape, classIri, className, iri, loaded, initial, flash, onSa
         setPhase({ name: 'blocked', prepared: p })
         return
       }
-      await write(p)
+      setPhase({ name: 'review', prepared: p })
     } catch (e) {
       setPhase({ name: 'error', message: e instanceof Error ? e.message : String(e) })
     }
@@ -227,6 +229,19 @@ function Editor ({ shape, classIri, className, iri, loaded, initial, flash, onSa
           Saved.{warnings > 0 && ` ${warnings} warning${warnings > 1 ? 's' : ''} remain, shown below.`}
         </div>
       )}
+      {phase.name === 'review' && (
+        <div className='alert info review' role='status'>
+          <p>
+            <strong>Review:</strong> {phase.prepared.diff.deletes.length} triple{phase.prepared.diff.deletes.length === 1 ? '' : 's'} removed,{' '}
+            {phase.prepared.diff.inserts.length} added{warnings > 0 && <>, with {warnings} warning{warnings > 1 ? 's' : ''} shown below</>}.
+          </p>
+          <ChangeList prepared={phase.prepared} shape={shape} />
+          <div className='actions'>
+            <button type='button' className='button primary' onClick={() => void write(phase.prepared)}>{isNew ? 'Create' : 'Save'}</button>
+            <button type='button' className='button' onClick={() => setPhase({ name: 'editing' })}>Keep editing</button>
+          </div>
+        </div>
+      )}
       {phase.name === 'blocked' && (
         <div className='alert error' role='alert'>
           <p>
@@ -280,6 +295,28 @@ function Editor ({ shape, classIri, className, iri, loaded, initial, flash, onSa
           <pre>{prepared.update}</pre>
         </details>
       )}
+      {loaded && <UsedBy iri={loaded.iri} owned={ownedOf(loaded)} />}
     </section>
+  )
+}
+
+/** The pending changes in the words of the shapes. */
+function ChangeList ({ prepared, shape }: { prepared: PreparedSave; shape: NodeShape }) {
+  const { model, languages } = useApp()
+  const changes = useMemo(() => describeChanges(prepared.diff, prepared.iri, shape, model, languages), [prepared, shape, model, languages])
+  return (
+    <table className='data-table changes'>
+      <tbody>
+        {changes.map(c => (
+          <tr key={`${c.subject} ${c.property}`}>
+            <th scope='row'>{c.subjectLabel !== localName(prepared.iri) && <span className='muted small'>{c.subjectLabel} › </span>}{c.propertyLabel}</th>
+            <td>
+              {c.removed.map((v, i) => <del key={`d${i}`}>{v}</del>)}
+              {c.added.map((v, i) => <ins key={`i${i}`}>{v}</ins>)}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   )
 }

@@ -168,3 +168,55 @@ input[type='radio'], input[type='checkbox'] { width: auto; height: auto; accent-
 @media (max-width: 760px) {
   .settings fieldset, .card { padding-left: var(--space-4); padding-right: var(--space-4); }
 }
+
+/* Top bar search */
+.search-box { margin-left: auto; width: min(320px, 40vw); }
+.search-box input { height: 36px; }
+
+/* Sidebar tools */
+.sidebar-heading { font-size: 12px; line-height: 20px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-muted); margin: var(--space-6) var(--space-6) var(--space-1); }
+
+/* Export menu */
+.menu { position: relative; }
+.menu summary { list-style: none; cursor: pointer; }
+.menu summary::-webkit-details-marker { display: none; }
+.menu-items {
+  position: absolute; right: 0; top: calc(100% + 4px); z-index: 5; min-width: 220px; padding: var(--space-1) 0;
+  background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-md); box-shadow: var(--shadow-raised);
+}
+.menu-items button { display: block; width: 100%; text-align: left; border: 0; background: transparent; padding: var(--space-2) var(--space-4); font: inherit; color: var(--ink); cursor: pointer; }
+.menu-items button:hover { background: var(--brand-soft); }
+
+/* Review before save */
+.changes th { font-weight: 500; white-space: nowrap; width: 1%; }
+.changes td { white-space: normal; max-width: none; }
+.changes del, .changes ins { display: block; text-decoration: none; padding: 0 var(--space-1); border-radius: var(--radius-sm); overflow-wrap: anywhere; }
+.changes del { background: var(--danger-soft); color: var(--danger); }
+.changes del::before { content: '− '; }
+.changes ins { background: var(--brand-soft); }
+.changes ins::before { content: '+ '; }
+.data-table.summary td.violation { color: var(--danger); }
+.data-table.summary td.warning { color: var(--amber-ink); }
+
+/* Used by */
+.used-by { margin-top: var(--space-6); }
+.used-by summary { cursor: pointer; color: var(--ink-muted); font-size: 14px; }
+.used-by ul { margin: var(--space-2) 0 0; padding-left: var(--space-5); }
+
+/* Validation results */
+.issue-card { margin-top: var(--space-4); }
+.issue-card h2 { font-size: 17px; }
+
+/* Translation grid */
+.grid-scroll { overflow: auto; margin-top: var(--space-2); border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface-raised); }
+.grid th, .grid td { max-width: none; white-space: normal; }
+.grid th.lang { font-weight: 500; }
+.grid tbody th { font-weight: 500; white-space: nowrap; }
+.grid td input { height: 34px; padding: var(--space-1) var(--space-2); min-width: 14ch; }
+.grid td.missing input { border-style: dashed; }
+.grid td.edited input { border-color: var(--brand); background: var(--brand-soft); }
+
+/* Import */
+.import textarea { margin: var(--space-3) 0; font-family: var(--font-mono); font-size: 13px; }
+.import-list { list-style: none; padding: 0; margin: 0 0 var(--space-3); }
+.import-list > li { padding: var(--space-1) 0; border-top: 1px solid var(--line); }

@@ -12,7 +12,8 @@
         "@rdf-data-manager/core",
         "@rdf-data-manager/react",
         "@rdf-data-manager/widget-map",
-        "@rdf-data-manager/widget-time"
+        "@rdf-data-manager/widget-time",
+        "@rdf-data-manager/store-memory"
       ]
     }
   ],
@@ -31,6 +32,9 @@
     },
     "packages/widget-time": {
       "component": "@rdf-data-manager/widget-time"
+    },
+    "packages/store-memory": {
+      "component": "@rdf-data-manager/store-memory"
     }
   },
   "changelog-sections": [

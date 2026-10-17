@@ -44,6 +44,8 @@ test('lists the classes, edits a key figure and writes only the changed triple',
   const title = page.locator('input[value="Total track length"]')
   await title.fill('Track length in total')
   await page.getByRole('button', { name: 'Save' }).click()
+  await expect(page.getByRole('status')).toContainText('Review')
+  await page.getByRole('status').getByRole('button', { name: 'Save' }).click()
   await expect(page.getByRole('status')).toContainText('Saved')
 
   const rows = await select(`SELECT ?t WHERE { <${BND}_keyFigure_trackLength> <http://purl.org/dc/terms/title> ?t FILTER(lang(?t) = 'en') }`)

@@ -23,12 +23,19 @@ widgets and the react package build on core; core depends on nothing of ours.
 |---|---|---|
 | `packages/core` | `shapes/`, `form/`, `data/`, `sparql/`, `validation/`, `rdf/` | `@rdf-data-manager/core` |
 | `packages/react` | `NodeForm`, the widget registry, built-in widgets, `useAsync`, `form.css` | `@rdf-data-manager/react` |
-| `packages/app` | Router, settings, pages, theme, `config.json`, `bin/` CLI, Playwright test | `rdf-data-manager` |
+| `packages/widget-map`, `packages/widget-time` | The map and time widgets, loaded on demand by the app | `@rdf-data-manager/widget-*` |
+| `packages/store-memory` | `MemoryClient`: Oxigraph (WebAssembly) behind `SparqlQueryClient`, so the whole stack runs without a server | `@rdf-data-manager/store-memory` |
+| `packages/app` | Router, settings, pages (list, form, validation, translations, search, import), theme, `config.json`, `bin/` CLI, Playwright tests | `rdf-data-manager` |
 | `packages/shapes-dim` | DIM shapes, sample data, invalid cases, `validate-endpoint` and `load-shapes` tools | private |
 
 In development, tests and the app build the packages resolve to each other's TypeScript
 sources (an alias in each Vite config), so nothing is built first. `npm run build`
-compiles `core` and `react` to `dist/` with declarations for publishing and builds the app.
+compiles the libraries to `dist/` with declarations for publishing and builds the app.
+
+`Repository` talks to a `SparqlQueryClient` (select, ask, construct, update). The
+protocol client is one implementation; the memory store is another, which is how the
+integration tests in `packages/store-memory/tests` exercise every query the app sends
+against a real SPARQL engine without a server, and how the demo mode works.
 
 ## The save pipeline
 
@@ -42,7 +49,15 @@ compiles `core` and `react` to `dist/` with declarations for publishing and buil
    from, so a save never silently overwrites someone else's edit.
 5. `buildUpdate` emits `DELETE DATA` / `INSERT DATA` (or `DELETE … WHERE` for blank
    nodes; `INSERT … WHERE { FILTER NOT EXISTS … }` for a new resource), and the
-   repository sends it.
+   repository sends it. A blank node that a change touches is replaced as a whole (its
+   triples, those under it and the link from its parent), since a blank node cannot be
+   addressed on its own.
+
+The other pages reuse the same pieces: the validation overview loads a whole class with
+the same CONSTRUCT shape as `loadResource` and attributes issues on nested nodes to their
+root; the translation grid saves each edited resource through `prepareSave`; import
+validates the parsed Turtle with the endpoint's context and replaces existing resources
+tree by tree; export serialises the same trees.
 
 ## Widgets
 

@@ -3,7 +3,7 @@ import { useAsync } from '@rdf-data-manager/react'
 import { useApp } from './context'
 import { href } from './router'
 
-export function Sidebar ({ active }: { active?: string }) {
+export function Sidebar ({ active, tool }: { active?: string; tool?: 'validation' | 'import' }) {
   const { model, repo, languages, revision } = useApp()
   const counts = useAsync(() => repo.countInstances(model.classes.map(c => c.iri)), [repo, model, revision])
 
@@ -20,6 +20,11 @@ export function Sidebar ({ active }: { active?: string }) {
         ))}
       </ul>
       {model.classes.length === 0 && <p className='muted small'>The shapes define no classes with an rdfs:label.</p>}
+      <h2 className='sidebar-heading'>Tools</h2>
+      <ul>
+        <li><a href={href({ name: 'validation' })} className={tool === 'validation' ? 'active' : undefined}>Check all data</a></li>
+        <li><a href={href({ name: 'import' })} className={tool === 'import' ? 'active' : undefined}>Import</a></li>
+      </ul>
     </nav>
   )
 }
