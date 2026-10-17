@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { navigate } from './router'
+import { t } from './i18n'
 
 /** The search box in the top bar; submitting goes to the results page. */
 export function SearchBox ({ initial }: { initial: string }) {
@@ -10,7 +11,7 @@ export function SearchBox ({ initial }: { initial: string }) {
   }
   return (
     <form className='search-box' role='search' onSubmit={submit}>
-      <input type='search' aria-label='Search' placeholder='Search…' value={query} onChange={e => setQuery(e.target.value)} />
+      <input type='search' aria-label={t('Search')} placeholder={t('Search…')} value={query} onChange={e => setQuery(e.target.value)} />
     </form>
   )
 }

@@ -1,6 +1,6 @@
 import { useEffect, useId, useState } from 'react'
 import { localName, namedNode, pickByLanguage, type SearchHit, type Term } from '@rdf-data-manager/core'
-import { useForm } from '../context'
+import { useForm, useT } from '../context'
 import { useAsync } from '../useAsync'
 import type { WidgetEditorProps } from './types'
 
@@ -10,6 +10,7 @@ import type { WidgetEditorProps } from './types'
  */
 export function AutoComplete ({ property, value, onChange, id, invalid }: WidgetEditorProps) {
   const { repo, languages, revision } = useForm()
+  const t = useT()
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
   const [hits, setHits] = useState<SearchHit[]>([])
@@ -45,13 +46,13 @@ export function AutoComplete ({ property, value, onChange, id, invalid }: Widget
     <div className='autocomplete'>
       <input
         id={id} aria-invalid={invalid} role='combobox' aria-expanded={open} aria-controls={listId} aria-autocomplete='list'
-        placeholder='Type to search…' title={current || undefined}
+        placeholder={t('Type to search…')} title={current || undefined}
         value={open ? query : (label.status === 'ready' && label.value ? label.value : current ? localName(current) : '')}
         onFocus={() => setOpen(true)}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
         onChange={e => { setQuery(e.target.value); setOpen(true) }}
       />
-      {current && !open && <button type='button' className='icon-button' title='Clear' aria-label='Clear' onClick={() => onChange({ ...value, text: '', term: undefined })}>×</button>}
+      {current && !open && <button type='button' className='icon-button' title={t('Clear')} aria-label={t('Clear')} onClick={() => onChange({ ...value, text: '', term: undefined })}>×</button>}
       {open && (
         <ul id={listId} role='listbox' className='autocomplete-list'>
           {hits.map(h => (
@@ -60,8 +61,8 @@ export function AutoComplete ({ property, value, onChange, id, invalid }: Widget
               <span className='mono small muted'>{localName(h.iri)}</span>
             </li>
           ))}
-          {query.trim().length >= 2 && hits.length === 0 && <li className='muted small'>No matches</li>}
-          {query.trim().length < 2 && <li className='muted small'>Type at least two characters</li>}
+          {query.trim().length >= 2 && hits.length === 0 && <li className='muted small'>{t('No matches')}</li>}
+          {query.trim().length < 2 && <li className='muted small'>{t('Type at least two characters')}</li>}
         </ul>
       )}
     </div>

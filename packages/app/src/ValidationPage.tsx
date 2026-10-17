@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { countBySeverity, labelOf, localName, validateClass, type ClassReport, type InstanceIssue } from '@rdf-data-manager/core'
 import { useApp } from './context'
 import { href } from './router'
+import { n, t } from './i18n'
 
 type Run =
   | { status: 'idle' }
@@ -42,18 +43,18 @@ export function ValidationPage ({ classIri }: { classIri?: string }) {
     }
   }
 
-  const title = classIri ? `Check ${className(classIri)}` : 'Check all data'
+  const title = classIri ? t('Check {class}', { class: className(classIri) }) : t('Check all data')
   return (
     <section>
       {classIri && <nav className='crumbs'><a href={href({ name: 'class', classIri })}>{className(classIri)}</a></nav>}
       <div className='page-header'>
         <div>
           <h1>{title}</h1>
-          <p className='muted'>Validates what is stored against the shapes, as a save would, and lists every problem with a link to fix it.</p>
+          <p className='muted'>{t('Validates what is stored against the shapes, as a save would, and lists every problem with a link to fix it.')}</p>
         </div>
         <div className='actions'>
           <button type='button' className='button primary' disabled={run.status === 'running'} onClick={() => void start()}>
-            {run.status === 'running' ? `Checking ${run.done}/${run.total}…` : run.status === 'done' ? 'Check again' : 'Check'}
+            {run.status === 'running' ? t('Checking {done}/{total}…', { done: run.done, total: run.total }) : run.status === 'done' ? t('Check again') : t('Check')}
           </button>
         </div>
       </div>
@@ -80,10 +81,10 @@ function Results ({ reports, labels, severity, setSeverity, className }: {
     <>
       <div className={`alert ${counts.Violation ? 'error' : 'success'}`} role='status'>
         <p>
-          <strong>{instances} resource{instances === 1 ? '' : 's'} checked.</strong>{' '}
+          <strong>{n(instances, '1 resource checked.', '{n} resources checked.')}</strong>{' '}
           {counts.Violation === 0 && counts.Warning === 0 && counts.Info === 0
-            ? 'Everything conforms to the shapes.'
-            : `${counts.Violation} problem${counts.Violation === 1 ? '' : 's'}, ${counts.Warning} warning${counts.Warning === 1 ? '' : 's'}, ${counts.Info} note${counts.Info === 1 ? '' : 's'}.`}
+            ? t('Everything conforms to the shapes.')
+            : t('{v} problems, {w} warnings, {i} notes.', { v: counts.Violation, w: counts.Warning, i: counts.Info })}
         </p>
         <table className='data-table summary'>
           <tbody>
@@ -92,9 +93,9 @@ function Results ({ reports, labels, severity, setSeverity, className }: {
               return (
                 <tr key={r.classIri}>
                   <td><a href={href({ name: 'class', classIri: r.classIri })}>{className(r.classIri)}</a></td>
-                  <td className='count'>{r.instances} checked</td>
-                  <td className={c.Violation ? 'violation' : ''}>{c.Violation} problems</td>
-                  <td className={c.Warning ? 'warning' : ''}>{c.Warning} warnings</td>
+                  <td className='count'>{t('{n} checked', { n: r.instances })}</td>
+                  <td className={c.Violation ? 'violation' : ''}>{n(c.Violation, '1 problem', '{n} problems')}</td>
+                  <td className={c.Warning ? 'warning' : ''}>{n(c.Warning, '1 warning', '{n} warnings')}</td>
                 </tr>
               )
             })}
@@ -104,7 +105,7 @@ function Results ({ reports, labels, severity, setSeverity, className }: {
       {all.length > 0 && (
         <label className='row small'>
           <input type='checkbox' checked={severity === 'Violation'} onChange={e => setSeverity(e.target.checked ? 'Violation' : 'all')} />
-          Problems only
+          {t('Problems only')}
         </label>
       )}
       {[...byInstance].map(([instance, issues]) => (
@@ -117,7 +118,7 @@ function Results ({ reports, labels, severity, setSeverity, className }: {
             {issues.map((i, n) => (
               <li key={n} className={i.severity.toLowerCase()}>
                 {i.path && <span className='muted'>{localName(i.path)}: </span>}{i.message}
-                {i.focusNode !== instance && <span className='muted small'> (nested node)</span>}
+                {i.focusNode !== instance && <span className='muted small'> {t('(nested node)')}</span>}
               </li>
             ))}
           </ul>

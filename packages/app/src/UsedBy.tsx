@@ -2,6 +2,7 @@ import { labelOf, localName, pickByLanguage } from '@rdf-data-manager/core'
 import { useAsync } from '@rdf-data-manager/react'
 import { useApp } from './context'
 import { href } from './router'
+import { n } from './i18n'
 
 /** The triples elsewhere that point at a resource, with links where the subject is managed. */
 export function UsedBy ({ iri, owned }: { iri: string; owned: string[] }) {
@@ -22,7 +23,7 @@ export function UsedBy ({ iri, owned }: { iri: string; owned: string[] }) {
   }
   return (
     <details className='used-by'>
-      <summary>Used by {refs.value.length} resource{refs.value.length === 1 ? '' : 's'}</summary>
+      <summary>{n(refs.value.length, 'Used by 1 resource', 'Used by {n} resources')}</summary>
       <ul>
         {refs.value.map(r => (
           <li key={`${r.subject} ${r.predicate}`}>

@@ -65,6 +65,15 @@ See [WIDGETS.md](WIDGETS.md). A widget implements a `dash:editor` IRI and scores
 well it fits a property; the registry picks by name when the shape names an editor,
 otherwise by score. The built-in editors are widgets too, so there is one mechanism.
 
+## UI languages
+
+The interface speaks the `language` of the configuration. Every message is written in
+English in the code and looked up in a catalogue keyed by that English text
+(`packages/app/src/messages/`); a missing entry shows the English. Norwegian Bokmål is
+bundled and Nynorsk falls back to it. The React package takes the same function through
+`FormServices.t`, so widgets call `useT()` and need no catalogue of their own.
+To add a language, copy `nb.ts`, translate the values and register the tag in `i18n.ts`.
+
 ## Configuration
 
 See [CONFIG.md](CONFIG.md): `config.json`, URL parameters, environment variables of the

@@ -1,3 +1,4 @@
+import { t } from './i18n'
 import { Component, type ErrorInfo, type ReactNode } from 'react'
 
 interface State { error?: Error }
@@ -22,7 +23,7 @@ export class ErrorBoundary extends Component<{ children: ReactNode; resetKey?: s
     if (!this.state.error) return this.props.children
     return (
       <div className='alert error' role='alert'>
-        <strong>Something went wrong on this page.</strong> {this.state.error.message}
+        <strong>{t('Something went wrong on this page.')}</strong> {this.state.error.message}
         <div className='actions'>
           <button type='button' className='button' onClick={() => this.setState({ error: undefined })}>Try again</button>
         </div>

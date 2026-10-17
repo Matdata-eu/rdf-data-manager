@@ -6,6 +6,7 @@ import {
 import { useAsync } from '@rdf-data-manager/react'
 import { useApp } from './context'
 import { href } from './router'
+import { n, t } from './i18n'
 
 /** A grid of every language-tagged text of a class, one row per resource, for translating in bulk. */
 export function TranslationsPage ({ classIri }: { classIri: string }) {
@@ -62,36 +63,36 @@ export function TranslationsPage ({ classIri }: { classIri: string }) {
       <nav className='crumbs'><a href={href({ name: 'class', classIri })}>{className}</a></nav>
       <div className='page-header'>
         <div>
-          <h1>Translations</h1>
-          <p className='muted'>Every text of {className.toLowerCase()} in every language. Edit the cells and save; each resource is checked against the shapes.</p>
+          <h1>{t('Translations')}</h1>
+          <p className='muted'>{t('Every text of {class} in every language. Edit the cells and save; each resource is checked against the shapes.', { class: className.toLowerCase() })}</p>
         </div>
         <div className='actions'>
           <button type='button' className='button primary' disabled={!changed || saving} onClick={() => void save()}>
-            {saving ? 'Saving…' : changed ? `Save ${changed} change${changed === 1 ? '' : 's'}` : 'Save'}
+            {saving ? t('Saving…') : changed ? n(changed, 'Save 1 change', 'Save {n} changes') : t('Save')}
           </button>
         </div>
       </div>
-      {results && failed.length === 0 && <div className='alert success' role='status'>Saved {results.length} resource{results.length === 1 ? '' : 's'}.</div>}
+      {results && failed.length === 0 && <div className='alert success' role='status'>{n(results.length, 'Saved 1 resource.', 'Saved {n} resources.')}</div>}
       {failed.length > 0 && (
         <div className='alert error' role='alert'>
-          <p><strong>{failed.length} resource{failed.length === 1 ? '' : 's'} not saved.</strong> The edits are kept in the grid.</p>
+          <p><strong>{n(failed.length, '1 resource not saved.', '{n} resources not saved.')}</strong> {t('The edits are kept in the grid.')}</p>
           <ul className='issues'>{failed.map(f => <li key={f.iri} className='violation'>{localName(f.iri)}: {f.error}</li>)}</ul>
         </div>
       )}
-      {properties.length === 0 && <p className='muted'>This class has no language-tagged text properties.</p>}
-      {rows.status === 'loading' && <p className='muted'>Loading…</p>}
+      {properties.length === 0 && <p className='muted'>{t('This class has no language-tagged text properties.')}</p>}
+      {rows.status === 'loading' && <p className='muted'>{t('Loading…')}</p>}
       {rows.status === 'error' && <div className='alert error'>{rows.error.message}</div>}
       {rows.status === 'ready' && properties.length > 0 && (
         <>
           <label className='row small'>
             <input type='checkbox' checked={onlyMissing} onChange={e => setOnlyMissing(e.target.checked)} />
-            Only resources with a missing translation ({rows.value.filter(missing).length})
+            {t('Only resources with a missing translation ({n})', { n: rows.value.filter(missing).length })}
           </label>
           <div className='grid-scroll'>
             <table className='data-table grid'>
               <thead>
                 <tr>
-                  <th rowSpan={2}>Resource</th>
+                  <th rowSpan={2}>{t('Resource')}</th>
                   {properties.map(p => <th key={p.key} colSpan={langs.length}>{text(p.name, languages) || localName(p.path.value)}</th>)}
                 </tr>
                 <tr>{properties.flatMap(p => langs.map(l => <th key={`${p.key} ${l}`} className='lang'>{l}</th>))}</tr>
@@ -118,7 +119,7 @@ export function TranslationsPage ({ classIri }: { classIri: string }) {
               </tbody>
             </table>
           </div>
-          {visible.length === 0 && <p className='muted'>Nothing to show.</p>}
+          {visible.length === 0 && <p className='muted'>{t('Nothing to show.')}</p>}
         </>
       )}
     </section>

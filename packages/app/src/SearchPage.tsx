@@ -2,6 +2,7 @@ import { labelOf, localName, pickByLanguage } from '@rdf-data-manager/core'
 import { useAsync } from '@rdf-data-manager/react'
 import { useApp } from './context'
 import { href } from './router'
+import { n, t } from './i18n'
 
 /** Results of the search box in the top bar: instances of every managed class whose label or IRI matches. */
 export function SearchPage ({ query }: { query: string }) {
@@ -15,15 +16,15 @@ export function SearchPage ({ query }: { query: string }) {
     <section>
       <div className='page-header'>
         <div>
-          <h1>Search</h1>
-          <p className='muted'>Resources whose label or IRI contains “{query}”.</p>
+          <h1>{t('Search')}</h1>
+          <p className='muted'>{t('Resources whose label or IRI contains “{q}”.', { q: query })}</p>
         </div>
       </div>
-      {hits.status === 'loading' && <p className='muted'>Searching…</p>}
+      {hits.status === 'loading' && <p className='muted'>{t('Searching…')}</p>}
       {hits.status === 'error' && <div className='alert error'>{hits.error.message}</div>}
       {hits.status === 'ready' && (
         <>
-          <p className='muted small'>{hits.value.length} result{hits.value.length === 1 ? '' : 's'}{hits.value.length === 100 ? ' (first 100)' : ''}</p>
+          <p className='muted small'>{n(hits.value.length, '1 result', '{n} results')}{hits.value.length === 100 ? ` ${t('(first {n})', { n: 100 })}` : ''}</p>
           <ul className='instance-list'>
             {hits.value.map(h => (
               <li key={h.iri}>

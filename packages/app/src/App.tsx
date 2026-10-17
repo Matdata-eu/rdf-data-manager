@@ -5,6 +5,7 @@ import { isConfigured, loadConfig, saveConfig, type AppConfig } from './config'
 import { AppContext, type AppServices } from './context'
 import { classOf, href, navigate, useRoute } from './router'
 import { loadWidgets } from './widgets'
+import { setUiLanguage, t } from './i18n'
 import { Settings } from './Settings'
 import { Sidebar } from './Sidebar'
 import { InstanceList } from './InstanceList'
@@ -41,6 +42,7 @@ export function App () {
 
   const start = useCallback(async (requested: AppConfig) => {
     setBoot({ status: 'loading', config: requested })
+    setUiLanguage(requested.language)
     try {
       let config = requested
       let repo: Repository
@@ -48,7 +50,7 @@ export function App () {
         // The demo runs on an in-browser store, loaded on demand so the normal app never pays for it.
         const { findDemo, startDemo } = await import('./demo')
         const demo = findDemo(requested.demo)
-        if (!demo) throw new Error(`There is no demo called "${requested.demo}".`)
+        if (!demo) throw new Error(t('There is no demo called "{name}".', { name: requested.demo }))
         const started = await startDemo(demo, requested)
         config = started.config
         repo = new Repository(config, started.client)
@@ -65,6 +67,7 @@ export function App () {
 
   useEffect(() => {
     loadConfig().then(({ config, locked }) => {
+      setUiLanguage(config.language)
       setInitial(config)
       setLocked(locked)
       if (isConfigured(config)) void start(config)
@@ -81,7 +84,8 @@ export function App () {
         revision,
         registry: boot.registry,
         resourceHref: (classIri, iri) => href({ name: 'resource', classIri, iri }),
-        notifyChanged: () => setRevision(r => r + 1)
+        notifyChanged: () => setRevision(r => r + 1),
+        t
       }
     : null, [boot, revision])
 
@@ -100,17 +104,17 @@ export function App () {
       <header className='topbar'>
         <a className='brand' href='#/'><img src='./favicon.svg' alt='' />RDF <b>Data</b> Manager</a>
         {config?.demo
-          ? <span className='endpoint demo-badge' title='The data lives in this browser tab; nothing is sent anywhere, and a reload starts over.'>Demo: changes stay in this tab</span>
+          ? <span className='endpoint demo-badge' title={t('The data lives in this browser tab; nothing is sent anywhere, and a reload starts over.')}>{t('Demo: changes stay in this tab')}</span>
           : config?.queryUrl && <span className='endpoint' title={config.queryUrl}>{config.queryUrl}</span>}
         {services && !showSettings && <SearchBox initial={route.name === 'search' ? route.query : ''} />}
-        {!locked && <a className='button ghost' href='#/settings'>Settings</a>}
+        {!locked && <a className='button ghost' href='#/settings'>{t('Settings')}</a>}
       </header>
-      {boot.status === 'loading' && <main className='content'><p className='muted'>Loading shapes…</p></main>}
+      {boot.status === 'loading' && <main className='content'><p className='muted'>{t('Loading shapes…')}</p></main>}
       {showSettings && config && boot.status !== 'loading' && (
         <main className='content narrow'>
           {boot.status === 'error' && (
             <div className='alert error' role='alert'>
-              <strong>Could not start.</strong> {boot.error.message}
+              <strong>{t('Could not start.')}</strong> {boot.error.message}
             </div>
           )}
           {!locked && (
@@ -129,7 +133,7 @@ export function App () {
               <main className='content'>
                 {boot.status === 'ready' && boot.failedWidgets.length > 0 && (
                   <div className='alert warning' role='alert'>
-                    Widgets that could not be loaded: {boot.failedWidgets.join(', ')}. The built-in editors are used instead.
+                    {t('Widgets that could not be loaded: {list}. The built-in editors are used instead.', { list: boot.failedWidgets.join(', ') })}
                   </div>
                 )}
                 <ErrorBoundary resetKey={window.location.hash}>

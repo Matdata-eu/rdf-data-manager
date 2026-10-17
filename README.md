@@ -78,6 +78,8 @@ What the app does:
   refers to it ("Used by").
 - Exports a class as Turtle (all triples) or CSV (one row per resource), and imports
   Turtle after checking it against the shapes, replacing resources that already exist.
+- Shows the interface in Norwegian (Bokmål; Nynorsk falls back to it) when the language
+  is `nb` or `nn`; other languages show English until a catalogue is added.
 - Previews the result of a SPARQL query a value points at (`rdm:queryText`, for the DIM
   managed queries), and offers `dash:AutoCompleteEditor` for classes with too many
   instances for a select.

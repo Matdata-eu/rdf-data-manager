@@ -24,3 +24,10 @@ test('starts the places demo from Settings with the map widget', async ({ page }
   await expect(page.locator('.leaflet-container')).toBeVisible()
   await expect(page.getByLabel('WKT')).toHaveValue('POINT (10.7522 59.9108)')
 })
+
+test('shows the interface in Norwegian when the language is nb', async ({ page }) => {
+  await page.goto('/?demo=dim&lang=nb')
+  await expect(page.getByText('Demo: endringer blir i denne fanen')).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Innstillinger' })).toBeVisible()
+  await expect(page.getByRole('navigation', { name: 'Klasser' })).toBeVisible()
+})

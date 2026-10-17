@@ -4,6 +4,7 @@ import { useAsync } from '@rdf-data-manager/react'
 import { useApp } from './context'
 import { href } from './router'
 import { download, fileSlug } from './download'
+import { t } from './i18n'
 
 export function InstanceList ({ classIri }: { classIri: string }) {
   const { model, repo, languages, revision } = useApp()
@@ -48,30 +49,30 @@ export function InstanceList ({ classIri }: { classIri: string }) {
           {entry && <p className='muted'>{text(entry.comment, languages)}</p>}
         </div>
         <div className='actions'>
-          {shape && <a className='button' href={href({ name: 'validation', classIri })}>Check</a>}
-          {shape && !shape.readOnly && <a className='button' href={href({ name: 'translations', classIri })}>Translations</a>}
+          {shape && <a className='button' href={href({ name: 'validation', classIri })}>{t('Check')}</a>}
+          {shape && !shape.readOnly && <a className='button' href={href({ name: 'translations', classIri })}>{t('Translations')}</a>}
           {shape && (
             <details className='menu'>
-              <summary className='button'>{exporting ? 'Exporting…' : 'Export'}</summary>
+              <summary className='button'>{exporting ? t('Exporting…') : t('Export')}</summary>
               <div className='menu-items'>
-                <button type='button' disabled={exporting} onClick={() => void exportAs('ttl')}>Turtle (all triples)</button>
-                <button type='button' disabled={exporting} onClick={() => void exportAs('csv')}>CSV (one row per resource)</button>
+                <button type='button' disabled={exporting} onClick={() => void exportAs('ttl')}>{t('Turtle (all triples)')}</button>
+                <button type='button' disabled={exporting} onClick={() => void exportAs('csv')}>{t('CSV (one row per resource)')}</button>
               </div>
             </details>
           )}
-          {shape && !shape.readOnly && <a className='button primary' href={href({ name: 'new', classIri })}>New</a>}
+          {shape && !shape.readOnly && <a className='button primary' href={href({ name: 'new', classIri })}>{t('New')}</a>}
         </div>
       </div>
       {exportError && <div className='alert error' role='alert'>{exportError}</div>}
       <input
-        type='search' className='filter' placeholder='Filter by label or IRI'
-        value={filter} onChange={e => setFilter(e.target.value)} aria-label='Filter'
+        type='search' className='filter' placeholder={t('Filter by label or IRI')}
+        value={filter} onChange={e => setFilter(e.target.value)} aria-label={t('Filter')}
       />
-      {instances.status === 'loading' && <p className='muted'>Loading…</p>}
+      {instances.status === 'loading' && <p className='muted'>{t('Loading…')}</p>}
       {instances.status === 'error' && <div className='alert error'>{instances.error.message}</div>}
       {instances.status === 'ready' && (
         <>
-          <p className='muted small'>{rows.length} of {instances.value.length}</p>
+          <p className='muted small'>{t('{shown} of {total}', { shown: rows.length, total: instances.value.length })}</p>
           <ul className='instance-list'>
             {rows.map(r => (
               <li key={r.iri}>
@@ -82,7 +83,7 @@ export function InstanceList ({ classIri }: { classIri: string }) {
               </li>
             ))}
           </ul>
-          {instances.value.length === 0 && <p className='muted'>No instances yet.</p>}
+          {instances.value.length === 0 && <p className='muted'>{t('No instances yet.')}</p>}
         </>
       )}
     </section>

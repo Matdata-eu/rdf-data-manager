@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { endpointsFromDataset, type AppConfig, type ShapesSource } from './config'
 import { DEMOS } from './demos'
+import { t } from './i18n'
 
 /** The configured and shape languages plus the current one, so a saved choice is never lost. */
 function languageOptions (config: AppConfig, shapeLanguages: string[]): string[] {
@@ -59,57 +60,56 @@ export function Settings ({ initial, shapeLanguages = [], onApply, onCancel }: P
 
   return (
     <form className='card settings' onSubmit={submit}>
-      <h1>Settings</h1>
+      <h1>{t('Settings')}</h1>
       <p className='muted'>
-        Connect to a SPARQL endpoint and choose the SHACL/DASH shapes that define the forms.
-        Settings are kept in this browser.
+        {t('Connect to a SPARQL endpoint and choose the SHACL/DASH shapes that define the forms. Settings are kept in this browser.')}
       </p>
 
       <fieldset>
-        <legend>Endpoint</legend>
+        <legend>{t('Endpoint')}</legend>
         <label>
-          <span>Dataset URL <small className='muted'>(fills in both URLs for Fuseki)</small></span>
+          <span>{t('Dataset URL')} <small className='muted'>{t('(fills in both URLs for Fuseki)')}</small></span>
           <div className='row'>
             <input type='url' placeholder='http://localhost:3030/dataset/' value={dataset} onChange={e => setDataset(e.target.value)} />
-            <button type='button' className='button' disabled={!dataset.trim()} onClick={() => setConfig(c => ({ ...c, ...endpointsFromDataset(dataset) }))}>Use</button>
+            <button type='button' className='button' disabled={!dataset.trim()} onClick={() => setConfig(c => ({ ...c, ...endpointsFromDataset(dataset) }))}>{t('Use')}</button>
           </div>
         </label>
         <label>
-          <span>Query URL</span>
+          <span>{t('Query URL')}</span>
           <input type='url' required value={config.queryUrl} onChange={e => set('queryUrl', e.target.value)} />
         </label>
         <label>
-          <span>Update URL</span>
+          <span>{t('Update URL')}</span>
           <input type='url' value={config.updateUrl} onChange={e => set('updateUrl', e.target.value)} />
         </label>
         <label>
-          <span>Data graph <small className='muted'>(empty: the default graph)</small></span>
+          <span>{t('Data graph')} <small className='muted'>{t('(empty: the default graph)')}</small></span>
           <input type='text' value={config.dataGraph} onChange={e => set('dataGraph', e.target.value)} />
         </label>
       </fieldset>
 
       <fieldset>
-        <legend>Shapes</legend>
+        <legend>{t('Shapes')}</legend>
         <div className='radios'>
-          <label><input type='radio' checked={source === 'endpoint'} onChange={() => setSource('endpoint')} /> Named graph in the endpoint</label>
-          <label><input type='radio' checked={source === 'url'} onChange={() => setSource('url')} /> Turtle file at a URL</label>
-          <label><input type='radio' checked={source === 'inline'} onChange={() => setSource('inline')} /> Local Turtle file</label>
+          <label><input type='radio' checked={source === 'endpoint'} onChange={() => setSource('endpoint')} /> {t('Named graph in the endpoint')}</label>
+          <label><input type='radio' checked={source === 'url'} onChange={() => setSource('url')} /> {t('Turtle file at a URL')}</label>
+          <label><input type='radio' checked={source === 'inline'} onChange={() => setSource('inline')} /> {t('Local Turtle file')}</label>
         </div>
         {source === 'endpoint' && (
           <label>
-            <span>Shapes graph</span>
+            <span>{t('Shapes graph')}</span>
             <input type='text' required placeholder='https://…' value={graph} onChange={e => setGraph(e.target.value)} />
           </label>
         )}
         {source === 'url' && (
           <label>
-            <span>Shapes URL</span>
+            <span>{t('Shapes URL')}</span>
             <input type='url' value={url} onChange={e => setUrl(e.target.value)} />
           </label>
         )}
         {source === 'inline' && (
           <label>
-            <span>Shapes file {file && <small className='muted'>({file.name} loaded)</small>}</span>
+            <span>{t('Shapes file')} {file && <small className='muted'>{t('({name} loaded)', { name: file.name })}</small>}</span>
             <input
               type='file' accept='.ttl,text/turtle'
               onChange={async e => {
@@ -122,9 +122,9 @@ export function Settings ({ initial, shapeLanguages = [], onApply, onCancel }: P
       </fieldset>
 
       <fieldset>
-        <legend>Display</legend>
+        <legend>{t('Display')}</legend>
         <label>
-          <span>Preferred language for labels</span>
+          <span>{t('Preferred language for labels and messages')}</span>
           <select value={config.language} onChange={e => set('language', e.target.value)}>
             {languageOptions(config, shapeLanguages).map(l => <option key={l} value={l}>{languageName(l)}</option>)}
           </select>
@@ -132,18 +132,18 @@ export function Settings ({ initial, shapeLanguages = [], onApply, onCancel }: P
       </fieldset>
 
       <div className='actions'>
-        <button type='submit' className='button primary' disabled={!canApply}>Connect</button>
-        {onCancel && <button type='button' className='button' onClick={onCancel}>Cancel</button>}
+        <button type='submit' className='button primary' disabled={!canApply}>{t('Connect')}</button>
+        {onCancel && <button type='button' className='button' onClick={onCancel}>{t('Cancel')}</button>}
       </div>
 
       <fieldset className='demo'>
-        <legend>No endpoint? Try a demo</legend>
-        <p className='muted small'>The data is loaded into a store that runs in this browser tab. Nothing is sent anywhere, and a reload starts over.</p>
+        <legend>{t('No endpoint? Try a demo')}</legend>
+        <p className='muted small'>{t('The data is loaded into a store that runs in this browser tab. Nothing is sent anywhere, and a reload starts over.')}</p>
         <div className='row'>
-          <select aria-label='Demo dataset' value={demo} onChange={e => setDemo(e.target.value)}>
+          <select aria-label={t('Demo dataset')} value={demo} onChange={e => setDemo(e.target.value)}>
             {DEMOS.map(d => <option key={d.name} value={d.name}>{d.title}</option>)}
           </select>
-          <button type='button' className='button' onClick={startDemo}>Start demo</button>
+          <button type='button' className='button' onClick={startDemo}>{t('Start demo')}</button>
         </div>
         <p className='muted small'>{DEMOS.find(d => d.name === demo)?.description}</p>
       </fieldset>
