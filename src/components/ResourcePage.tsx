@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useApp } from '../app/context'
 import { href, navigate } from '../app/router'
 import { useAsync } from '../app/useAsync'
-import { LABEL_PROPERTIES, literal, localName, pickByLanguage } from '../rdf/terms'
+import { LABEL_PROPERTIES, isValidIri, literal, localName, pickByLanguage } from '../rdf/terms'
 import { labelOf, text, type NodeShape } from '../shapes/model'
 import { emptyState, withLanguageSlots, type NodeState } from '../form/state'
 import { buildDelete, loadForEditing, ownedOf, prepareSave, type LoadedResource, type PreparedSave } from '../data/editing'
@@ -63,8 +63,14 @@ function ExistingResource ({ shape, classIri, className, iri }: { shape: NodeSha
       </div>
     )
   }
-  return <Editor shape={shape} classIri={classIri} className={className} iri={iri} loaded={loaded.value} initial={loaded.value.state} flash={flash}
-    onSaved={message => { setFlash(message); setVersion(v => v + 1) }} />
+  // The key remounts the editor after a save reloads the resource, so it starts from the fresh state.
+  return (
+    <Editor
+      key={version} shape={shape} classIri={classIri} className={className} iri={iri}
+      loaded={loaded.value} initial={loaded.value.state} flash={flash}
+      onSaved={message => { setFlash(message); setVersion(v => v + 1) }}
+    />
+  )
 }
 
 function NewResource ({ shape, classIri, className }: { shape: NodeShape; classIri: string; className: string }) {
@@ -92,8 +98,6 @@ function Editor ({ shape, classIri, className, iri, loaded, initial, flash, onSa
   const [showUpdate, setShowUpdate] = useState(false)
   const readOnly = shape.readOnly
 
-  useEffect(() => setState(initial), [initial])
-
   const isNew = !iri
   const targetIri = iri ?? (shape.uriStart ? `${shape.uriStart}${localPart.trim()}` : localPart.trim())
   const prepared = phase.name === 'blocked' || phase.name === 'saved' ? phase.prepared : undefined
@@ -117,8 +121,8 @@ function Editor ({ shape, classIri, className, iri, loaded, initial, flash, onSa
       setNameError(text(shape.localNameDescription, languages) ? 'This identifier does not have the expected form.' : `The identifier must match ${shape.localNamePattern}.`)
       return false
     }
-    if (!shape.uriStart && !/^[a-z][a-z0-9+.-]*:\S+$/i.test(part)) {
-      setNameError('Enter an absolute IRI.')
+    if (!isValidIri(targetIri)) {
+      setNameError(shape.uriStart ? 'The identifier contains characters that are not allowed in an IRI.' : 'Enter an absolute IRI.')
       return false
     }
     if (await repo.exists(targetIri)) {

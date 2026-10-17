@@ -5,6 +5,8 @@ export type AsyncState<T> =
   | { status: 'error'; error: Error }
   | { status: 'ready'; value: T }
 
+/* The dependency list is an argument, like useEffect's own, so the hooks rules cannot check it. */
+/* eslint-disable react-hooks/exhaustive-deps, react-hooks/set-state-in-effect */
 export function useAsync<T> (load: () => Promise<T>, deps: DependencyList): AsyncState<T> {
   const [state, setState] = useState<AsyncState<T>>({ status: 'loading' })
   useEffect(() => {
