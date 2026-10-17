@@ -1,0 +1,121 @@
+@prefix rdm:  <https://matdata.eu/ns/rdf-data-manager#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+# The RDF data manager vocabulary: annotations on SHACL shapes that the app reads in
+# addition to SHACL Core and DASH. The namespace is https://matdata.eu/ns/rdf-data-manager#
+# and this file is its definition; the app repository keeps it in sync with the code.
+
+<https://matdata.eu/ns/rdf-data-manager#>
+  a owl:Ontology ;
+  rdfs:label "RDF data manager vocabulary"@en ;
+  rdfs:comment "Annotations on SHACL/DASH shapes read by the RDF data manager: menu order, IRI minting, defaults, display and widget hints."@en ;
+  dcterms:license <https://opensource.org/licenses/MIT> ;
+  rdfs:seeAlso <https://github.com/Matdata-eu/rdf-data-manager> ;
+  owl:versionInfo "1.0" .
+
+## Node shapes
+
+rdm:order a rdf:Property ;
+  rdfs:label "menu order"@en ;
+  rdfs:comment "Position of the target class in the menu; lower first. Default 1000."@en ;
+  rdfs:domain sh:NodeShape ; rdfs:range xsd:integer ;
+  rdfs:isDefinedBy <https://matdata.eu/ns/rdf-data-manager#> .
+
+rdm:hideFromMenu a rdf:Property ;
+  rdfs:label "hide from menu"@en ;
+  rdfs:comment "True to keep the target class out of the menu, for nested or helper classes."@en ;
+  rdfs:domain sh:NodeShape ; rdfs:range xsd:boolean ;
+  rdfs:isDefinedBy <https://matdata.eu/ns/rdf-data-manager#> .
+
+rdm:localNamePattern a rdf:Property ;
+  rdfs:label "local name pattern"@en ;
+  rdfs:comment "Regular expression the local name of a new instance must match; the IRI is dash:uriStart followed by that local name."@en ;
+  rdfs:domain sh:NodeShape ; rdfs:range xsd:string ;
+  rdfs:isDefinedBy <https://matdata.eu/ns/rdf-data-manager#> .
+
+rdm:localNameDescription a rdf:Property ;
+  rdfs:label "local name description"@en ;
+  rdfs:comment "Help text shown next to the local name field, in one or more languages."@en ;
+  rdfs:domain sh:NodeShape ; rdfs:range rdf:langString ;
+  rdfs:isDefinedBy <https://matdata.eu/ns/rdf-data-manager#> .
+
+rdm:localNameProperty a rdf:Property ;
+  rdfs:label "local name property"@en ;
+  rdfs:comment "Property whose value completes the IRI of a new nested node, so nested resources get stable IRIs instead of blank nodes."@en ;
+  rdfs:domain sh:NodeShape ; rdfs:range rdf:Property ;
+  rdfs:isDefinedBy <https://matdata.eu/ns/rdf-data-manager#> .
+
+## Property and node shapes
+
+rdm:orderBy a rdf:Property ;
+  rdfs:label "order by"@en ;
+  rdfs:comment "On a property shape: the property of the values to sort them by. On a node shape: the property to sort the instance list by."@en ;
+  rdfs:range rdf:Property ;
+  rdfs:isDefinedBy <https://matdata.eu/ns/rdf-data-manager#> .
+
+rdm:orderDescending a rdf:Property ;
+  rdfs:label "order descending"@en ;
+  rdfs:comment "True to reverse the order given by rdm:orderBy."@en ;
+  rdfs:range xsd:boolean ;
+  rdfs:isDefinedBy <https://matdata.eu/ns/rdf-data-manager#> .
+
+## Property shapes
+
+rdm:defaultValue a rdf:Property ;
+  rdfs:label "default value"@en ;
+  rdfs:comment "Value pre-filled when a resource is created. The individual rdm:today stands for the current date. sh:defaultValue is read when this is absent."@en ;
+  rdfs:domain sh:PropertyShape ;
+  rdfs:isDefinedBy <https://matdata.eu/ns/rdf-data-manager#> .
+
+rdm:today a owl:NamedIndividual ;
+  rdfs:label "today"@en ;
+  rdfs:comment "Used as rdm:defaultValue: the date of the day the resource is created."@en ;
+  rdfs:isDefinedBy <https://matdata.eu/ns/rdf-data-manager#> .
+
+rdm:updateOnSave a rdf:Property ;
+  rdfs:label "update on save"@en ;
+  rdfs:comment "True to set the value to the current date every time the resource is saved, for a dcterms:modified field."@en ;
+  rdfs:domain sh:PropertyShape ; rdfs:range xsd:boolean ;
+  rdfs:isDefinedBy <https://matdata.eu/ns/rdf-data-manager#> .
+
+rdm:collapsed a rdf:Property ;
+  rdfs:label "collapsed"@en ;
+  rdfs:comment "True to start the field collapsed, false to keep it open. Without it, fields with more than five values start collapsed."@en ;
+  rdfs:domain sh:PropertyShape ; rdfs:range xsd:boolean ;
+  rdfs:isDefinedBy <https://matdata.eu/ns/rdf-data-manager#> .
+
+rdm:pageSize a rdf:Property ;
+  rdfs:label "page size"@en ;
+  rdfs:comment "Number of values shown before a \"Show more\" button. Default 10."@en ;
+  rdfs:domain sh:PropertyShape ; rdfs:range xsd:integer ;
+  rdfs:isDefinedBy <https://matdata.eu/ns/rdf-data-manager#> .
+
+rdm:languages a rdf:Property ;
+  rdfs:label "languages"@en ;
+  rdfs:comment "RDF list of language tags the form offers for a language-tagged text field."@en ;
+  rdfs:domain sh:PropertyShape ; rdfs:range rdf:List ;
+  rdfs:isDefinedBy <https://matdata.eu/ns/rdf-data-manager#> .
+
+rdm:queryText a rdf:Property ;
+  rdfs:label "query text"@en ;
+  rdfs:comment "SPARQL property path from a value of the property to the text of a SPARQL query. The form offers to run that query and shows the first rows."@en ;
+  rdfs:domain sh:PropertyShape ; rdfs:range xsd:string ;
+  rdfs:isDefinedBy <https://matdata.eu/ns/rdf-data-manager#> .
+
+## Widgets
+
+rdm:MapEditor a dash:Editor ;
+  rdfs:label "map editor"@en ;
+  rdfs:comment "Shows a GeoSPARQL WKT geometry on a map; a point can be placed and dragged. Provided by @rdf-data-manager/widget-map."@en ;
+  rdfs:isDefinedBy <https://matdata.eu/ns/rdf-data-manager#> .
+
+rdm:TimeEditor a dash:Editor ;
+  rdfs:label "time editor"@en ;
+  rdfs:comment "Calendar and clock editors for OWL-Time instants and intervals and the XSD date and time datatypes. Provided by @rdf-data-manager/widget-time."@en ;
+  rdfs:isDefinedBy <https://matdata.eu/ns/rdf-data-manager#> .
