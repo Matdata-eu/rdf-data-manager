@@ -10,6 +10,8 @@ export interface AppConfig extends RepositoryConfig {
   languages: string[]
   /** Widgets to load: bundled names (map, time) or URLs of ES modules (see docs/CONFIG.md). */
   widgets: string[]
+  /** A bundled demo dataset to run in the browser instead of an endpoint (see demo.ts). */
+  demo?: string
 }
 
 export const DEFAULT_CONFIG: AppConfig = {
@@ -32,7 +34,7 @@ export function endpointsFromDataset (datasetUrl: string): { queryUrl: string; u
 }
 
 export function isConfigured (config: AppConfig): boolean {
-  return Boolean(config.queryUrl)
+  return Boolean(config.queryUrl) || Boolean(config.demo)
 }
 
 function readStorage (): Partial<AppConfig> {
@@ -55,7 +57,8 @@ export function saveConfig (config: AppConfig): void {
 /**
  * Settings from URL parameters, so a link can open the app on a given endpoint:
  *   ?dataset=<Fuseki dataset URL> or ?query=<url>&update=<url>
- *   &shapesGraph=<iri> or &shapesUrl=<url>, &graph=<data graph>, &lang=<tag>
+ *   &shapesGraph=<iri> or &shapesUrl=<url>, &graph=<data graph>, &lang=<tag>,
+ *   &widgets=map,time, or ?demo=<name> for a dataset that runs in the browser
  */
 function readUrlParams (search: string): Partial<AppConfig> {
   const params = new URLSearchParams(search)
@@ -69,6 +72,7 @@ function readUrlParams (search: string): Partial<AppConfig> {
   if (params.get('shapesUrl')) out.shapes = { source: 'url', url: params.get('shapesUrl')! }
   if (params.get('lang')) out.language = params.get('lang')!
   if (params.get('widgets') !== null) out.widgets = params.get('widgets')!.split(',').map(w => w.trim()).filter(Boolean)
+  if (params.get('demo') !== null) out.demo = params.get('demo') || 'dim'
   return out
 }
 

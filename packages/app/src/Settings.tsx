@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { endpointsFromDataset, type AppConfig, type ShapesSource } from './config'
+import { DEMOS } from './demos'
 
 /** The configured and shape languages plus the current one, so a saved choice is never lost. */
 function languageOptions (config: AppConfig, shapeLanguages: string[]): string[] {
@@ -43,12 +44,15 @@ export function Settings ({ initial, shapeLanguages = [], onApply, onCancel }: P
         : { source: 'inline', turtle: file?.turtle ?? '', name: file?.name ?? 'shapes.ttl' }
     onApply({
       ...config,
+      demo: undefined,
       queryUrl: config.queryUrl.trim(),
       updateUrl: (config.updateUrl || config.queryUrl).trim(),
       dataGraph: config.dataGraph.trim(),
       shapes
     })
   }
+  const [demo, setDemo] = useState(initial.demo ?? DEMOS[0].name)
+  const startDemo = () => onApply({ ...config, demo })
 
   const canApply = Boolean(config.queryUrl.trim()) &&
     (source === 'endpoint' ? Boolean(graph.trim()) : source === 'url' ? Boolean(url.trim()) : Boolean(file))
@@ -131,6 +135,18 @@ export function Settings ({ initial, shapeLanguages = [], onApply, onCancel }: P
         <button type='submit' className='button primary' disabled={!canApply}>Connect</button>
         {onCancel && <button type='button' className='button' onClick={onCancel}>Cancel</button>}
       </div>
+
+      <fieldset className='demo'>
+        <legend>No endpoint? Try a demo</legend>
+        <p className='muted small'>The data is loaded into a store that runs in this browser tab. Nothing is sent anywhere, and a reload starts over.</p>
+        <div className='row'>
+          <select aria-label='Demo dataset' value={demo} onChange={e => setDemo(e.target.value)}>
+            {DEMOS.map(d => <option key={d.name} value={d.name}>{d.title}</option>)}
+          </select>
+          <button type='button' className='button' onClick={startDemo}>Start demo</button>
+        </div>
+        <p className='muted small'>{DEMOS.find(d => d.name === demo)?.description}</p>
+      </fieldset>
     </form>
   )
 }

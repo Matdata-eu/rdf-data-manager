@@ -16,6 +16,10 @@ from the Fuseki `/metadata` dataset.
 
 ## Running the app
 
+Try it without an endpoint: [the demo on GitHub Pages](https://matdata-eu.github.io/rdf-data-manager/?demo=dim)
+runs the DIM example in a SPARQL store inside your browser (`?demo=geo-time` shows the
+map and time widgets).
+
 The app is a static TypeScript/React site with no backend: the browser talks to the
 SPARQL endpoint directly, so the endpoint must allow CORS from the app's origin (Fuseki
 does by default).

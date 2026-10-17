@@ -25,6 +25,9 @@
     },
     {
       "path": "../widget-time"
+    },
+    {
+      "path": "../store-memory"
     }
   ]
 }
