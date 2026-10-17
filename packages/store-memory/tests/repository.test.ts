@@ -5,7 +5,7 @@ import { beforeAll, describe, expect, it } from 'vitest'
 import {
   Repository, ShapesValidator, buildShapesModel, checkImport, declaredPrefixes, loadTranslations, parseImport, saveTranslations,
   toCsv, toTable, toTurtle, translatableProperties, validateClass, writeImport, describeChanges, diffQuads, managedQuads,
-  loadForEditing, applyTranslations, cellKey
+  loadForEditing, applyTranslations, cellKey, prepareSave, withText
 } from '@rdf-data-manager/core'
 import { Parser } from 'n3'
 import { MemoryClient, initMemoryStore } from '../src'
@@ -150,5 +150,33 @@ describe('translations', () => {
     expect(changes[0].propertyLabel).toBe('Title')
     expect(changes[0].removed).toEqual(['Total track length@en'])
     expect(changes[0].added).toEqual(['Track length@en'])
+  })
+})
+
+describe('memory store', () => {
+  it('keeps derived datatypes that Oxigraph would replace with their base type', async () => {
+    const XSD = 'http://www.w3.org/2001/XMLSchema#'
+    const client = new MemoryClient()
+    client.loadTurtle(`<https://example.org/a> <https://example.org/at> "2026-03-06T22:00:00+01:00"^^<${XSD}dateTimeStamp> .`)
+    await client.update(`INSERT DATA { <https://example.org/a> <https://example.org/n> "5"^^<${XSD}int> }`)
+    const rows = await client.select(`SELECT ?o WHERE { <https://example.org/a> ?p ?o FILTER(?o = "5"^^<${XSD}int> || isLiteral(?o)) } ORDER BY ?o`)
+    expect(rows.map(r => (r.o as { datatype: { value: string } }).datatype.value).sort()).toEqual([`${XSD}dateTimeStamp`, `${XSD}int`])
+    expect(await client.ask(`ASK { ?s ?p "5"^^<${XSD}int> }`)).toBe(true)
+    expect(client.dump().map(q => (q.object as { datatype: { value: string } }).datatype.value).sort()).toEqual([`${XSD}dateTimeStamp`, `${XSD}int`])
+  })
+
+  it('saves an edited geo-time event without problems on its xsd:dateTimeStamp instants', async () => {
+    const geo = (p: string) => readFileSync(join(here, '../../../examples/geo-time', p), 'utf8')
+    const client = new MemoryClient()
+    client.loadTurtle(geo('data.ttl'))
+    const repo = new Repository({ queryUrl: 'memory:', updateUrl: 'memory:', dataGraph: '', shapes: { source: 'inline', turtle: geo('shapes.ttl'), name: 'geo-time.ttl' } }, client)
+    const model = buildShapesModel(new Parser().parse(geo('shapes.ttl')))
+    const shape = model.shapeForClass('https://example.org/geo-time/Event')!
+    const iri = 'https://example.org/geo-time/event/maintenance-window'
+    const loaded = await loadForEditing(repo, model, shape, iri)
+    const current = withText(loaded.state, 'https://example.org/geo-time/duration', 'PT10H')
+    const prepared = await prepareSave(repo, new ShapesValidator(model.quads), { iri, current, loaded })
+    expect(prepared.diff.inserts).toHaveLength(1)
+    expect(prepared.report.issues).toEqual([])
   })
 })
