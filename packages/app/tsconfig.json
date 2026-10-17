@@ -19,6 +19,12 @@
     },
     {
       "path": "../react"
+    },
+    {
+      "path": "../widget-map"
+    },
+    {
+      "path": "../widget-time"
     }
   ]
 }

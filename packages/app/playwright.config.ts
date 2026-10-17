@@ -10,6 +10,8 @@ export default defineConfig({
   testDir: './e2e',
   timeout: 60_000,
   retries: process.env.CI ? 1 : 0,
+  // The specs share one dataset, so they must not run at the same time.
+  workers: 1,
   use: {
     baseURL: 'http://localhost:5173',
     trace: 'retain-on-failure',

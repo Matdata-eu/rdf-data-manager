@@ -8,7 +8,7 @@ export interface AppConfig extends RepositoryConfig {
   language: string
   /** Language tags offered in Settings; the shapes' rdm:languages are added to these. */
   languages: string[]
-  /** URLs of ES modules that export extra widgets (see docs/CONFIG.md). */
+  /** Widgets to load: bundled names (map, time) or URLs of ES modules (see docs/CONFIG.md). */
   widgets: string[]
 }
 
@@ -68,6 +68,7 @@ function readUrlParams (search: string): Partial<AppConfig> {
   if (params.get('shapesGraph')) out.shapes = { source: 'endpoint', graph: params.get('shapesGraph')! }
   if (params.get('shapesUrl')) out.shapes = { source: 'url', url: params.get('shapesUrl')! }
   if (params.get('lang')) out.language = params.get('lang')!
+  if (params.get('widgets') !== null) out.widgets = params.get('widgets')!.split(',').map(w => w.trim()).filter(Boolean)
   return out
 }
 

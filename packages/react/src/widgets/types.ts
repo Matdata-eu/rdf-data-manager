@@ -3,7 +3,11 @@ import type { PropertyShape, Term, ValueState } from '@rdf-data-manager/core'
 
 export interface WidgetEditorProps {
   property: PropertyShape
-  /** The value being edited: its text, language tag and the RDF term it came from. */
+  /**
+   * The value being edited: its text, language tag and the RDF term it came from. For a
+   * property edited as nested nodes, value.node is the nested node's state; a widget
+   * that claims such a property edits that node (see withText / withNode in core).
+   */
   value: ValueState
   onChange: (value: ValueState) => void
   /** Id for the input element, so the field label can point at it. */

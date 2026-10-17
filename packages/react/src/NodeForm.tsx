@@ -85,6 +85,8 @@ function Field ({ property, node, onChange, issues, subjects, depth }: {
   const values = node.values[path] ?? []
   const kind = editorFor(property)
   const Editor = kind === 'details' ? undefined : registry.pickEditor(property)?.Editor
+  // A widget can claim a nested node too (a map for a geometry); the built-ins never do.
+  const NodeEditor = kind === 'details' ? registry.pickEditor(property)?.Editor : undefined
   const readOnly = node.readOnly || property.readOnly
   const label = text(property.name, languages) || localName(path)
   const description = text(property.description, languages)
@@ -147,7 +149,9 @@ function Field ({ property, node, onChange, issues, subjects, depth }: {
                   <span className='mono small'>{(v.node.subject && v.node.subject.termType === 'NamedNode' ? localName(v.node.subject.value) : subjects.get(v.node.id) ? localName(subjects.get(v.node.id)!) : 'new')}</span>
                   {!readOnly && <button type='button' className='button ghost small' onClick={() => remove(v)}>Remove</button>}
                 </div>
-                <NodeForm node={v.node} onChange={n => replace({ ...v, node: n })} issues={issues} subjects={subjects} depth={depth + 1} />
+                {NodeEditor !== undefined && !readOnly
+                  ? <NodeEditor property={property} value={v} onChange={replace} id={`${id}-${v.id}`} invalid={own.some(i => i.severity === 'Violation')} />
+                  : <NodeForm node={v.node} onChange={n => replace({ ...v, node: n })} issues={issues} subjects={subjects} depth={depth + 1} />}
               </div>
             )
           : (

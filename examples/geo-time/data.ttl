@@ -1,0 +1,30 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix geo:  <http://www.opengis.net/ont/geosparql#> .
+@prefix time: <http://www.w3.org/2006/time#> .
+@prefix ex:   <https://example.org/geo-time/> .
+
+<https://example.org/geo-time/place/oslo-s> a ex:Place ;
+    rdfs:label "Oslo S" ;
+    geo:hasGeometry <https://example.org/geo-time/geometry/oslo-s> .
+
+<https://example.org/geo-time/geometry/oslo-s> a geo:Geometry ;
+    geo:asWKT "POINT (10.7522 59.9108)"^^geo:wktLiteral .
+
+<https://example.org/geo-time/place/bergen-line> a ex:Place ;
+    rdfs:label "Bergen line (sketch)" ;
+    geo:hasGeometry <https://example.org/geo-time/geometry/bergen-line> .
+
+<https://example.org/geo-time/geometry/bergen-line> a geo:Geometry ;
+    geo:asWKT "<http://www.opengis.net/def/crs/OGC/1.3/CRS84> LINESTRING (10.75 59.91, 8.5 60.5, 7.1 60.6, 5.33 60.39)"^^geo:wktLiteral .
+
+<https://example.org/geo-time/event/maintenance-window> a ex:Event ;
+    rdfs:label "Maintenance window" ;
+    ex:at <https://example.org/geo-time/place/oslo-s> ;
+    ex:duration "PT6H"^^xsd:duration ;
+    ex:year "2026"^^xsd:gYear ;
+    time:hasTime [
+        a time:Interval ;
+        time:hasBeginning [ a time:Instant ; time:inXSDDateTimeStamp "2026-03-06T22:00:00+01:00"^^xsd:dateTimeStamp ] ;
+        time:hasEnd [ a time:Instant ; time:inXSDDateTimeStamp "2026-03-07T04:00:00+01:00"^^xsd:dateTimeStamp ]
+    ] .

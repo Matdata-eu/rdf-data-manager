@@ -1,9 +1,23 @@
 {
   "files": [],
   "references": [
-    { "path": "packages/core" },
-    { "path": "packages/react" },
-    { "path": "packages/app" },
-    { "path": "packages/shapes-dim" }
+    {
+      "path": "packages/core"
+    },
+    {
+      "path": "packages/react"
+    },
+    {
+      "path": "packages/widget-map"
+    },
+    {
+      "path": "packages/widget-time"
+    },
+    {
+      "path": "packages/app"
+    },
+    {
+      "path": "packages/shapes-dim"
+    }
   ]
 }

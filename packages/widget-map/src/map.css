@@ -1,0 +1,6 @@
+.rdm-map { display: flex; flex-direction: column; gap: var(--space-2, 8px); min-width: 0; }
+.rdm-map-canvas { height: 280px; border: 1px solid var(--line, #ccc); border-radius: var(--radius-md, 8px); background: var(--surface-sunken, #eee); }
+.rdm-map-wkt { font-family: var(--font-mono, monospace); font-size: 13px; }
+code.rdm-map-wkt { overflow-wrap: anywhere; }
+.rdm-map-error { color: var(--danger, #b00020); margin: 0; font-size: 14px; }
+.rdm-map-marker { width: 16px; height: 16px; border-radius: 50%; background: var(--brand, #0563bb); border: 2px solid #fff; box-shadow: 0 0 0 1px var(--brand, #0563bb); }

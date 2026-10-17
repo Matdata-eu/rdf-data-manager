@@ -47,7 +47,7 @@ import type { Widget } from '@rdf-data-manager/react'
 
 const colour: Widget = {
   id: 'https://example.org/widgets#ColourEditor',
-  score: p => p.datatype === 'https://example.org/datatypes#colour' ? 10 : 0,
+  score: p => p.datatype === 'https://example.org/datatypes#colour' ? 20 : 0,
   Editor: ({ value, onChange, id, invalid }) => (
     <input id={id} type='color' aria-invalid={invalid} value={value.text || '#000000'}
       onChange={e => onChange({ ...value, text: e.target.value })} />
@@ -69,15 +69,33 @@ const registry = new WidgetRegistry([...builtinWidgets, colour])
 // <FormContext.Provider value={{ repo, model, languages, revision, registry }}><NodeForm … /></FormContext.Provider>
 ```
 
-In the app without a rebuild: publish the widget as an ES module (a URL the browser can
-import) and list it in `config.json`:
+In the app, `config.json` lists the widgets to load (`RDM_WIDGETS=map,time` for the
+container image). The map and time widgets ship with the app as separate chunks that are
+only downloaded when listed:
 
 ```json
-{ "widgets": ["https://cdn.example.org/rdm-widget-colour.js"] }
+{ "widgets": ["map", "time"] }
+```
+
+Any other entry is the URL of an ES module the browser can import, so a deployment adds a
+widget without a rebuild:
+
+```json
+{ "widgets": ["map", "https://cdn.example.org/rdm-widget-colour.js"] }
 ```
 
 The module's default export is a `Widget` or an array of them. A module that fails to
 load is reported in the app and the built-in editors are used instead.
+
+## The bundled widgets
+
+| Widget | Package | Claims |
+|---|---|---|
+| `map` | [`@rdf-data-manager/widget-map`](../packages/widget-map) | `geo:wktLiteral` / `geo:asWKT` literals and nested `geo:Geometry` nodes (`geo:hasGeometry`). Points are placed by clicking and moved by dragging; other geometries are drawn and edited as WKT text. CRS84 and EPSG:4326 are shown; other CRSs stay editable as text. Tiles come from OpenStreetMap by default (`configureMap` changes the tile URL). |
+| `time` | [`@rdf-data-manager/widget-time`](../packages/widget-time) | `xsd:dateTimeStamp`, `xsd:time`, `xsd:gYear`, `xsd:gYearMonth` and `xsd:duration` literals, and OWL-Time nodes: a `time:Instant` becomes one field, a `time:Interval` a from/to pair, each built from the nested shape (`time:hasBeginning` / `time:hasEnd`, `time:inXSDDateTimeStamp` and friends). |
+
+Both are named in shapes as `dash:editor rdm:MapEditor` / `rdm:TimeEditor`, and otherwise
+win by score. [examples/geo-time](../examples/geo-time) has shapes and data to try them.
 
 A widget that needs a large library (a map) should import it lazily inside the component
 (`React.lazy` or a dynamic `import()`), so a form without such a property never loads it.
@@ -86,6 +104,10 @@ A widget that needs a large library (a map) should import it lazily inside the c
 
 A property whose values are nested nodes (`dash:DetailsEditor` with `sh:node`, for
 example a table's columns or a `geo:Geometry` with `geo:asWKT`) is rendered by the form
-as a nested `NodeForm`; widgets apply to the nested node's own properties. A widget that
-wants to edit a whole nested node at once (a map that owns the geometry node) is the next
-step on the roadmap; today a map widget is written for the `geo:asWKT` literal.
+as a nested `NodeForm`, and widgets apply to the nested node's own properties. A widget
+can also claim the whole nested node: when its `score` is positive for such a property,
+its `Editor` receives a value whose `node` is the nested `NodeState`, and edits it with
+the helpers from core (`firstText`, `withText`, `firstNode`, `withNode`). The map widget
+does this for `geo:Geometry` nodes and the time widget for `time:Interval` and
+`time:Instant` nodes; see their `index.tsx` for the pattern. Saving is unchanged: the
+form turns the nested node into triples with blank or minted subjects as the shape says.
