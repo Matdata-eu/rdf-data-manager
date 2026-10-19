@@ -7,10 +7,12 @@
 @prefix schema:  <http://schema.org/> .
 @prefix geo:     <http://www.opengis.net/ont/geosparql#> .
 @prefix time:    <http://www.w3.org/2006/time#> .
+@prefix railml3: <http://ontology.railml.org/railml3#> .
 @prefix ex:      <https://example.org/showcase/> .
 @prefix st:      <https://example.org/showcase/station/> .
 @prefix line:    <https://example.org/showcase/line/> .
 @prefix sec:     <https://example.org/showcase/section/> .
+@prefix sw:      <https://example.org/showcase/switch/> .
 @prefix org:     <https://example.org/showcase/org/> .
 @prefix person:  <https://example.org/showcase/person/> .
 @prefix query:   <https://example.org/showcase/query/> .
@@ -33,6 +35,9 @@ st:oslo-s a ex:Station ;
     ex:passengersPerDay 150000.0 ;
     ex:internalNote "Hidden in the form (dash:hidden), still in the data." ;
     geo:hasGeometry [ a geo:Geometry ; geo:asWKT "POINT (10.7522 59.9108)"^^geo:wktLiteral ] ;
+    railml3:hasDesignator
+        [ a railml3:Designator ; railml3:hasRegister "UIC" ; railml3:hasEntry "7600100" ] ,
+        [ a railml3:Designator ; railml3:hasRegister "_Example-AssetRegister" ; railml3:hasEntry "ST-0001" ] ;
     dcterms:created "2026-01-05"^^xsd:date ;
     dcterms:modified "2026-09-30"^^xsd:date .
 
@@ -122,7 +127,10 @@ st:lillestrom a ex:Station ;
     ex:platforms 8 ;
     ex:stepFree true ;
     ex:passengersPerDay 22000.0 ;
-    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "POINT (11.0490 59.9534)"^^geo:wktLiteral ] .
+    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "POINT (11.0490 59.9534)"^^geo:wktLiteral ] ;
+    railml3:hasDesignator
+        [ a railml3:Designator ; railml3:hasRegister "UIC" ; railml3:hasEntry "7600400" ] ,
+        [ a railml3:Designator ; railml3:hasRegister "_Example-AssetRegister" ; railml3:hasEntry "ST-0014" ] .
 
 st:gardermoen a ex:Station ;
     rdfs:label "Oslo Airport"@en, "Oslo lufthavn"@nb, "Oslo lufthamn"@nn ;
@@ -255,6 +263,28 @@ line:m1 a ex:Line ;
     ex:lengthKm 18.0 ;
     ex:serves st:voss, st:fleischer ;
     geo:hasGeometry [ a geo:Geometry ; geo:asWKT "LINESTRING (6.4170 60.6290, 6.4160 60.6280)"^^geo:wktLiteral ] .
+
+# ---------------------------------------------------------------------------
+# Switches: railML designators (register | entry) and type designators (rulebook | entry)
+# ---------------------------------------------------------------------------
+
+sw:lls-101 a ex:Switch ;
+    rdfs:label "Switch 101 Lillestrøm"@en, "Sporveksel 101 Lillestrøm"@nb, "Sporveksel 101 Lillestrøm"@nn ;
+    ex:atStation st:lillestrom ;
+    railml3:hasDesignator
+        [ a railml3:Designator ; railml3:hasRegister "_Example-AssetRegister" ; railml3:hasEntry "SW-LLS-101" ] ,
+        [ a railml3:Designator ; railml3:hasRegister "Interlocking" ; railml3:hasEntry "V101" ] ;
+    railml3:hasTypeDesignator [ a railml3:TypeDesignator ; railml3:hasRulebook "EN 13232" ; railml3:hasEntry "60E1-1200-1:18.5" ] ;
+    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "POINT (11.0452 59.9521)"^^geo:wktLiteral ] .
+
+sw:osl-202 a ex:Switch ;
+    rdfs:label "Switch 202 Oslo Central"@en, "Sporveksel 202 Oslo S"@nb, "Sporveksel 202 Oslo S"@nn ;
+    ex:atStation st:oslo-s ;
+    railml3:hasDesignator
+        [ a railml3:Designator ; railml3:hasRegister "_Example-AssetRegister" ; railml3:hasEntry "SW-OSL-202" ] ,
+        [ a railml3:Designator ; railml3:hasRegister "Interlocking" ; railml3:hasEntry "V202" ] ;
+    railml3:hasTypeDesignator [ a railml3:TypeDesignator ; railml3:hasRulebook "EN 13232" ; railml3:hasEntry "54E3-300-1:9" ] ;
+    geo:hasGeometry [ a geo:Geometry ; geo:asWKT "POINT (10.7561 59.9104)"^^geo:wktLiteral ] .
 
 # ---------------------------------------------------------------------------
 # Areas

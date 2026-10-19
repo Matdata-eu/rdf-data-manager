@@ -11,6 +11,7 @@
 @prefix geo:     <http://www.opengis.net/ont/geosparql#> .
 @prefix time:    <http://www.w3.org/2006/time#> .
 @prefix rdm:     <https://matdata.eu/ns/rdf-data-manager#> .
+@prefix railml3: <http://ontology.railml.org/railml3#> .
 @prefix ex:      <https://example.org/showcase/> .
 
 # Prefixes for the SPARQL constraints and rdm:queryText below.
@@ -105,6 +106,47 @@ ex:GeometryShape a sh:NodeShape ;
         sh:path geo:asWKT ; sh:name "WKT"@en ; sh:datatype geo:wktLiteral ; sh:minCount 1 ; sh:maxCount 1
     ] .
 
+# railML 3 designators: an element's key in an external register, shown and edited as one
+# quiet tag "register | entry" (rdm:ScopedTagEditor takes the nested shape's first two
+# properties as scope and entry).
+ex:designators a sh:PropertyShape ;
+    sh:path railml3:hasDesignator ;
+    sh:name "Designators"@en, "Betegnelser"@nb, "Nemningar"@nn ;
+    sh:description "Keys in other registers, as register | entry."@en,
+        "Nøkler i andre registre, som register | oppføring."@nb ;
+    sh:class railml3:Designator ;
+    sh:node ex:DesignatorShape ;
+    sh:nodeKind sh:BlankNode ;
+    dash:editor rdm:ScopedTagEditor ;
+    dash:viewer rdm:ScopedTagViewer ;
+    sh:group ex:GeneralGroup ;
+    sh:order 9 .
+
+ex:DesignatorShape a sh:NodeShape ;
+    sh:targetClass railml3:Designator ;
+    sh:property [
+        sh:path railml3:hasRegister ; sh:name "Register"@en, "Register"@nb, "Register"@nn ;
+        sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ; sh:order 1
+    ] ;
+    sh:property [
+        sh:path railml3:hasEntry ; sh:name "Entry"@en, "Oppføring"@nb, "Oppføring"@nn ;
+        sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ; sh:order 2
+    ] .
+
+# The type of an element in a rule book, "rulebook | entry". The railML ontology defines
+# railml3:TypeDesignator but no property that points at it yet; hasTypeDesignator follows
+# its naming for <typeDesignator> in the XML schema.
+ex:TypeDesignatorShape a sh:NodeShape ;
+    sh:targetClass railml3:TypeDesignator ;
+    sh:property [
+        sh:path railml3:hasRulebook ; sh:name "Rule book"@en, "Regelverk"@nb, "Regelverk"@nn ;
+        sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ; sh:order 1
+    ] ;
+    sh:property [
+        sh:path railml3:hasEntry ; sh:name "Entry"@en, "Oppføring"@nb, "Oppføring"@nn ;
+        sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ; sh:order 2
+    ] .
+
 # ---------------------------------------------------------------------------
 # Station: text, language, pattern, number range, boolean, date, enums, URI, map
 # ---------------------------------------------------------------------------
@@ -120,7 +162,7 @@ ex:StationShape a sh:NodeShape ;
     rdm:localNamePattern "^[a-z][a-z0-9-]*$" ;
     rdm:localNameDescription "Lower case letters, digits and hyphens, for example oslo-s."@en,
         "Små bokstaver, sifre og bindestrek, for eksempel oslo-s."@nb ;
-    sh:property ex:name, ex:description, ex:created, ex:modified, ex:internalNote, ex:location ;
+    sh:property ex:name, ex:description, ex:created, ex:modified, ex:internalNote, ex:location, ex:designators ;
     sh:property [
         sh:path ex:code ;
         sh:name "Station code"@en, "Stasjonskode"@nb, "Stasjonskode"@nn ;
@@ -394,6 +436,46 @@ ex:SectionShape a sh:NodeShape ;
     ] .
 
 # ---------------------------------------------------------------------------
+# Switch: railML designators and a type designator as scoped tags
+# ---------------------------------------------------------------------------
+
+ex:SwitchShape a sh:NodeShape ;
+    sh:targetClass ex:Switch ;
+    rdfs:label "Switch"@en, "Sporveksel"@nb, "Sporveksel"@nn ;
+    rdfs:comment "A set of points, known by its keys in other registers and by its type."@en,
+        "En sporveksel, kjent ved nøklene i andre registre og ved typen."@nb ;
+    rdm:order 3 ;
+    rdm:orderBy rdfs:label ;
+    dash:uriStart "https://example.org/showcase/switch/" ;
+    rdm:localNamePattern "^[a-z0-9][a-z0-9-]*$" ;
+    sh:property ex:name, ex:description, ex:designators, ex:location ;
+    sh:property [
+        sh:path railml3:hasTypeDesignator ;
+        sh:name "Type"@en, "Type"@nb, "Type"@nn ;
+        sh:description "The switch type in a rule book, as rulebook | entry."@en,
+            "Veksletypen i et regelverk, som regelverk | oppføring."@nb ;
+        sh:class railml3:TypeDesignator ;
+        sh:node ex:TypeDesignatorShape ;
+        sh:nodeKind sh:BlankNode ;
+        sh:maxCount 1 ;
+        dash:editor rdm:ScopedTagEditor ;
+        dash:viewer rdm:ScopedTagViewer ;
+        sh:group ex:GeneralGroup ;
+        sh:order 10
+    ] ;
+    sh:property [
+        sh:path ex:atStation ;
+        sh:name "Station"@en, "Stasjon"@nb, "Stasjon"@nn ;
+        sh:class ex:Station ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+        dash:editor dash:InstancesSelectEditor ;
+        dash:viewer dash:LabelViewer ;
+        sh:group ex:NetworkGroup ;
+        sh:order 1
+    ] .
+
+# ---------------------------------------------------------------------------
 # Area: a polygon on the map
 # ---------------------------------------------------------------------------
 
@@ -401,7 +483,7 @@ ex:AreaShape a sh:NodeShape ;
     sh:targetClass ex:Area ;
     rdfs:label "Area"@en, "Område"@nb, "Område"@nn ;
     rdfs:comment "A region drawn as a polygon, maintained by an organisation."@en, "Et område tegnet som et polygon."@nb ;
-    rdm:order 3 ;
+    rdm:order 4 ;
     dash:uriStart "https://example.org/showcase/area/" ;
     rdm:localNamePattern "^[a-z][a-z0-9-]*$" ;
     sh:property ex:name, ex:description, ex:location ;
@@ -423,7 +505,7 @@ ex:ClosureShape a sh:NodeShape ;
     sh:targetClass ex:Closure ;
     rdfs:label "Track closure"@en, "Sporbrudd"@nb, "Sporbrot"@nn ;
     rdfs:comment "A planned closure for maintenance: the calendar and clock editors."@en, "Et planlagt sporbrudd."@nb ;
-    rdm:order 4 ;
+    rdm:order 5 ;
     rdm:orderBy ex:reported ;
     rdm:orderDescending true ;
     dash:uriStart "https://example.org/showcase/closure/" ;
@@ -530,7 +612,7 @@ ex:OrganisationShape a sh:NodeShape ;
     rdfs:label "Organisation"@en, "Organisasjon"@nb, "Organisasjon"@nn ;
     rdfs:comment "Closed shape: a property it does not list is reported as a violation."@en,
         "Lukket form: egenskaper som ikke er nevnt rapporteres."@nb ;
-    rdm:order 5 ;
+    rdm:order 6 ;
     rdm:orderBy schema:name ;
     dash:uriStart "https://example.org/showcase/org/" ;
     rdm:localNamePattern "^[a-z][a-z0-9-]*$" ;
@@ -584,7 +666,7 @@ ex:PersonShape a sh:NodeShape ;
     sh:targetClass schema:Person ;
     rdfs:label "Person"@en, "Person"@nb, "Person"@nn ;
     rdfs:comment "A contact person."@en, "En kontaktperson."@nb ;
-    rdm:order 6 ;
+    rdm:order 7 ;
     rdm:orderBy schema:name ;
     dash:uriStart "https://example.org/showcase/person/" ;
     rdm:localNamePattern "^[a-z][a-z0-9-]*$" ;
@@ -636,7 +718,7 @@ ex:ReportShape a sh:NodeShape ;
     sh:targetClass ex:Report ;
     rdfs:label "Report"@en, "Rapport"@nb, "Rapport"@nn ;
     rdfs:comment "Points at a stored query; the form can run it and show the rows."@en, "Peker på en lagret spørring."@nb ;
-    rdm:order 7 ;
+    rdm:order 8 ;
     dash:uriStart "https://example.org/showcase/report/" ;
     rdm:localNamePattern "^[a-z][a-z0-9-]*$" ;
     sh:property ex:name, ex:description ;
@@ -658,7 +740,7 @@ ex:QueryShape a sh:NodeShape ;
     sh:targetClass ex:Query ;
     rdfs:label "Query"@en, "Spørring"@nb, "Spørjing"@nn ;
     rdfs:comment "A stored SPARQL query."@en, "En lagret SPARQL-spørring."@nb ;
-    rdm:order 8 ;
+    rdm:order 9 ;
     dash:uriStart "https://example.org/showcase/query/" ;
     rdm:localNamePattern "^[a-z][a-z0-9-]*$" ;
     sh:property ex:name ;
