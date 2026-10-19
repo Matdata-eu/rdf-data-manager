@@ -217,5 +217,6 @@ export const nb: Record<string, string> = {
   minutes: 'minutter',
   seconds: 'sekunder',
   negative: 'negativ',
-  'This instant shape has no time:inXSD… property.': 'Denne instant-shapen har ingen time:inXSD…-egenskap.'
+  'This instant shape has no time:inXSD… property.': 'Denne instant-shapen har ingen time:inXSD…-egenskap.',
+  'A scoped tag needs a nested shape with two properties.': 'En avgrenset merkelapp trenger en nestet shape med to egenskaper.'
 }

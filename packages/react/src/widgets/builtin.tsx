@@ -7,6 +7,7 @@ import { useForm, useT } from '../context'
 import { useAsync } from '../useAsync'
 import type { Widget, WidgetEditorProps } from './types'
 import { AutoComplete } from './AutoComplete'
+import { scopedTagWidgets } from './ScopedTag'
 
 interface EditorProps extends WidgetEditorProps {
   kind: EditorKind
@@ -173,5 +174,7 @@ export const builtinWidgets: Widget[] = [
     Editor: props => <Editor {...props} kind={kind} />
   })),
   // Searches the endpoint instead of listing every instance; chosen by naming it in dash:editor.
-  { id: DASH.AutoCompleteEditor, score: p => editorFor(p) === 'instances' && p.classes.length > 0 ? 9 : 0, Editor: AutoComplete }
+  { id: DASH.AutoCompleteEditor, score: p => editorFor(p) === 'instances' && p.classes.length > 0 ? 9 : 0, Editor: AutoComplete },
+  // "register | entry" for nested identifier nodes; chosen by naming it, never by score.
+  ...scopedTagWidgets
 ]

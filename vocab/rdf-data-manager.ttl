@@ -115,6 +115,16 @@ rdm:MapEditor a dash:Editor ;
   rdfs:comment "Shows a GeoSPARQL WKT geometry on a map; a point can be placed and dragged. Provided by @rdf-data-manager/widget-map."@en ;
   rdfs:isDefinedBy <https://matdata.eu/ns/rdf-data-manager#> .
 
+rdm:ScopedTagEditor a dash:Editor ;
+  rdfs:label "scoped tag editor"@en ;
+  rdfs:comment "Edits a nested node as one scoped identifier, \"register | entry\": the first two properties of the nested shape, in sh:order, are the scope and the entry (a railML designator or type designator). Built in."@en ;
+  rdfs:isDefinedBy <https://matdata.eu/ns/rdf-data-manager#> .
+
+rdm:ScopedTagViewer a dash:Viewer ;
+  rdfs:label "scoped tag viewer"@en ;
+  rdfs:comment "Shows a nested node read-only as a quiet two-part tag, \"register | entry\". Built in."@en ;
+  rdfs:isDefinedBy <https://matdata.eu/ns/rdf-data-manager#> .
+
 rdm:TimeEditor a dash:Editor ;
   rdfs:label "time editor"@en ;
   rdfs:comment "Calendar and clock editors for OWL-Time instants and intervals and the XSD date and time datatypes. Provided by @rdf-data-manager/widget-time."@en ;

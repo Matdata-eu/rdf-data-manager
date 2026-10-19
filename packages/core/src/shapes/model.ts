@@ -78,10 +78,21 @@ export interface PropertyShape {
   alternatives?: PropertyAlternative[]
 }
 
-/** True when values of this property are nested nodes edited or shown in place. */
+/** An editor or viewer IRI outside DASH: a widget's own, such as rdm:MapEditor. */
+function isWidgetIri (iri: string | undefined): boolean {
+  return iri !== undefined && !iri.startsWith('http://datashapes.org/dash#')
+}
+
+/**
+ * True when values of this property are nested nodes edited or shown in place: DASH's
+ * details editor or viewer, a widget's own editor on a property with sh:node, or a nested
+ * blank node shape with no editor named.
+ */
 export function isDetails (p: PropertyShape): boolean {
   if (p.editor === DASH_DETAILS_EDITOR || p.viewer === DASH_DETAILS_VIEWER) return true
-  return !p.editor && !p.viewer && Boolean(p.node) && (p.nodeKind?.endsWith('#BlankNode') ?? false)
+  if (!p.node) return false
+  if (isWidgetIri(p.editor)) return true
+  return !p.editor && (!p.viewer || isWidgetIri(p.viewer)) && (p.nodeKind?.endsWith('#BlankNode') ?? false)
 }
 
 export interface NodeShape {

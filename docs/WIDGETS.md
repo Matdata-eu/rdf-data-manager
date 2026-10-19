@@ -101,11 +101,34 @@ win by score. [examples/geo-time](../examples/geo-time) has shapes and data to t
 A widget that needs a large library (a map) should import it lazily inside the component
 (`React.lazy` or a dynamic `import()`), so a form without such a property never loads it.
 
+## Scoped tags
+
+`rdm:ScopedTagEditor` and `rdm:ScopedTagViewer` are built in. They show a nested node as
+one identifier in a scope, "register | entry": a two-part tag with the scope on a sunken
+plate, one per line with a remove button, instead of a nested box. The first two
+properties of the nested shape, in `sh:order`, are the scope and the entry. They are used
+only when the shapes name them:
+
+```turtle
+ex:designators a sh:PropertyShape ;
+    sh:path railml3:hasDesignator ;
+    sh:class railml3:Designator ;
+    sh:node ex:DesignatorShape ;          # railml3:hasRegister (order 1), railml3:hasEntry (order 2)
+    sh:nodeKind sh:BlankNode ;
+    dash:editor rdm:ScopedTagEditor ;
+    dash:viewer rdm:ScopedTagViewer .
+```
+
+A widget of your own does the same by setting `inline: true`. The feature tour
+([examples/showcase](../examples/showcase)) uses it for railML designators
+(register | entry) and type designators (rulebook | entry) on stations and switches.
+
 ## Nested nodes
 
 A property whose values are nested nodes (`dash:DetailsEditor` with `sh:node`, for
 example a table's columns or a `geo:Geometry` with `geo:asWKT`) is rendered by the form
-as a nested `NodeForm`, and widgets apply to the nested node's own properties. A widget
+as a nested `NodeForm`, and widgets apply to the nested node's own properties. A widget's
+own `dash:editor` (one outside DASH) on a property with `sh:node` also makes it nested. A widget
 can also claim the whole nested node: when its `score` is positive for such a property,
 its `Editor` receives a value whose `node` is the nested `NodeState`, and edits it with
 the helpers from core (`firstText`, `withText`, `firstNode`, `withNode`). The map widget

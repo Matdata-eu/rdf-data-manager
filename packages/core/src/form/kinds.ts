@@ -59,6 +59,8 @@ export function editorFor (p: PropertyShape): EditorKind {
     case DASH.URIEditor: return 'uri'
     case DASH.DetailsEditor: return 'details'
   }
+  // A widget's own editor (rdm:ScopedTagEditor, rdm:MapEditor) on a nested shape edits the node.
+  if (p.node && p.editor && !p.editor.startsWith(D)) return 'details'
   if (p.in?.length) return 'enum'
   if (p.datatype === RDF_LANG_STRING || (p.languageIn?.length ?? 0) > 0) return p.singleLine === false ? 'langTextarea' : 'langText'
   if (p.datatype === `${XSD}date`) return 'date'

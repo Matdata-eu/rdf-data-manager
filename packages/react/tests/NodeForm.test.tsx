@@ -104,3 +104,36 @@ describe('NodeForm', () => {
     expect(screen.getByText('Beginning › At: A value is required.')).toBeInTheDocument()
   })
 })
+
+describe('scoped tag widget', () => {
+  const RAILML = 'http://ontology.railml.org/railml3#'
+  const SW = 'https://example.org/showcase/switch/'
+  const showcase = (file: string) => new Parser().parse(readFileSync(join(fixtures, '../../examples/showcase', file), 'utf8'))
+  const showcaseModel = buildShapesModel(showcase('shapes.ttl'))
+  const showcaseData = new Store(showcase('data.ttl'))
+  const svc = (): FormServices => ({ ...services(), model: showcaseModel })
+
+  it('edits a railML designator as register | entry on one line', () => {
+    const shape = showcaseModel.shapeForClass('https://example.org/showcase/Switch')!
+    const state = stateFromQuads(namedNode(`${SW}lls-101`), shape, showcaseData, showcaseModel)
+    const form = renderForm(state, svc())
+    expect(screen.getAllByRole('group', { name: 'Designators' })).toHaveLength(2)
+    expect(screen.getByDisplayValue('Interlocking')).toHaveAttribute('aria-label', 'Register')
+    expect(screen.getByDisplayValue('EN 13232')).toHaveAttribute('aria-label', 'Rule book')
+    fireEvent.change(screen.getByDisplayValue('V101'), { target: { value: 'V102' } })
+    const diff = diffQuads(managedQuads(state), managedQuads(form.state()))
+    // A blank node is rewritten as a whole, so the designator's three triples are replaced.
+    const entries = (quads: Quad[]) => quads.filter(q => q.predicate.value === `${RAILML}hasEntry`).map(q => q.object.value)
+    expect(entries(diff.deletes)).toEqual(['V101'])
+    expect(entries(diff.inserts)).toEqual(['V102'])
+  })
+
+  it('shows a read-only designator as a tag', () => {
+    const shape = showcaseModel.shapeForClass('https://example.org/showcase/Switch')!
+    const state = stateFromQuads(namedNode(`${SW}osl-202`), shape, showcaseData, showcaseModel, 1, true)
+    const { container } = renderForm(state, svc()).view
+    const tags = [...container.querySelectorAll('.scoped-tag')].map(t => [...t.children].map(c => c.textContent))
+    expect(tags).toEqual(expect.arrayContaining([['Interlocking', 'V202'], ['EN 13232', '54E3-300-1:9']]))
+    expect(container.querySelector('.scoped-tag input')).toBeNull()
+  })
+})
