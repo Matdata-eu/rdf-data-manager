@@ -53,3 +53,10 @@ test('saves an edited station with its nested geometry', async ({ page }) => {
   await expect(page.getByRole('status')).toContainText('Saved')
   await expect(page.getByLabel('WKT')).toHaveValue('POINT (7.5032 60.6014)')
 })
+
+test('shows the SHACL shape behind the page', async ({ page }) => {
+  await page.goto(resource('Station', 'station/oslo-s'))
+  await page.getByText(/^SHACL shape \(\d+ shapes\)$/).click()
+  await expect(page.locator('.shape-source pre')).toContainText('ex:StationShape')
+  await expect(page.locator('.shape-source pre')).toContainText('sh:targetClass ex:Station')
+})
