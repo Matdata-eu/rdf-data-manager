@@ -39,3 +39,15 @@ test('saves an edited event in the places demo without false problems on its int
   await page.getByRole('button', { name: 'Save' }).click()
   await expect(page.getByRole('status')).toContainText('Review')
 })
+
+test('reorders key figures in the table view of the DIM demo', async ({ page }) => {
+  await page.goto('/?demo=dim')
+  await page.getByRole('navigation', { name: 'Classes' }).getByRole('link', { name: /^Key figure\s*\d*$/ }).click()
+  await page.getByRole('navigation', { name: 'View' }).getByRole('link', { name: 'Table' }).click()
+  const position = page.getByRole('textbox', { name: 'Total track length Position' })
+  await expect(position).toHaveValue('1')
+  await position.fill('3')
+  await page.getByRole('button', { name: 'Save 1 change' }).click()
+  await expect(page.getByRole('status')).toContainText('Saved 1 resource.')
+  await expect(page.getByRole('textbox', { name: 'Total track length Position' })).toHaveValue('3')
+})

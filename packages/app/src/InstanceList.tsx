@@ -5,13 +5,15 @@ import { useApp } from './context'
 import { href } from './router'
 import { download, fileSlug } from './download'
 import { t } from './i18n'
+import { InstanceTable } from './InstanceTable'
 
-export function InstanceList ({ classIri }: { classIri: string }) {
+export function InstanceList ({ classIri, view = 'list' }: { classIri: string; view?: 'list' | 'table' }) {
   const { model, repo, languages, revision } = useApp()
   const [filter, setFilter] = useState('')
   const entry = model.classes.find(c => c.iri === classIri)
   const shape = model.shapeForClass(classIri)
-  const instances = useAsync(() => repo.listInstances(classIri), [repo, classIri, revision])
+  const table = view === 'table' && Boolean(shape)
+  const instances = useAsync(async () => table ? [] : repo.listInstances(classIri), [repo, classIri, revision, table])
 
   const rows = useMemo(() => {
     if (instances.status !== 'ready') return []
@@ -64,13 +66,22 @@ export function InstanceList ({ classIri }: { classIri: string }) {
         </div>
       </div>
       {exportError && <div className='alert error' role='alert'>{exportError}</div>}
-      <input
-        type='search' className='filter' placeholder={t('Filter by label or IRI')}
-        value={filter} onChange={e => setFilter(e.target.value)} aria-label={t('Filter')}
-      />
-      {instances.status === 'loading' && <p className='muted'>{t('Loading…')}</p>}
-      {instances.status === 'error' && <div className='alert error'>{instances.error.message}</div>}
-      {instances.status === 'ready' && (
+      <div className='list-controls'>
+        <input
+          type='search' className='filter' placeholder={t('Filter by label or IRI')}
+          value={filter} onChange={e => setFilter(e.target.value)} aria-label={t('Filter')}
+        />
+        {shape && (
+          <nav className='view-switch' aria-label={t('View')}>
+            <a href={href({ name: 'class', classIri })} aria-current={table ? undefined : 'page'}>{t('List')}</a>
+            <a href={href({ name: 'class', classIri, view: 'table' })} aria-current={table ? 'page' : undefined}>{t('Table')}</a>
+          </nav>
+        )}
+      </div>
+      {table && shape && <InstanceTable classIri={classIri} shape={shape} filter={filter} />}
+      {!table && instances.status === 'loading' && <p className='muted'>{t('Loading…')}</p>}
+      {!table && instances.status === 'error' && <div className='alert error'>{instances.error.message}</div>}
+      {!table && instances.status === 'ready' && (
         <>
           <p className='muted small'>{t('{shown} of {total}', { shown: rows.length, total: instances.value.length })}</p>
           <ul className='instance-list'>

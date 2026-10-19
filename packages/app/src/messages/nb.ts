@@ -39,6 +39,12 @@ export const nb: Record<string, string> = {
   Filter: 'Filter',
   '{shown} of {total}': '{shown} av {total}',
   'No instances yet.': 'Ingen forekomster ennå.',
+  View: 'Visning',
+  List: 'Liste',
+  Table: 'Tabell',
+  'Edit the cells and save; each resource is checked against the shapes. Texts in several languages are edited under Translations.': 'Rediger cellene og lagre; hver ressurs sjekkes mot shapes. Tekster på flere språk redigeres under Oversettelser.',
+  Yes: 'Ja',
+  No: 'Nei',
   // Resource page
   'No shape targets': 'Ingen shape retter seg mot',
   'was not found.': 'ble ikke funnet.',
