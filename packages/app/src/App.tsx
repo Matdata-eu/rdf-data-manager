@@ -138,7 +138,7 @@ export function App () {
                 )}
                 <ErrorBoundary resetKey={window.location.hash}>
                   {route.name === 'home' && <Home />}
-                  {route.name === 'class' && <InstanceList key={route.classIri} classIri={route.classIri} />}
+                  {route.name === 'class' && <InstanceList key={route.classIri} classIri={route.classIri} view={route.view ?? 'list'} />}
                   {route.name === 'resource' && <ResourcePage key={`${route.classIri} ${route.iri}`} classIri={route.classIri} iri={route.iri} />}
                   {route.name === 'new' && <ResourcePage key={`new ${route.classIri}`} classIri={route.classIri} />}
                   {route.name === 'validation' && <ValidationPage key={route.classIri ?? '*'} classIri={route.classIri} />}

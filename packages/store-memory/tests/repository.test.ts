@@ -5,7 +5,7 @@ import { beforeAll, describe, expect, it } from 'vitest'
 import {
   Repository, ShapesValidator, buildShapesModel, checkImport, declaredPrefixes, loadTranslations, parseImport, saveTranslations,
   toCsv, toTable, toTurtle, translatableProperties, validateClass, writeImport, describeChanges, diffQuads, managedQuads,
-  loadForEditing, applyTranslations, cellKey, prepareSave, withText
+  loadForEditing, applyTranslations, cellKey, prepareSave, withText, gridColumns, loadGrid, saveGrid, cellValue
 } from '@rdf-data-manager/core'
 import { Parser } from 'n3'
 import { MemoryClient, initMemoryStore } from '../src'
@@ -138,6 +138,39 @@ describe('translations', () => {
     // clearing a required language is refused
     const refused = await saveTranslations(repo, validator, model, `${BNO}KeyFigure`, new Map([[row.iri, { [cellKey(`${DCT}title`, 'en')]: '' }]]))
     expect(refused[0].error).toBeTruthy()
+  })
+
+  it('loads a table of a class and saves edited cells through the shapes', async () => {
+    const { client, repo, model, validator } = setup()
+    const classIri = `${BNO}KeyFigure`
+    const shape = model.shapeForClass(classIri)!
+    const columns = gridColumns(shape)
+    const position = columns.find(c => c.property.path.value === 'http://schema.org/position')!
+    expect(position.editable).toBe(true)
+    // texts in several languages are shown but edited on the translations page
+    expect(columns.find(c => c.property.path.value === `${DCT}title`)?.editable).toBe(false)
+    expect(columns.some(c => c.property.path.value === 'http://www.w3.org/ns/dcat#distribution')).toBe(false)
+
+    const rows = await loadGrid(repo, model, classIri, shape, columns, ['en'])
+    const row = rows.find(r => r.iri === `${BND}_keyFigure_trackLength`)!
+    expect(row.label).toBe('Total track length')
+    expect(cellValue(row.state, position.property)).toBe('1')
+    const loaded = new Map(rows.map(r => [r.iri, r.state]))
+
+    const results = await saveGrid(repo, validator, model, classIri, new Map([[row.iri, { 'http://schema.org/position': '3' }]]), loaded)
+    expect(results[0].error).toBeUndefined()
+    const stored = await client.select(`SELECT ?p WHERE { <${row.iri}> <http://schema.org/position> ?p }`)
+    expect(stored.map(r => r.p.value)).toEqual(['3'])
+    expect((stored[0].p as { datatype: { value: string } }).datatype.value).toBe('http://www.w3.org/2001/XMLSchema#integer')
+
+    // a value below sh:minInclusive is refused and nothing is written
+    const refused = await saveGrid(repo, validator, model, classIri, new Map([[row.iri, { 'http://schema.org/position': '0' }]]), new Map([[row.iri, (await loadGrid(repo, model, classIri, shape, columns, ['en'])).find(r => r.iri === row.iri)!.state]]))
+    expect(refused[0].error).toBeTruthy()
+    // a cell changed by someone else since the table was loaded is not overwritten
+    const stale = await saveGrid(repo, validator, model, classIri, new Map([[row.iri, { 'http://schema.org/position': '5' }]]), loaded)
+    expect(stale[0].error).toMatch(/someone else/)
+    const after = await client.select(`SELECT ?p WHERE { <${row.iri}> <http://schema.org/position> ?p }`)
+    expect(after.map(r => r.p.value)).toEqual(['3'])
   })
 
   it('describes a change in the words of the shapes', async () => {

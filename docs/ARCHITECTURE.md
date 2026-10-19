@@ -25,7 +25,7 @@ widgets and the react package build on core; core depends on nothing of ours.
 | `packages/react` | `NodeForm`, the widget registry, built-in widgets, `useAsync`, `form.css` | `@rdf-data-manager/react` |
 | `packages/widget-map`, `packages/widget-time` | The map and time widgets, loaded on demand by the app | `@rdf-data-manager/widget-*` |
 | `packages/store-memory` | `MemoryClient`: Oxigraph (WebAssembly) behind `SparqlQueryClient`, so the whole stack runs without a server | `@rdf-data-manager/store-memory` |
-| `packages/app` | Router, settings, pages (list, form, validation, translations, search, import), theme, `config.json`, `bin/` CLI, Playwright tests | `rdf-data-manager` |
+| `packages/app` | Router, settings, pages (list and table, form, validation, translations, search, import), theme, `config.json`, `bin/` CLI, Playwright tests | `rdf-data-manager` |
 | `packages/shapes-dim` | DIM shapes, sample data, invalid cases, `validate-endpoint` and `load-shapes` tools | private |
 
 In development, tests and the app build the packages resolve to each other's TypeScript
