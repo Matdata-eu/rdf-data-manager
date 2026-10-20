@@ -109,8 +109,12 @@ function Field ({ property, node, onChange, issues, subjects, depth }: {
   const kind = editorFor(property)
   const Editor = kind === 'details' ? undefined : registry.pickEditor(property)?.Editor
   // A widget can claim a nested node too (a map for a geometry); the built-ins never do.
-  const NodeEditor = kind === 'details' ? registry.pickEditor(property)?.Editor : undefined
+  const nodeWidget = kind === 'details' ? registry.pickEditor(property) : undefined
+  const NodeEditor = nodeWidget?.Editor
   const readOnly = node.readOnly || property.readOnly
+  const NodeViewer = kind === 'details' && readOnly ? registry.pickViewer(property)?.Viewer : undefined
+  // Nested nodes a widget shows on one line, like literal values (a scoped tag).
+  const inline = readOnly ? NodeViewer !== undefined : nodeWidget?.inline === true && NodeEditor !== undefined
   const label = text(property.name, languages) || localName(path)
   const description = text(property.description, languages)
   const id = `f-${node.id}-${property.key}`
@@ -150,7 +154,7 @@ function Field ({ property, node, onChange, issues, subjects, depth }: {
   return (
     <div className={`field${own.some(i => i.severity === 'Violation') ? ' has-error' : ''}`}>
       <div className='field-label'>
-        <label htmlFor={expanded && values[0] && !values[0].node ? `${id}-${values[0].id}` : undefined}>
+        <label htmlFor={expanded && values[0] && (!values[0].node || (inline && !readOnly)) ? `${id}-${values[0].id}` : undefined}>
           {label}{required && !readOnly && <span className='required' title={t('Required')}>*</span>}
         </label>
         {(values.length > COLLAPSE_ABOVE || property.collapsed !== undefined) && values.length > 0 && (
@@ -169,7 +173,7 @@ function Field ({ property, node, onChange, issues, subjects, depth }: {
             {values.length === 1 ? t('Show') : t('Show {n} {label}', { n: values.length, label: label.toLowerCase() })}
           </button>
         )}
-        {visible.map(v => v.node
+        {visible.map(v => v.node && !inline
           ? (
               <div key={v.id} className='nested'>
                 <div className='nested-header'>
@@ -184,12 +188,14 @@ function Field ({ property, node, onChange, issues, subjects, depth }: {
           : (
               <div key={v.id} className='value-row'>
                 {readOnly
-                  ? <ValueView property={property} value={v} />
+                  ? v.node && NodeViewer !== undefined ? <NodeViewer property={property} value={v} /> : <ValueView property={property} value={v} />
                   : (
                       <>
-                        {Editor !== undefined
-                          ? <Editor property={property} value={v} onChange={replace} id={`${id}-${v.id}`} invalid={own.some(i => i.severity === 'Violation')} />
-                          : <input id={`${id}-${v.id}`} aria-invalid={own.some(i => i.severity === 'Violation')} value={v.text} onChange={e => replace({ ...v, text: e.target.value })} />}
+                        {v.node && NodeEditor !== undefined
+                          ? <NodeEditor property={property} value={v} onChange={replace} id={`${id}-${v.id}`} invalid={own.some(i => i.severity === 'Violation')} />
+                          : Editor !== undefined
+                            ? <Editor property={property} value={v} onChange={replace} id={`${id}-${v.id}`} invalid={own.some(i => i.severity === 'Violation')} />
+                            : <input id={`${id}-${v.id}`} aria-invalid={own.some(i => i.severity === 'Violation')} value={v.text} onChange={e => replace({ ...v, text: e.target.value })} />}
                         <button type='button' className='icon-button' title={t('Remove value')} aria-label={t('Remove {label} value', { label })} onClick={() => remove(v)}>×</button>
                       </>
                     )}

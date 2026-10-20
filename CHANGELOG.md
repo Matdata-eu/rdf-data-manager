@@ -11,6 +11,8 @@ on `main`. The entries below summarise what the first release carries.
   shape, nested resources, guarded saves with review-before-write, SHACL validation on save.
 - Widget registry with built-in DASH editors, `dash:AutoCompleteEditor`, and the bundled
   map (GeoSPARQL WKT) and time (OWL-Time, XSD dates) widgets; more via `config.json`.
+- Scoped tag editor and viewer (`rdm:ScopedTagEditor`, `rdm:ScopedTagViewer`) that show a
+  nested identifier as "register | entry", with railML designators in the feature tour.
 - Validation overview for a class or all data, translation grid, search across classes,
   "Used by" references, Turtle and CSV export, Turtle import checked against the shapes,
   managed-query preview, "Other properties" for triples outside the shape.

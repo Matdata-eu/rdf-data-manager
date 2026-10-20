@@ -29,6 +29,11 @@ export interface Widget {
   id: string
   /** How well the widget fits a property; 0 means not at all. DASH uses 1 to 10. */
   score: (property: PropertyShape, value?: Term) => number
+  /**
+   * For a widget that claims nested nodes: show each node on one line like a literal value,
+   * with a remove button beside it, instead of in a nested box with a header.
+   */
+  inline?: boolean
   Editor?: ComponentType<WidgetEditorProps>
   Viewer?: ComponentType<WidgetViewerProps>
 }

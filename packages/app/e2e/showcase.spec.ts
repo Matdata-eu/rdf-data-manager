@@ -10,7 +10,7 @@ test('is the default demo in Settings and lists every class', async ({ page }) =
   await expect(page.getByLabel('Demo dataset')).toHaveValue('showcase')
   await page.getByRole('button', { name: 'Start demo' }).click()
   const nav = page.getByRole('navigation', { name: 'Classes' })
-  for (const name of ['Station', 'Line', 'Area', 'Track closure', 'Organisation', 'Person', 'Report', 'Query']) {
+  for (const name of ['Station', 'Line', 'Switch', 'Area', 'Track closure', 'Organisation', 'Person', 'Report', 'Query']) {
     await expect(nav.getByRole('link', { name: new RegExp(`^${name}\\s*\\d*$`) })).toBeVisible()
   }
 })
@@ -28,6 +28,16 @@ test('shows a closure period and duration with the time widget', async ({ page }
   await expect(page.getByRole('heading', { name: 'Finse track renewal' })).toBeVisible()
   await expect(page.getByRole('group', { name: 'Interval' })).toBeVisible()
   await expect(page.getByText('PT6H30M')).toBeVisible()
+})
+
+test('shows railML designators as register | entry tags', async ({ page }) => {
+  await page.goto(resource('Switch', 'switch/lls-101'))
+  await expect(page.getByRole('heading', { name: 'Switch 101 Lillestrøm' })).toBeVisible()
+  const designators = page.getByRole('group', { name: 'Designators' })
+  await expect(designators).toHaveCount(2)
+  await expect(designators.getByLabel('Entry').and(page.locator('[value="SW-LLS-101"]'))).toBeVisible()
+  await expect(designators.getByLabel('Register').and(page.locator('[value="Interlocking"]'))).toBeVisible()
+  await expect(page.getByRole('group', { name: 'Type' }).getByLabel('Rule book')).toHaveValue('EN 13232')
 })
 
 test('runs the stored query of a report', async ({ page }) => {

@@ -21,6 +21,7 @@ also be loaded into a real endpoint.
 | Map: point, line, polygon (`geo:hasGeometry` / `geo:asWKT`) | Station, Line, Area › Location |
 | Instance picker and search-as-you-type (`dash:InstancesSelectEditor`, `dash:AutoCompleteEditor`) | Station › Replaced by; Line › Stations served |
 | Long lists with `rdm:pageSize` and `rdm:orderBy` | Line › Stations served |
+| railML designators and type designators as "register \| entry" tags (`rdm:ScopedTagEditor`, `rdm:ScopedTagViewer`) | Switch › Designators, Type; Station › Designators |
 | Nested nodes with minted IRIs (`dash:DetailsEditor`, `rdm:localNameProperty`, `rdm:hideFromMenu`) | Line › Sections |
 | `sh:xone` of two classes | Line › Operator (Old Voss Line is run by a person) |
 | `sh:or` of two classes and of two datatypes | Track closure › Affects, Reported |

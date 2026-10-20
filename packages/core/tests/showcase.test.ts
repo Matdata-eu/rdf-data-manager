@@ -35,7 +35,7 @@ describe('showcase example', () => {
   it('lists its classes in menu order and keeps nested sections out of the menu', () => {
     const model = parseShapes(shapesText)
     expect(model.classes.map(c => c.iri.replace(EX, '').replace('http://schema.org/', 'schema:'))).toEqual([
-      'Station', 'Line', 'Area', 'Closure', 'schema:Organization', 'schema:Person', 'Report', 'Query'
+      'Station', 'Line', 'Switch', 'Area', 'Closure', 'schema:Organization', 'schema:Person', 'Report', 'Query'
     ])
   })
 
@@ -53,7 +53,8 @@ describe('showcase example', () => {
       platforms: 'text',
       stepFree: 'boolean',
       replacedBy: 'instances',
-      hasGeometry: 'details'
+      hasGeometry: 'details',
+      hasDesignator: 'details'
     })
   })
 })

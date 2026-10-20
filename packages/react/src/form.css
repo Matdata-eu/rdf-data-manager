@@ -70,6 +70,28 @@ legend { font-size: 15px; line-height: 22px; font-weight: 500; color: var(--bran
 }
 
 
+/* Scoped tags (rdm:ScopedTagEditor / rdm:ScopedTagViewer): "register | entry" read as one
+   identifier. The scope sits on a sunken plate, a hairline divides it from the entry. */
+.scoped-tag {
+  display: inline-flex; align-items: stretch; max-width: 100%; overflow: hidden;
+  border: 1px solid var(--line-strong); border-radius: var(--radius-sm); background: var(--surface-raised);
+  font: 400 13px/22px var(--font-mono); color: var(--ink);
+}
+.scoped-tag > * { padding: 0 var(--space-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.scoped-tag-scope { background: var(--surface-sunken); color: var(--ink-muted); font-size: 12px; }
+.scoped-tag > * + * { border-left: 1px solid var(--line); }
+.value-row .scoped-tag:not(.editing) { flex: none; margin: var(--space-2) 0; }
+.scoped-tag.editing { display: flex; height: 40px; }
+.scoped-tag.editing.invalid { border-color: var(--danger); }
+.scoped-tag.editing input { height: 38px; border: 0; border-radius: 0; font: inherit; padding: 0 var(--space-3); }
+/* One width for every scope, so the dividers of a field's tags line up */
+.scoped-tag.editing input:first-child {
+  flex: 0 0 26ch; max-width: 45%;
+  background: var(--surface-sunken); color: var(--ink-muted); font-size: 12px;
+}
+.scoped-tag.editing input + input { flex: 1 1 auto; }
+.scoped-tag.editing input:focus-visible { outline-offset: -2px; }
+
 /* Autocomplete (dash:AutoCompleteEditor) */
 .autocomplete { position: relative; flex: 1; display: flex; gap: var(--space-2); align-items: center; }
 .autocomplete input { flex: 1; }

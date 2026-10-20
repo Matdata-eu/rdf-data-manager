@@ -124,6 +124,13 @@ input[type='radio'], input[type='checkbox'] { width: auto; height: auto; accent-
 
 /* Instance list */
 .filter { max-width: 420px; margin-bottom: var(--space-2); }
+.list-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-4); }
+.list-controls .filter { margin-bottom: 0; }
+.view-switch { display: inline-flex; border: 1px solid var(--line-strong); border-radius: var(--radius-sm); overflow: hidden; }
+.view-switch a { padding: var(--space-1) var(--space-3); color: var(--ink); font-size: 14px; }
+.view-switch a + a { border-left: 1px solid var(--line-strong); }
+.view-switch a:hover { text-decoration: none; background: var(--brand-soft); }
+.view-switch a[aria-current='page'] { background: var(--brand); color: #fff; }
 .instance-list { list-style: none; padding: 0; margin: var(--space-2) 0 0; background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-md); }
 .instance-list li + li { border-top: 1px solid var(--line); }
 .instance-list a { display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); padding: var(--space-3) var(--space-6); color: var(--ink); }
@@ -211,7 +218,7 @@ input[type='radio'], input[type='checkbox'] { width: auto; height: auto; accent-
 .issue-card { margin-top: var(--space-4); }
 .issue-card h2 { font-size: 17px; }
 
-/* Translation grid */
+/* Translation grid and instance table */
 .grid-scroll { overflow: auto; margin-top: var(--space-2); border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface-raised); }
 .grid th, .grid td { max-width: none; white-space: normal; }
 .grid th.lang { font-weight: 500; }
@@ -219,6 +226,12 @@ input[type='radio'], input[type='checkbox'] { width: auto; height: auto; accent-
 .grid td input { height: 34px; padding: var(--space-1) var(--space-2); min-width: 14ch; }
 .grid td.missing input { border-style: dashed; }
 .grid td.edited input { border-color: var(--brand); background: var(--brand-soft); }
+.grid td select { height: 34px; padding: var(--space-1) var(--space-2); min-width: 14ch; }
+.grid td.edited select { border-color: var(--brand); background: var(--brand-soft); }
+.grid td.readonly { color: var(--ink-muted); }
+.grid th button.sort { border: 0; background: transparent; padding: 0; font: inherit; color: inherit; cursor: pointer; text-align: left; }
+.table-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-4); margin-top: var(--space-2); }
+.table-toolbar p { margin: 0; }
 
 /* Import */
 .import textarea { margin: var(--space-3) 0; font-family: var(--font-mono); font-size: 13px; }
