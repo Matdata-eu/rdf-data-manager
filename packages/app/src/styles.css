@@ -165,9 +165,9 @@ input[type='radio'], input[type='checkbox'] { width: auto; height: auto; accent-
 .prefix { color: var(--ink-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 55%; }
 
 /* SPARQL update preview */
-.update-preview { margin-top: var(--space-6); }
-.update-preview summary { cursor: pointer; color: var(--ink-muted); font-size: 14px; }
-.update-preview pre {
+.update-preview, .shape-source { margin-top: var(--space-6); }
+.update-preview summary, .shape-source summary { cursor: pointer; color: var(--ink-muted); font-size: 14px; }
+.update-preview pre, .shape-source pre {
   background: var(--surface-sunken); border-radius: var(--radius-md);
   padding: var(--space-4); overflow: auto; font: 13px/20px var(--font-mono); max-height: 400px;
 }
