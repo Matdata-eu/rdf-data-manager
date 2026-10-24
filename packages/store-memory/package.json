@@ -36,6 +36,6 @@
   },
   "dependencies": {
     "@rdf-data-manager/core": "0.1.0",
-    "oxigraph": "^0.5.11"
+    "oxigraph": "^0.5.12"
   }
 }
